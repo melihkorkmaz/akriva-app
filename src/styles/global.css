@@ -1,0 +1,103 @@
+@import "./theme.css";
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -moz-tab-size: 4;
+  tab-size: 4;
+}
+
+body {
+  font-family: var(--akriva-font-primary);
+  color: var(--akriva-text-primary);
+  background-color: var(--akriva-surface-secondary);
+  font-size: var(--akriva-size-body);
+  line-height: var(--akriva-height-base);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  line-height: var(--leading-tight);
+  font-weight: var(--weight-semibold);
+}
+
+a {
+  text-decoration: underline;
+}
+
+code,
+pre {
+  font-family: var(--font-mono);
+}
+
+/* Card defaults */
+wa-card {
+  border-radius: var(--wa-border-radius-s);
+  border-color: var(--wa-color-surface-border);
+  --spacing: var(--wa-space-2xl);
+  box-shadow: none;
+}
+
+h1 {
+  font-size: var(--akriva-size-h1);
+}
+
+h2 {
+  font-size: var(--akriva-size-h2);
+}
+
+h3 {
+  font-size: var(--akriva-size-h3);
+  font-weight: var(--akriva-weight-medium);
+}
+
+h4 {
+  font-size: var(--akriva-size-h4);
+}
+
+wa-input[disabled] {
+  --wa-form-control-background-color: var(--akriva-surface-tertiary);
+  --wa-form-control-value-color): var(--akriva-text-tertiary);
+}

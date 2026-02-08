@@ -1,0 +1,113 @@
+/* Akriva design tokens (from Pencil design system) */
+:root {
+  /* Colors — Actions */
+  --akriva-action-primary: #2563eb;
+  --akriva-action-hover: #1d4ed8;
+  --akriva-action-pressed: #1e40af;
+
+  /* Colors — Brand */
+  --akriva-brand-primary: #1e293b;
+  --akriva-brand-secondary: #64748b;
+
+  /* Colors — Surfaces */
+  --akriva-surface-primary: #ffffff;
+  --akriva-surface-secondary: #f7f8f9;
+  --akriva-surface-tertiary: #f1f5f9;
+
+  /* Colors — Text */
+  --akriva-text-primary: #1e293b;
+  --akriva-text-secondary: #64748b;
+  --akriva-text-tertiary: #94a3b8;
+  --akriva-text-disabled: #cbd5e1;
+  --akriva-text-inverse: #ffffff;
+
+  /* Colors — Borders */
+  --akriva-border-default: #e5e7eb;
+  --akriva-border-strong: #cbd5e1;
+  --akriva-border-subtle: #f1f5f9;
+  --akriva-border-focus: #2563eb;
+
+  /* Colors — Status */
+  --akriva-status-error: #ef4444;
+  --akriva-status-error-light: #fee2e2;
+  --akriva-status-risk: #fb923c;
+  --akriva-status-risk-light: #fed7aa;
+  --akriva-status-verified: #10b981;
+  --akriva-status-verified-light: #d1fae5;
+
+  /* Typography — Fonts */
+  --akriva-font-primary: "Inter", system-ui, -apple-system, sans-serif;
+  --akriva-font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  /* Typography — Sizes */
+  --akriva-size-display: 48px;
+  --akriva-size-h1: 32px;
+  --akriva-size-h2: 24px;
+  --akriva-size-h3: 20px;
+  --akriva-size-h4: 18px;
+  --akriva-size-body-lg: 16px;
+  --akriva-size-body: 14px;
+  --akriva-size-body-sm: 12px;
+  --akriva-size-caption: 12px;
+  --akriva-size-micro: 10px;
+
+  /* Typography — Weights */
+  --akriva-weight-light: 300;
+  --akriva-weight-regular: 400;
+  --akriva-weight-medium: 500;
+  --akriva-weight-semibold: 600;
+  --akriva-weight-bold: 700;
+
+  /* Typography — Line Heights */
+  --akriva-height-tight: 1.2;
+  --akriva-height-base: 1.5;
+  --akriva-height-relaxed: 1.75;
+
+  /* Spacing */
+  --akriva-space-0: 0px;
+  --akriva-space-1: 4px;
+  --akriva-space-2: 8px;
+  --akriva-space-3: 12px;
+  --akriva-space-4: 16px;
+  --akriva-space-5: 20px;
+  --akriva-space-6: 24px;
+  --akriva-space-8: 32px;
+  --akriva-space-10: 40px;
+  --akriva-space-12: 48px;
+  --akriva-space-16: 64px;
+  --akriva-space-20: 80px;
+
+  /* Radius */
+  --akriva-radius-none: 0px;
+  --akriva-radius-xs: 2px;
+  --akriva-radius-sm: 4px;
+  --akriva-radius-md: 8px;
+  --akriva-radius-lg: 12px;
+  --akriva-radius-xl: 16px;
+  --akriva-radius-full: 9999px;
+
+  /* Border Widths */
+  --akriva-border-thin: 1px;
+  --akriva-border-medium: 2px;
+  --akriva-border-thick: 3px;
+
+  /* Shadows */
+  --akriva-shadow-xs: 0 1px 2px 0 rgba(30, 41, 59, 0.05);
+  --akriva-shadow-sm: 0 2px 4px 0 rgba(30, 41, 59, 0.06);
+  --akriva-shadow-md: 0 4px 8px -1px rgba(30, 41, 59, 0.08);
+  --akriva-shadow-lg: 0 10px 20px -3px rgba(30, 41, 59, 0.1);
+  --akriva-shadow-xl: 0 20px 40px -5px rgba(30, 41, 59, 0.15);
+
+  /* Opacity */
+  --akriva-opacity-0: 0;
+  --akriva-opacity-25: 0.25;
+  --akriva-opacity-50: 0.5;
+  --akriva-opacity-75: 0.75;
+  --akriva-opacity-100: 1;
+
+  /* Duration */
+  --akriva-duration-instant: 100ms;
+  --akriva-duration-fast: 200ms;
+  --akriva-duration-normal: 300ms;
+  --akriva-duration-slow: 500ms;
+}
