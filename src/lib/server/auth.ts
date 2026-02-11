@@ -1,15 +1,30 @@
 import type { Cookies } from '@sveltejs/kit';
 import { dev } from '$app/environment';
-import type { JwtCustomClaims } from '$lib/api/types.js';
+import type { AuthTokens, UserRole } from '$lib/api/types.js';
 
-/** Seconds before actual expiry to consider a token expired (prevents race conditions) */
+const VALID_ROLES: UserRole[] = ['owner', 'admin', 'user'];
+
+/** Seconds before actual JWT expiry to treat the token as expired, ensuring it remains valid for the duration of the downstream API request */
 const EXPIRY_BUFFER_SECONDS = 60;
 
+/** Session user extracted from JWT claims */
+export interface SessionUser {
+	id: string;
+	email: string;
+	tenantId: string;
+	role: UserRole;
+	givenName: string;
+	familyName: string;
+}
+
+/** Authenticated session established by hooks.server.ts */
+export interface Session {
+	accessToken: string;
+	user: SessionUser;
+}
+
 /** Set httpOnly auth cookies after successful authentication */
-export function setAuthCookies(
-	cookies: Cookies,
-	tokens: { accessToken: string; idToken: string; refreshToken: string; expiresIn: number }
-) {
+export function setAuthCookies(cookies: Cookies, tokens: AuthTokens): void {
 	const cookieOptions = {
 		path: '/',
 		httpOnly: true,
@@ -29,26 +44,22 @@ export function setAuthCookies(
 
 	cookies.set('refreshToken', tokens.refreshToken, {
 		...cookieOptions,
-		maxAge: 60 * 60 * 24 * 30
+		maxAge: 60 * 60 * 24 * 30 // 30 days — matches Cognito refresh token default lifetime
 	});
 }
 
 /** Remove all auth cookies */
-export function clearAuthCookies(cookies: Cookies) {
+export function clearAuthCookies(cookies: Cookies): void {
 	const cookieOptions = { path: '/' };
 	cookies.delete('accessToken', cookieOptions);
 	cookies.delete('idToken', cookieOptions);
 	cookies.delete('refreshToken', cookieOptions);
 }
 
-/** Decode a JWT payload without signature verification (server-side only) */
+/** Decode a JWT payload without verifying the signature. Safe here because the token was received directly from our API over HTTPS. */
 function parseJwtPayload(token: string): Record<string, unknown> {
-	const parts = token.split('.');
-	if (parts.length !== 3) return {};
-
-	const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
-	const json = atob(base64);
-	return JSON.parse(json);
+	const payload = token.split('.')[1];
+	return JSON.parse(Buffer.from(payload, 'base64url').toString('utf-8'));
 }
 
 /** Check if a JWT token is expired (with buffer) */
@@ -60,31 +71,53 @@ export function isTokenExpired(token: string): boolean {
 
 		const nowSeconds = Math.floor(Date.now() / 1000);
 		return nowSeconds >= exp - EXPIRY_BUFFER_SECONDS;
-	} catch {
+	} catch (error) {
+		console.error('[auth] Failed to parse token for expiry check:', error instanceof Error ? error.message : error);
 		return true;
 	}
 }
 
-/** Extract session data from access + id tokens */
+/** Extract session data from access + id tokens. Returns null if claims are missing or malformed. */
 export function getSessionFromTokens(
 	accessToken: string,
 	idToken: string
-): App.Locals['session'] {
+): Session | null {
 	try {
-		const claims = parseJwtPayload(idToken) as unknown as JwtCustomClaims;
+		const claims = parseJwtPayload(idToken);
+
+		const id = claims['custom:user_id'];
+		const email = claims.email;
+		const tenantId = claims['custom:tenant_id'];
+		const role = claims['custom:tenant_role'];
+		const givenName = claims.given_name;
+		const familyName = claims.family_name;
+
+		if (
+			typeof id !== 'string' ||
+			typeof email !== 'string' ||
+			typeof tenantId !== 'string' ||
+			typeof role !== 'string' ||
+			typeof givenName !== 'string' ||
+			typeof familyName !== 'string' ||
+			!VALID_ROLES.includes(role as UserRole)
+		) {
+			console.error('[auth] idToken missing or invalid claims');
+			return null;
+		}
 
 		return {
 			accessToken,
 			user: {
-				id: claims['custom:user_id'],
-				email: claims.email,
-				tenantId: claims['custom:tenant_id'],
-				role: claims['custom:tenant_role'] as 'owner' | 'admin' | 'user',
-				givenName: claims.given_name,
-				familyName: claims.family_name
+				id,
+				email,
+				tenantId,
+				role: role as UserRole,
+				givenName,
+				familyName
 			}
 		};
-	} catch {
+	} catch (error) {
+		console.error('[auth] Failed to extract session from tokens:', error instanceof Error ? error.message : error);
 		return null;
 	}
 }

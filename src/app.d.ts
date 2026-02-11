@@ -1,24 +1,10 @@
-// See https://svelte.dev/docs/kit/types#app.d.ts
-// for information about these interfaces
+import type { Session } from '$lib/server/auth.js';
+
 declare global {
 	namespace App {
-		// interface Error {}
 		interface Locals {
-			session: {
-				accessToken: string;
-				user: {
-					id: string;
-					email: string;
-					tenantId: string;
-					role: 'owner' | 'admin' | 'user';
-					givenName: string;
-					familyName: string;
-				};
-			} | null;
+			session: Session | null;
 		}
-		// interface PageData {}
-		// interface PageState {}
-		// interface Platform {}
 	}
 }
 
