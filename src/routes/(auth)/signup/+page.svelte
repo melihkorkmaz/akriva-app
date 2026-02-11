@@ -11,7 +11,7 @@
 
   let { data } = $props();
 
-  const { form, errors, enhance, message } = superForm(data.form, {
+  const { form, errors, enhance, message, submitting } = superForm(data.form, {
     validators: zod4Client(signupSchema),
   });
 </script>
@@ -126,7 +126,15 @@
         {/if}
       </div>
 
-      <wa-button type="submit" variant="brand">Create Organization</wa-button>
+      {#if $submitting}
+        <wa-button type="submit" variant="brand" loading disabled>
+          Create Organization
+        </wa-button>
+      {:else}
+        <wa-button type="submit" variant="brand">
+          Create Organization
+        </wa-button>
+      {/if}
     </form>
 
     <TextDivider />

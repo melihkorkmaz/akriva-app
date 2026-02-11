@@ -1,0 +1,5228 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+src/
+  components/
+    AkrivaLogo.svelte
+    CountrySelect.svelte
+    DatePicker.svelte
+    TextDivider.svelte
+  lib/
+    actions/
+      wa-events.ts
+    api/
+      auth.ts
+      client.ts
+      tenant.ts
+      types.ts
+    assets/
+      favicon.svg
+    schemas/
+      signin.ts
+      signup.ts
+      tenant-settings.ts
+    server/
+      auth.ts
+    stores/
+      auth.svelte.ts
+    index.ts
+  routes/
+    (app)/
+      dashboard/
+        +page.svelte
+      settings/
+        company/
+          +page.server.ts
+          +page.svelte
+        methodology-calculation/
+          +page.svelte
+        organizational-tree/
+          +page.svelte
+        +layout.svelte
+        +page.server.ts
+      +layout.server.ts
+      +layout.svelte
+    (auth)/
+      signin/
+        +page.server.ts
+        +page.svelte
+      signup/
+        invited/
+          +page.svelte
+        +page.server.ts
+        +page.svelte
+      verify-email/
+        +page.svelte
+      +layout.server.ts
+      +layout.svelte
+    logout/
+      +server.ts
+    +layout.svelte
+    +page.server.ts
+  styles/
+    akriva-tokens.css
+    flatpickr-akriva.css
+    global.css
+    theme.css
+    wa-overrides.css
+  app.d.ts
+  app.html
+  hooks.server.ts
+static/
+  robots.txt
+.env.example
+.gitignore
+.npmrc
+CLAUDE.md
+package.json
+Product Requrement Document.md
+README.md
+svelte.config.js
+tsconfig.json
+vite.config.ts
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="src/components/CountrySelect.svelte">
+<script lang="ts">
+  import "@awesome.me/webawesome/dist/components/select/select.js";
+  import "@awesome.me/webawesome/dist/components/option/option.js";
+  import { waChange } from "$lib/actions/wa-events.js";
+
+  interface Props {
+    value?: string | null;
+    label?: string;
+    placeholder?: string;
+    clearable?: boolean;
+    name?: string;
+    disabled?: boolean;
+    "data-invalid"?: string;
+    onchange?: (value: string | null) => void;
+  }
+
+  let {
+    value = $bindable(null),
+    label = "Country",
+    placeholder = "Select country",
+    clearable = true,
+    name = "",
+    disabled = false,
+    "data-invalid": dataInvalid = undefined,
+    onchange,
+  }: Props = $props();
+
+  const COUNTRIES = [
+    { code: "AE", name: "United Arab Emirates" },
+    { code: "AR", name: "Argentina" },
+    { code: "AT", name: "Austria" },
+    { code: "AU", name: "Australia" },
+    { code: "BE", name: "Belgium" },
+    { code: "BG", name: "Bulgaria" },
+    { code: "BR", name: "Brazil" },
+    { code: "CA", name: "Canada" },
+    { code: "CH", name: "Switzerland" },
+    { code: "CL", name: "Chile" },
+    { code: "CN", name: "China" },
+    { code: "CO", name: "Colombia" },
+    { code: "CY", name: "Cyprus" },
+    { code: "CZ", name: "Czech Republic" },
+    { code: "DE", name: "Germany" },
+    { code: "DK", name: "Denmark" },
+    { code: "EE", name: "Estonia" },
+    { code: "EG", name: "Egypt" },
+    { code: "ES", name: "Spain" },
+    { code: "FI", name: "Finland" },
+    { code: "FR", name: "France" },
+    { code: "GB", name: "United Kingdom" },
+    { code: "GR", name: "Greece" },
+    { code: "HK", name: "Hong Kong" },
+    { code: "HR", name: "Croatia" },
+    { code: "HU", name: "Hungary" },
+    { code: "ID", name: "Indonesia" },
+    { code: "IE", name: "Ireland" },
+    { code: "IL", name: "Israel" },
+    { code: "IN", name: "India" },
+    { code: "IT", name: "Italy" },
+    { code: "JP", name: "Japan" },
+    { code: "KE", name: "Kenya" },
+    { code: "KR", name: "South Korea" },
+    { code: "LT", name: "Lithuania" },
+    { code: "LU", name: "Luxembourg" },
+    { code: "LV", name: "Latvia" },
+    { code: "MT", name: "Malta" },
+    { code: "MX", name: "Mexico" },
+    { code: "MY", name: "Malaysia" },
+    { code: "NG", name: "Nigeria" },
+    { code: "NL", name: "Netherlands" },
+    { code: "NO", name: "Norway" },
+    { code: "NZ", name: "New Zealand" },
+    { code: "PH", name: "Philippines" },
+    { code: "PL", name: "Poland" },
+    { code: "PT", name: "Portugal" },
+    { code: "RO", name: "Romania" },
+    { code: "SA", name: "Saudi Arabia" },
+    { code: "SE", name: "Sweden" },
+    { code: "SG", name: "Singapore" },
+    { code: "SI", name: "Slovenia" },
+    { code: "SK", name: "Slovakia" },
+    { code: "TH", name: "Thailand" },
+    { code: "TR", name: "Turkey" },
+    { code: "TW", name: "Taiwan" },
+    { code: "US", name: "United States" },
+    { code: "VN", name: "Vietnam" },
+    { code: "ZA", name: "South Africa" },
+  ] as const;
+</script>
+
+{#if name}
+  <input type="hidden" {name} value={value ?? ""} />
+{/if}
+<wa-select
+  {label}
+  {placeholder}
+  {clearable}
+  {disabled}
+  value={value ?? ""}
+  data-invalid={dataInvalid}
+  use:waChange={(val) => {
+    value = val || null;
+    onchange?.(value);
+  }}
+>
+  {#each COUNTRIES as country}
+    <wa-option value={country.code}>{country.name}</wa-option>
+  {/each}
+</wa-select>
+</file>
+
+<file path="src/lib/actions/wa-events.ts">
+import type { Action } from 'svelte/action';
+
+/**
+ * Svelte action: imperative `change` listener for Web Awesome custom elements.
+ * WA 3.2 dispatches native `change` events (not `wa-change`).
+ * Svelte 5 doesn't reliably wire `onchange` on custom elements, so we use addEventListener.
+ */
+export const waChange: Action<HTMLElement, (value: string) => void> = (node, handler) => {
+	let current = handler;
+	const listener = () => current((node as unknown as { value: string }).value);
+	node.addEventListener('change', listener);
+	return {
+		update(h) { current = h; },
+		destroy() { node.removeEventListener('change', listener); }
+	};
+};
+</file>
+
+<file path="src/lib/api/tenant.ts">
+import { apiFetchAuth } from './client.js';
+import type { TenantResponseDto, UpdateTenantSettingsRequest } from './types.js';
+
+/** GET /v1/tenants/{id} */
+export async function getTenant(accessToken: string, tenantId: string): Promise<TenantResponseDto> {
+	return apiFetchAuth<TenantResponseDto>(`/tenants/${tenantId}`, accessToken);
+}
+
+/** PATCH /v1/tenants/settings */
+export async function updateTenantSettings(
+	accessToken: string,
+	data: UpdateTenantSettingsRequest
+): Promise<TenantResponseDto> {
+	return apiFetchAuth<TenantResponseDto>('/tenants/settings', accessToken, {
+		method: 'PATCH',
+		body: JSON.stringify(data)
+	});
+}
+</file>
+
+<file path="src/lib/schemas/tenant-settings.ts">
+import { z } from 'zod';
+
+/** Max days per month (using 29 for February to allow leap years) */
+const MAX_DAYS_PER_MONTH: Record<number, number> = {
+	1: 31, 2: 29, 3: 31, 4: 30, 5: 31, 6: 30,
+	7: 31, 8: 31, 9: 30, 10: 31, 11: 30, 12: 31
+};
+
+/** Company settings form schema — matches backend PATCH /v1/tenants/settings validation */
+export const tenantSettingsSchema = z
+	.object({
+		name: z.string().min(1, 'Name is required').max(255, 'Name must be at most 255 characters'),
+		slug: z
+			.string()
+			.min(3, 'Slug must be at least 3 characters')
+			.max(50, 'Slug must be at most 50 characters')
+			.regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be lowercase alphanumeric with hyphens'),
+		hqCountry: z
+			.string()
+			.regex(/^[A-Z]{2}$/, 'Country code must be uppercase ISO 3166-1 alpha-2')
+			.nullish()
+			.default(null),
+		stateProvince: z.string().min(1, 'State/province must not be empty').max(255).nullish().default(null),
+		city: z.string().min(1, 'City must not be empty').max(255).nullish().default(null),
+		reportingCurrency: z
+			.string()
+			.regex(/^[A-Z]{3}$/, 'Currency code must be uppercase ISO 4217')
+			.nullish()
+			.default(null),
+		fiscalYearStartMonth: z.coerce
+			.number()
+			.int()
+			.min(1, 'Month must be between 1 and 12')
+			.max(12, 'Month must be between 1 and 12')
+			.nullish()
+			.default(null),
+		fiscalYearStartDay: z.coerce
+			.number()
+			.int()
+			.min(1, 'Day must be at least 1')
+			.max(31, 'Day must be at most 31')
+			.nullish()
+			.default(null),
+		baseYear: z.coerce
+			.number()
+			.int()
+			.min(1900, 'Base year must be at least 1900')
+			.max(2100, 'Base year must be at most 2100')
+			.nullish()
+			.default(null),
+		sector: z.string().min(1, 'Sector must not be empty').max(255).nullish().default(null),
+		subSector: z.string().min(1, 'Sub-sector must not be empty').max(255).nullish().default(null),
+		consolidationApproach: z
+			.enum(['operational_control', 'financial_control', 'equity_share'])
+			.nullish()
+			.default(null)
+	})
+	.superRefine((data, ctx) => {
+		if (data.fiscalYearStartMonth != null && data.fiscalYearStartDay != null) {
+			const maxDay = MAX_DAYS_PER_MONTH[data.fiscalYearStartMonth];
+			if (data.fiscalYearStartDay > maxDay) {
+				ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					message: `Day ${data.fiscalYearStartDay} is invalid for month ${data.fiscalYearStartMonth} (max: ${maxDay})`,
+					path: ['fiscalYearStartDay']
+				});
+			}
+		}
+	});
+</file>
+
+<file path="src/routes/(app)/settings/company/+page.server.ts">
+import { message, superValidate } from 'sveltekit-superforms';
+import { zod4 } from 'sveltekit-superforms/adapters';
+import type { Actions, PageServerLoad } from './$types.js';
+import { getTenant, updateTenantSettings } from '$lib/api/tenant.js';
+import { ApiError } from '$lib/api/client.js';
+import { tenantSettingsSchema } from '$lib/schemas/tenant-settings.js';
+import type { UpdateTenantSettingsRequest } from '$lib/api/types.js';
+
+export const load: PageServerLoad = async ({ locals }) => {
+	const session = locals.session!; // App layout guard ensures session exists
+	const tenant = await getTenant(session.idToken, session.user.tenantId);
+
+	const form = await superValidate(
+		{
+			name: tenant.name,
+			slug: tenant.slug,
+			hqCountry: tenant.hqCountry,
+			stateProvince: tenant.stateProvince,
+			city: tenant.city,
+			reportingCurrency: tenant.reportingCurrency,
+			fiscalYearStartMonth: tenant.fiscalYearStartMonth,
+			fiscalYearStartDay: tenant.fiscalYearStartDay,
+			baseYear: tenant.baseYear,
+			sector: tenant.sector,
+			subSector: tenant.subSector,
+			consolidationApproach: tenant.consolidationApproach
+		},
+		zod4(tenantSettingsSchema)
+	);
+
+	return { form };
+};
+
+export const actions: Actions = {
+	default: async ({ request, locals }) => {
+		const session = locals.session!;
+		const form = await superValidate(request, zod4(tenantSettingsSchema));
+
+		if (!form.valid) {
+			return message(form, 'Please check your information and try again.', { status: 400 });
+		}
+
+		try {
+			const payload: UpdateTenantSettingsRequest = {
+				name: form.data.name,
+				slug: form.data.slug,
+				hqCountry: form.data.hqCountry ?? null,
+				stateProvince: form.data.stateProvince ?? null,
+				city: form.data.city ?? null,
+				reportingCurrency: form.data.reportingCurrency ?? null,
+				fiscalYearStartMonth: form.data.fiscalYearStartMonth ?? null,
+				fiscalYearStartDay: form.data.fiscalYearStartDay ?? null,
+				baseYear: form.data.baseYear ?? null,
+				sector: form.data.sector ?? null,
+				subSector: form.data.subSector ?? null,
+				consolidationApproach: form.data.consolidationApproach ?? null
+			};
+
+			await updateTenantSettings(session.idToken, payload);
+		} catch (err) {
+			if (err instanceof ApiError) {
+				if (err.status === 400 && err.body.code === 'VALIDATION_FAILED') {
+					return message(
+						form,
+						err.body.error || 'Please check your information and try again.',
+						{ status: 400 }
+					);
+				}
+
+				if (err.status === 404) {
+					return message(form, 'Tenant not found.', { status: 404 });
+				}
+			}
+
+			return message(form, 'Something went wrong. Please try again.', { status: 500 });
+		}
+
+		return message(form, 'Settings saved successfully.');
+	}
+};
+</file>
+
+<file path="src/routes/logout/+server.ts">
+import { redirect } from '@sveltejs/kit';
+import { clearAuthCookies } from '$lib/server/auth.js';
+import type { RequestHandler } from './$types.js';
+
+export const POST: RequestHandler = async ({ cookies }) => {
+	clearAuthCookies(cookies);
+	redirect(302, '/signin');
+};
+</file>
+
+<file path="src/routes/+page.server.ts">
+import { redirect } from '@sveltejs/kit';
+import type { PageServerLoad } from './$types';
+
+export const load: PageServerLoad = async () => {
+	redirect(302, '/dashboard');
+};
+</file>
+
+<file path="Product Requrement Document.md">
+# GHG Reporting Platform
+
+---
+# 1. Product Overview
+
+## One-Line Positioning
+
+**A professional-grade GHG reporting platform designed for reliability, auditability, and regulatory confidence.**
+
+---
+
+## Product Vision
+
+To become the trusted infrastructure for organizations that require defensible, verification-grade greenhouse gas (GHG) reporting.
+
+The platform prioritizes **data reliability, auditability, and regulatory alignment** over speed or simplicity, supporting organizations where emissions data has legal, financial, or reputational impact.
+
+---
+
+## Core Product Pillars
+
+### 1) Data Reliability (Non-Negotiable Accuracy)
+
+The platform is built for organizations where data accuracy and defensibility are mission-critical.
+
+- Validated inputs over estimates  
+- Traceable data sources  
+- Transparent calculation logic  
+- Reproducible results  
+
+This is not a lightweight estimation tool, but a system for producing verification-grade emissions data.
+
+---
+
+### 2) Professional Audit Trails
+
+Every data point, change, and calculation is:
+
+- Time-stamped  
+- Attributable to a user  
+- Historically reconstructable  
+- Methodology-linked  
+
+The system must answer:
+
+- What was reported on date X?  
+- Who changed what and when?  
+- Which emission factor/version was used?  
+- What assumptions were active then?
+
+---
+
+### 3) Up-to-Date Authority Data
+
+The platform continuously aligns with:
+
+- Latest emission factor datasets  
+- Regulatory frameworks  
+- Methodological guidance  
+
+Key principles:
+
+- Versioned emission factors  
+- Regulatory update tracking  
+- Historical consistency for audits  
+
+---
+
+### 4) Built with Sustainability Professionals
+
+Product decisions are guided by professional sustainability managers.
+
+This ensures:
+
+- Realistic workflows  
+- Methodological rigor  
+- Regulatory awareness  
+- Practitioner-grade usability  
+
+---
+
+# 2. Target Market
+
+## Primary Market
+
+Organizations requiring defensible GHG reporting, including:
+
+- Enterprise companies  
+- Upper mid-market organizations  
+- Regulated industries  
+- Multinational groups  
+- Consultant-led reporting environments  
+
+---
+
+## Ideal Customer Profile (ICP)
+
+Organizations that:
+
+- Undergo third-party verification  
+- Face CSRD, SEC, or similar regulations and frameworks 
+- Have multi-entity structures  
+- Require defensible reporting  
+- Treat sustainability data as compliance-grade information  
+
+---
+
+# 3. Personas
+
+---
+
+## Persona 1: Enterprise Sustainability Director / Head of ESG
+
+**Profile**  
+Leads sustainability across large or multinational organizations.
+
+**Goals**
+
+- Defensible reporting  
+- Standardized methodologies  
+- Audit success  
+- Strong internal governance  
+
+**Pain Points**
+
+- Complex data collection  
+- Regulatory scrutiny  
+- Cross-entity inconsistency  
+- Audit risk exposure  
+
+**Success Metrics**
+
+- Audit pass rate  
+- Data completeness  
+- Cross-entity consistency  
+
+---
+
+## Persona 2: Sustainability Manager (Mid-Market)
+
+**Profile**  
+Responsible for GHG reporting with limited team resources.
+
+**Goals**
+
+- Reliable calculations  
+- Audit-ready documentation  
+- Reduced consultant dependency  
+
+**Pain Points**
+
+- Manual audit trail work  
+- Consistent methodologies    
+- Complex data management
+
+---
+
+## Persona 3: Environmental Consultant
+
+**Profile**  
+Supports multiple clients with GHG reporting and verification.
+
+**Goals**
+
+- Audit-ready outputs  
+- Reduced manual documentation work  
+- Consistent methodologies  
+
+---
+
+# 4. Problem Statement
+
+Organizations increasingly rely on GHG data for:
+
+- Regulatory compliance  
+- Investor reporting  
+- Value chain requirements  
+- Public disclosures  
+
+However, the current market fails to serve organizations that need both **reliability and practicality**.
+
+Most existing solutions fall into one of the following categories:
+
+---
+### Too Generic
+Broad ESG platforms often prioritize dashboards and high-level reporting over audit defensibility.  
+They lack deep audit trails, methodology transparency, and versioned data controls required for verification-grade reporting.
+
+---
+### Too Simplistic
+Lightweight SMB carbon calculators focus on speed and simplicity but lack defensibility.  
+They are suitable for rough estimates but not for audit-ready or regulatory-grade reporting.
+
+---
+### Too Expensive
+Reliable, audit-grade platforms are often priced for large enterprises only.  
+This makes them inaccessible for smaller or mid-sized organizations that still require high-quality reporting.
+Organizations are forced to choose between:
+- Affordability and reliability  
+- Simplicity and defensibility  
+
+---
+### Too Rigid
+Many platforms enforce fixed methodologies and calculation structures.  
+Organizations cannot:
+- Apply different methodologies to different scopes or categories  
+- Adapt to sector-specific practices  
+- Reflect evolving regulatory expectations  
+
+This rigidity reduces real-world applicability and creates audit risks.
+
+---
+### Too Dependent on Experts
+Some tools require deep methodological expertise to operate correctly.  
+Users become highly dependent on consultants or specialists to:
+- Configure calculations  
+- Interpret standards  
+- Prepare audit documentation  
+This increases cost, slows reporting cycles, and creates knowledge silos.
+
+---
+## Resulting Challenges
+These limitations lead to:
+- Audit failures  
+- Rework and remediation costs  
+- Overreliance on consultants  
+- Compliance risks  
+- Low trust in reported data  
+- Limited scalability across organization sizes  
+---
+## Opportunity
+There is a clear need for a platform that delivers:
+- Professional-grade reliability  
+- Built-in auditability  
+- Methodological flexibility  
+- Reduced expert dependency  
+- Scalable pricing aligned with organizational complexity  
+A solution that treats GHG reporting as compliance-grade data infrastructure rather than a lightweight reporting exercise.
+
+---
+# 5. Product Goals
+
+## Primary Goals
+
+- Enable defensible, audit-ready GHG reporting  
+- Ensure high data reliability  
+- Provide professional-grade audit trails  
+- Maintain regulatory alignment  
+
+---
+
+## Non-Goals
+
+- Being the fastest setup tool  
+- Serving “quick footprint” use cases  
+- Competing with free/low-cost calculators  
+- Marketing-driven sustainability reporting  
+
+---
+
+# 6. Functional Requirements
+
+---
+
+## 6.1 Data Management
+
+- Multi-entity organizational structures  
+- Role-based access control  
+- Approval workflows  
+- Segregation of duties  
+- Bulk imports (Excel/CSV/API)  
+- Data validation rules  
+
+---
+
+## 6.2 Emissions Calculations
+
+- Scope 1, 2, 3 coverage  
+- Transparent calculation logic  
+- Reproducible formulas  
+- Assumption documentation  
+- Methodology tagging  
+
+---
+
+## 6.3 Audit Trail System
+
+- Immutable change logs  
+- User attribution  
+- Timestamped events  
+- Historical snapshots  
+- Methodology version tracking  
+
+---
+
+## 6.4 Emission Factor Management
+
+- Versioned factor libraries  
+- Authority source references  
+- Region-specific factors  
+- Historical factor preservation  
+
+---
+
+## 6.5 Reporting
+
+- Audit-ready reports  
+- Methodology documentation  
+- Supporting evidence packages  
+- Multi-format exports (PDF/Excel/XML)  
+
+---
+
+## 6.6 Auditor Collaboration
+
+- Read-only auditor portal  
+- Commenting system  
+- Evidence sharing  
+- Version comparison tools  
+
+---
+
+# 7. Compliance Requirements
+
+- GHG Protocol alignment  
+- ISO 14064 compatibility  
+- CSRD readiness  
+- SEC climate disclosure readiness  
+- GDPR compliance  
+- SOC 2 Type II  
+
+---
+
+# 8. Success Metrics
+
+## Product Metrics
+
+- Audit pass rate  
+- Data completeness ratio  
+- Calculation accuracy  
+- System reliability (uptime)  
+
+---
+
+## Customer Metrics
+
+- Customer retention  
+- Audit confidence rating  
+- Reduction in audit remediation effort  
+- Consultant dependency reduction  
+
+---
+
+## Business Metrics
+
+- ARR growth  
+- Enterprise customer share  
+- Multi-year contract rate  
+- Expansion revenue  
+
+---
+
+# 9. Competitive Positioning
+
+We are:
+
+- Audit-first, not dashboard-first  
+- Reliability-focused, not speed-focused  
+- Specialist, not generic ESG  
+- Defensibility-driven, not marketing-driven  
+
+---
+
+# 10. High-Level Roadmap
+
+---
+
+## Phase 1 – Audit-Grade Foundation
+
+- Core calculations  
+- Audit trails  
+- Emission factor versioning  
+- Reporting exports  
+- Auditor portal  
+
+---
+
+## Phase 2 – Enterprise Governance
+
+- Approval workflows  
+- Multi-entity consolidation  
+- Advanced permissions  
+- Regulatory mapping  
+
+---
+
+## Phase 3 – Intelligence Layer
+
+- Audit risk indicators  
+- Data quality scoring  
+- Benchmarking  
+- Integration ecosystem
+</file>
+
+<file path="src/components/AkrivaLogo.svelte">
+<div
+  class="wa-cluster wa-gap-3xs wa-align-items-end wa-justify-content-center"
+>
+  <svg
+    width="48"
+    height="48"
+    viewBox="0 0 48 48"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M4 44L24 4L44 44L36 44L24 20L12 44Z"
+      fill="var(--akriva-action-primary)"
+    />
+    <rect
+      x="18"
+      y="28"
+      width="12"
+      height="3"
+      fill="var(--akriva-brand-primary)"
+    />
+  </svg>
+  <span class="akriva-logo-text">AKRIVA</span>
+</div>
+
+<style>
+  .akriva-logo-text {
+    font-size: var(--akriva-size-display);
+    font-weight: var(--akriva-weight-semibold);
+    color: var(--akriva-brand-primary);
+    letter-spacing: -0.5px;
+    line-height: 0.85;
+  }
+</style>
+</file>
+
+<file path="src/components/DatePicker.svelte">
+<script lang="ts">
+  import { onMount } from "svelte";
+  import flatpickr from "flatpickr";
+  import type { Instance } from "flatpickr/dist/types/instance";
+  import "../styles/flatpickr-akriva.css";
+
+  interface Props {
+    mode?: "single" | "range";
+    value?: string;
+    label?: string;
+    placeholder?: string;
+    minDate?: string | Date;
+    maxDate?: string | Date;
+    disabled?: boolean;
+    onchange?: (selectedDates: Date[], dateStr: string) => void;
+  }
+
+  let {
+    mode = "single",
+    value = $bindable(""),
+    label = "",
+    placeholder = "Select date",
+    minDate = undefined,
+    maxDate = undefined,
+    disabled = false,
+    onchange,
+  }: Props = $props();
+
+  let inputEl: HTMLInputElement;
+  let fp: Instance | undefined;
+
+  onMount(() => {
+    fp = flatpickr(inputEl, {
+      mode,
+      defaultDate: value || undefined,
+      dateFormat: "Y-m-d",
+      minDate: minDate ?? undefined,
+      maxDate: maxDate ?? undefined,
+      disableMobile: true,
+      onChange(selectedDates, dateStr) {
+        value = dateStr;
+        onchange?.(selectedDates, dateStr);
+      },
+    });
+
+    return () => fp?.destroy();
+  });
+
+  $effect(() => {
+    if (!fp) return;
+    const opts: Record<string, unknown> = {};
+    if (minDate !== undefined) opts.minDate = minDate;
+    if (maxDate !== undefined) opts.maxDate = maxDate;
+    for (const [key, val] of Object.entries(opts)) {
+      fp.set(key as keyof flatpickr.Options.Options, val);
+    }
+  });
+
+  $effect(() => {
+    if (!fp) return;
+    if (value !== fp.input.value) {
+      fp.setDate(value, false);
+    }
+  });
+</script>
+
+<div class="datepicker" class:disabled>
+  {#if label}
+    <!-- svelte-ignore a11y_label_has_associated_control -->
+    <label class="datepicker__label">{label}</label>
+  {/if}
+  <div class="datepicker__wrapper">
+    <input
+      bind:this={inputEl}
+      type="text"
+      readonly
+      {placeholder}
+      {disabled}
+      class="datepicker__input"
+    />
+    <svg
+      class="datepicker__icon"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+      width="18"
+      height="18"
+      aria-hidden="true"
+    >
+      <path
+        fill-rule="evenodd"
+        d="M5.75 2a.75.75 0 0 1 .75.75V4h7V2.75a.75.75 0 0 1 1.5 0V4h.25A2.75 2.75 0 0 1 18 6.75v8.5A2.75 2.75 0 0 1 15.25 18H4.75A2.75 2.75 0 0 1 2 15.25v-8.5A2.75 2.75 0 0 1 4.75 4H5V2.75A.75.75 0 0 1 5.75 2Zm-1 5.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25H4.75Z"
+        clip-rule="evenodd"
+      />
+    </svg>
+  </div>
+</div>
+
+<style>
+  .datepicker {
+    display: flex;
+    flex-direction: column;
+    gap: var(--akriva-space-1);
+  }
+
+  .datepicker__label {
+    font-family: var(--akriva-font-primary);
+    font-size: var(--akriva-size-body);
+    font-weight: var(--akriva-weight-medium);
+    color: var(--akriva-text-primary);
+  }
+
+  .datepicker__wrapper {
+    position: relative;
+  }
+
+  .datepicker__input {
+    width: 100%;
+    height: var(--wa-form-control-height, 38px);
+    padding: 0 var(--akriva-space-10) 0 var(--akriva-space-3);
+    font-family: var(--akriva-font-primary);
+    font-size: var(--akriva-size-body);
+    font-weight: var(--akriva-weight-regular);
+    color: var(--akriva-text-primary);
+    background: var(--akriva-surface-primary);
+    border: var(--akriva-border-thin) solid var(--akriva-border-default);
+    border-radius: var(--akriva-radius-xs);
+    outline: none;
+    cursor: pointer;
+    box-sizing: border-box;
+  }
+
+  .datepicker__input::placeholder {
+    color: var(--akriva-text-tertiary);
+  }
+
+  .datepicker__input:focus {
+    border-color: var(--akriva-border-focus);
+    box-shadow: 0 0 0 1px var(--akriva-border-focus);
+  }
+
+  .datepicker__input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .datepicker__icon {
+    position: absolute;
+    right: var(--akriva-space-3);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--akriva-text-tertiary);
+    pointer-events: none;
+  }
+
+  .disabled .datepicker__icon {
+    opacity: 0.5;
+  }
+</style>
+</file>
+
+<file path="src/components/TextDivider.svelte">
+<script lang="ts">
+  interface Props {
+    text?: string;
+  }
+
+  let { text = 'OR' }: Props = $props();
+</script>
+
+<div class="text-divider">
+  <div class="text-divider__line"></div>
+  <span class="wa-caption-xs wa-color-text-quiet">{text}</span>
+  <div class="text-divider__line"></div>
+</div>
+
+<style>
+  .text-divider {
+    display: flex;
+    align-items: center;
+    gap: var(--akriva-space-4);
+  }
+
+  .text-divider__line {
+    flex: 1;
+    height: var(--akriva-border-thin);
+    background: var(--akriva-border-default);
+  }
+</style>
+</file>
+
+<file path="src/lib/api/auth.ts">
+import { apiFetch, apiFetchAuth } from './client.js';
+import type {
+	SignupRequest,
+	SignupResponse,
+	SigninRequest,
+	SigninResponse,
+	MfaVerifyRequest,
+	MfaVerifyResponse,
+	RefreshRequest,
+	RefreshResponse,
+	ForgotPasswordRequest,
+	ConfirmForgotPasswordRequest,
+	ChangePasswordRequest,
+	MessageResponse
+} from './types.js';
+
+/** POST /auth/signup */
+export async function signup(data: SignupRequest): Promise<SignupResponse> {
+	return apiFetch<SignupResponse>('/auth/signup', {
+		method: 'POST',
+		body: JSON.stringify(data)
+	});
+}
+
+/** POST /auth/signin */
+export async function signin(data: SigninRequest): Promise<SigninResponse> {
+	return apiFetch<SigninResponse>('/auth/signin', {
+		method: 'POST',
+		body: JSON.stringify(data)
+	});
+}
+
+/** POST /auth/mfa/verify */
+export async function verifyMfa(data: MfaVerifyRequest): Promise<MfaVerifyResponse> {
+	return apiFetch<MfaVerifyResponse>('/auth/mfa/verify', {
+		method: 'POST',
+		body: JSON.stringify(data)
+	});
+}
+
+/** POST /auth/refresh */
+export async function refreshTokens(data: RefreshRequest): Promise<RefreshResponse> {
+	return apiFetch<RefreshResponse>('/auth/refresh', {
+		method: 'POST',
+		body: JSON.stringify(data)
+	});
+}
+
+/** POST /auth/forgot-password */
+export async function forgotPassword(data: ForgotPasswordRequest): Promise<MessageResponse> {
+	return apiFetch<MessageResponse>('/auth/forgot-password', {
+		method: 'POST',
+		body: JSON.stringify(data)
+	});
+}
+
+/** POST /auth/confirm-forgot-password */
+export async function confirmForgotPassword(
+	data: ConfirmForgotPasswordRequest
+): Promise<MessageResponse> {
+	return apiFetch<MessageResponse>('/auth/confirm-forgot-password', {
+		method: 'POST',
+		body: JSON.stringify(data)
+	});
+}
+
+/** POST /auth/change-password (authenticated) */
+export async function changePassword(
+	accessToken: string,
+	data: ChangePasswordRequest
+): Promise<MessageResponse> {
+	return apiFetchAuth<MessageResponse>('/auth/change-password', accessToken, {
+		method: 'POST',
+		body: JSON.stringify(data)
+	});
+}
+</file>
+
+<file path="src/lib/api/client.ts">
+import type { ApiErrorResponse } from './types.js';
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.akriva.com/v1';
+
+/** Custom error class for API errors */
+export class ApiError extends Error {
+	constructor(
+		public status: number,
+		public body: ApiErrorResponse
+	) {
+		super(body.error);
+		this.name = 'ApiError';
+	}
+}
+
+/** Generic fetch wrapper with error handling */
+export async function apiFetch<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+	const url = `${API_BASE_URL}${endpoint}`;
+
+	const response = await fetch(url, {
+		...options,
+		headers: {
+			'Content-Type': 'application/json',
+			...options.headers
+		}
+	});
+
+	if (!response.ok) {
+		const errorBody = (await response.json()) as ApiErrorResponse;
+		throw new ApiError(response.status, errorBody);
+	}
+
+	return response.json() as Promise<T>;
+}
+
+/** Authenticated fetch wrapper — injects Bearer token */
+export async function apiFetchAuth<T>(
+	endpoint: string,
+	accessToken: string,
+	options: RequestInit = {}
+): Promise<T> {
+	return apiFetch<T>(endpoint, {
+		...options,
+		headers: {
+			...options.headers,
+			Authorization: `Bearer ${accessToken}`
+		}
+	});
+}
+</file>
+
+<file path="src/lib/assets/favicon.svg">
+<svg xmlns="http://www.w3.org/2000/svg" width="107" height="128" viewBox="0 0 107 128"><title>svelte-logo</title><path d="M94.157 22.819c-10.4-14.885-30.94-19.297-45.792-9.835L22.282 29.608A29.92 29.92 0 0 0 8.764 49.65a31.5 31.5 0 0 0 3.108 20.231 30 30 0 0 0-4.477 11.183 31.9 31.9 0 0 0 5.448 24.116c10.402 14.887 30.942 19.297 45.791 9.835l26.083-16.624A29.92 29.92 0 0 0 98.235 78.35a31.53 31.53 0 0 0-3.105-20.232 30 30 0 0 0 4.474-11.182 31.88 31.88 0 0 0-5.447-24.116" style="fill:#ff3e00"/><path d="M45.817 106.582a20.72 20.72 0 0 1-22.237-8.243 19.17 19.17 0 0 1-3.277-14.503 18 18 0 0 1 .624-2.435l.49-1.498 1.337.981a33.6 33.6 0 0 0 10.203 5.098l.97.294-.09.968a5.85 5.85 0 0 0 1.052 3.878 6.24 6.24 0 0 0 6.695 2.485 5.8 5.8 0 0 0 1.603-.704L69.27 76.28a5.43 5.43 0 0 0 2.45-3.631 5.8 5.8 0 0 0-.987-4.371 6.24 6.24 0 0 0-6.698-2.487 5.7 5.7 0 0 0-1.6.704l-9.953 6.345a19 19 0 0 1-5.296 2.326 20.72 20.72 0 0 1-22.237-8.243 19.17 19.17 0 0 1-3.277-14.502 17.99 17.99 0 0 1 8.13-12.052l26.081-16.623a19 19 0 0 1 5.3-2.329 20.72 20.72 0 0 1 22.237 8.243 19.17 19.17 0 0 1 3.277 14.503 18 18 0 0 1-.624 2.435l-.49 1.498-1.337-.98a33.6 33.6 0 0 0-10.203-5.1l-.97-.294.09-.968a5.86 5.86 0 0 0-1.052-3.878 6.24 6.24 0 0 0-6.696-2.485 5.8 5.8 0 0 0-1.602.704L37.73 51.72a5.42 5.42 0 0 0-2.449 3.63 5.79 5.79 0 0 0 .986 4.372 6.24 6.24 0 0 0 6.698 2.486 5.8 5.8 0 0 0 1.602-.704l9.952-6.342a19 19 0 0 1 5.295-2.328 20.72 20.72 0 0 1 22.237 8.242 19.17 19.17 0 0 1 3.277 14.503 18 18 0 0 1-8.13 12.053l-26.081 16.622a19 19 0 0 1-5.3 2.328" style="fill:#fff"/></svg>
+</file>
+
+<file path="src/lib/schemas/signin.ts">
+import { z } from 'zod';
+
+/** Signin form schema */
+export const signinSchema = z.object({
+	email: z.string().email('Please enter a valid email').max(255),
+	password: z.string().min(8, 'Password must be at least 8 characters').max(256)
+});
+
+/** MFA verification form schema */
+export const mfaVerifySchema = z.object({
+	session: z.string().min(1, 'Session is required'),
+	code: z.string().min(1, 'Please enter your verification code')
+});
+</file>
+
+<file path="src/lib/schemas/signup.ts">
+import { z } from 'zod';
+
+/** Signup form schema — shared between server validation and client-side validation */
+export const signupSchema = z.object({
+	firstName: z.string().min(1, 'First name is required').max(255),
+	lastName: z.string().min(1, 'Last name is required').max(255),
+	companyName: z.string().min(1, 'Company name is required').max(255),
+	email: z.string().email('Please enter a valid email').max(255),
+	password: z.string().min(8, 'Password must be at least 8 characters').max(256)
+});
+</file>
+
+<file path="src/lib/stores/auth.svelte.ts">
+import type { AuthTokens, UserInfo, JwtCustomClaims } from '$lib/api/types.js';
+
+/** Key for storing auth data in localStorage */
+const STORAGE_KEY = 'akriva_auth';
+
+/** Parsed auth state stored in localStorage */
+interface StoredAuth {
+	tokens: AuthTokens;
+	user: UserInfo;
+}
+
+/**
+ * Auth store using Svelte 5 runes
+ * Manages authentication state and persists to localStorage
+ */
+function createAuthStore() {
+	// Initialize from localStorage if available
+	let tokens = $state<AuthTokens | null>(null);
+	let user = $state<UserInfo | null>(null);
+
+	// Load from localStorage on client-side only
+	$effect(() => {
+		if (typeof window === 'undefined') return;
+		
+		const stored = localStorage.getItem(STORAGE_KEY);
+		if (stored) {
+			try {
+				const parsed = JSON.parse(stored) as StoredAuth;
+				tokens = parsed.tokens;
+				user = parsed.user;
+			} catch {
+				// Invalid stored data, clear it
+				localStorage.removeItem(STORAGE_KEY);
+			}
+		}
+	});
+
+	// Persist to localStorage whenever state changes
+	$effect(() => {
+		if (typeof window === 'undefined') return;
+		
+		if (tokens && user) {
+			const toStore: StoredAuth = { tokens, user };
+			localStorage.setItem(STORAGE_KEY, JSON.stringify(toStore));
+		} else {
+			localStorage.removeItem(STORAGE_KEY);
+		}
+	});
+
+	return {
+		/** Get current tokens (null if not authenticated) */
+		get tokens() {
+			return tokens;
+		},
+
+		/** Get current user info (null if not authenticated) */
+		get user() {
+			return user;
+		},
+
+		/** Check if user is authenticated */
+		get isAuthenticated() {
+			return tokens !== null && user !== null;
+		},
+
+		/** Get access token for API Authorization header */
+		get accessToken() {
+			return tokens?.accessToken ?? null;
+		},
+
+		/** Get refresh token for token refresh */
+		get refreshToken() {
+			return tokens?.refreshToken ?? null;
+		},
+
+		/** Set session after successful signup/signin */
+		setSession(newTokens: AuthTokens, newUser: UserInfo) {
+			tokens = newTokens;
+			user = newUser;
+		},
+
+		/** Clear session on logout or auth failure */
+		clearSession() {
+			tokens = null;
+			user = null;
+		},
+
+		/** Update tokens after refresh */
+		updateTokens(newTokens: AuthTokens) {
+			if (tokens) {
+				tokens = { ...newTokens, refreshToken: tokens.refreshToken };
+			}
+		},
+
+		/** Get tenant ID from idToken claims (client-side only) */
+		getTenantId(): string | null {
+			if (!tokens?.idToken) return null;
+			try {
+				const claims = parseJwt(tokens.idToken) as unknown as JwtCustomClaims;
+				return claims['custom:tenant_id'] ?? null;
+			} catch {
+				return null;
+			}
+		},
+
+		/** Get user role from idToken claims (client-side only) */
+		getRole(): string | null {
+			if (!tokens?.idToken) return null;
+			try {
+				const claims = parseJwt(tokens.idToken) as unknown as JwtCustomClaims;
+				return claims['custom:tenant_role'] ?? null;
+			} catch {
+				return null;
+			}
+		}
+	};
+}
+
+/**
+ * Parse JWT token without verification (client-side only)
+ * Used to read claims from idToken
+ */
+function parseJwt(token: string): Record<string, unknown> {
+	try {
+		const base64Url = token.split('.')[1];
+		const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+		const jsonPayload = decodeURIComponent(
+			atob(base64)
+				.split('')
+				.map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+				.join('')
+		);
+		return JSON.parse(jsonPayload);
+	} catch {
+		return {};
+	}
+}
+
+/** Global auth store instance */
+export const auth = createAuthStore();
+</file>
+
+<file path="src/lib/index.ts">
+// API infrastructure
+export { ApiError } from './api/client.js';
+
+// API domain clients
+export * from './api/auth.js';
+
+// API types
+export * from './api/types.js';
+
+// Stores
+export { auth } from './stores/auth.svelte.js';
+</file>
+
+<file path="src/routes/(app)/dashboard/+page.svelte">
+<script lang="ts">
+  import "@awesome.me/webawesome/dist/components/callout/callout.js";
+</script>
+
+<svelte:head>
+  <title>Dashboard | Akriva</title>
+</svelte:head>
+
+<div
+  class="onboarding wa-stack wa-gap-l wa-align-items-center wa-justify-content-center"
+>
+  <!-- Empty State Icon -->
+  <div class="state-icon">
+    <wa-icon
+      library="heroicons"
+      name="book-open"
+      style="font-size: 40px; color: var(--akriva-text-tertiary);"
+    ></wa-icon>
+  </div>
+
+  <!-- Welcome Text -->
+  <div class="wa-stack wa-gap-xs wa-align-items-center">
+    <h2>Welcome to Akriva</h2>
+    <p class="wa-body-l wa-color-text-quiet" style="text-align: center;">
+      Complete these steps to start your carbon accounting journey
+    </p>
+  </div>
+
+  <!-- Success Checklist -->
+  <wa-card style="width: 100%; max-width: 600px;">
+    <div class="wa-stack wa-gap-l">
+      <!-- Header -->
+      <div class="wa-cluster wa-gap-s wa-align-items-center">
+        <wa-icon
+          library="heroicons"
+          name="document-check"
+          style="color: var(--akriva-action-primary); font-size: 24px;"
+        ></wa-icon>
+        <h3>Success Checklist</h3>
+      </div>
+
+      <!-- Progress -->
+      <div class="progress-section wa-stack wa-gap-xs">
+        <div
+          class="wa-cluster wa-align-items-center"
+          style="justify-content: space-between;"
+        >
+          <span class="wa-caption-xs wa-color-text-quiet">Setup Progress</span>
+          <span
+            class="wa-font-weight-semibold"
+            style="color: var(--akriva-action-primary); font-size: var(--akriva-size-body);"
+            >0/3 Completed</span
+          >
+        </div>
+        <wa-progress-bar value="0" max="100"></wa-progress-bar>
+      </div>
+
+      <wa-divider></wa-divider>
+
+      <!-- Tasks -->
+      <div class="wa-stack wa-gap-m">
+        <wa-callout variant="neutral" appearance="filled-outlined">
+          <wa-checkbox slot="icon"></wa-checkbox>
+          <strong>Task 1: Define Boundary</strong><br />
+          <span class="wa-body-s wa-color-text-quiet"
+            >Set up organizational boundaries and reporting scope</span
+          ><br />
+          <span
+            class="wa-caption-xs"
+            style="color: var(--akriva-text-tertiary);">Status: Incomplete</span
+          >
+        </wa-callout>
+
+        <wa-callout variant="neutral" appearance="filled-outlined">
+          <wa-checkbox slot="icon"></wa-checkbox>
+          <strong>Task 2: Configure Company Master</strong><br />
+          <span class="wa-body-s wa-color-text-quiet"
+            >Add company details, locations, and operational units</span
+          ><br />
+          <span
+            class="wa-caption-xs"
+            style="color: var(--akriva-text-tertiary);">Status: Incomplete</span
+          >
+        </wa-callout>
+
+        <wa-callout variant="neutral" appearance="filled-outlined">
+          <wa-checkbox slot="icon"></wa-checkbox>
+          <strong>Task 3: Set Calculation Engine</strong><br />
+          <span class="wa-body-s wa-color-text-quiet"
+            >Configure emission factors and calculation methodology</span
+          ><br />
+          <span
+            class="wa-caption-xs"
+            style="color: var(--akriva-text-tertiary);">Status: Incomplete</span
+          >
+        </wa-callout>
+      </div>
+    </div>
+  </wa-card>
+</div>
+
+<style>
+  .onboarding {
+    padding: var(--akriva-space-12);
+    height: 100%;
+  }
+
+  .state-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: var(--akriva-radius-full);
+    background: var(--akriva-surface-tertiary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .progress-section {
+    background: var(--akriva-surface-tertiary);
+    padding: var(--akriva-space-3) var(--akriva-space-4);
+    border-radius: var(--akriva-radius-xs);
+  }
+
+  wa-checkbox {
+    --wa-form-control-toggle-size: 24px;
+  }
+
+  wa-progress-bar {
+    --track-height: 4px;
+  }
+</style>
+</file>
+
+<file path="src/routes/(app)/settings/company/+page.svelte">
+<script lang="ts">
+  import { superForm } from "sveltekit-superforms";
+  import { zod4Client } from "sveltekit-superforms/adapters";
+  import "@awesome.me/webawesome/dist/components/input/input.js";
+  import "@awesome.me/webawesome/dist/components/select/select.js";
+  import "@awesome.me/webawesome/dist/components/option/option.js";
+  import "@awesome.me/webawesome/dist/components/radio-group/radio-group.js";
+  import "@awesome.me/webawesome/dist/components/radio/radio.js";
+  import "@awesome.me/webawesome/dist/components/callout/callout.js";
+  import CountrySelect from "$components/CountrySelect.svelte";
+  import { tenantSettingsSchema } from "$lib/schemas/tenant-settings.js";
+  import { waChange } from "$lib/actions/wa-events.js";
+  import type { ConsolidationApproach } from "$lib/api/types.js";
+
+  let { data } = $props();
+
+  const { form, errors, allErrors, enhance, message, submitting } = superForm(
+    data.form,
+    {
+      validators: zod4Client(tenantSettingsSchema),
+      dataType: "json",
+      resetForm: false,
+      onError({ result }) {
+        $message =
+          typeof result.error === "string"
+            ? result.error
+            : "An unexpected error occurred. Please try again.";
+      },
+    },
+  );
+
+  let consolidationApproach = $derived(
+    $form.consolidationApproach ?? "operational_control",
+  );
+
+  const MONTHS = [
+    { value: 1, label: "January" },
+    { value: 2, label: "February" },
+    { value: 3, label: "March" },
+    { value: 4, label: "April" },
+    { value: 5, label: "May" },
+    { value: 6, label: "June" },
+    { value: 7, label: "July" },
+    { value: 8, label: "August" },
+    { value: 9, label: "September" },
+    { value: 10, label: "October" },
+    { value: 11, label: "November" },
+    { value: 12, label: "December" },
+  ] as const;
+
+  const SECTOR_SUB_SECTORS: Record<string, string[]> = {
+    Energy: [
+      "Oil & Gas Exploration",
+      "Oil & Gas Refining",
+      "Renewable Energy",
+      "Power Generation",
+      "Energy Trading & Services",
+    ],
+    Materials: [
+      "Chemicals",
+      "Construction Materials",
+      "Metals & Mining",
+      "Paper & Forest Products",
+      "Packaging",
+    ],
+    Industrials: [
+      "Aerospace & Defense",
+      "Building Products",
+      "Electrical Equipment",
+      "Industrial Conglomerates",
+      "Machinery",
+      "Commercial Services",
+    ],
+    Manufacturing: [
+      "Automotive",
+      "Electronics",
+      "Food & Beverage Processing",
+      "Pharmaceuticals",
+      "Textiles & Apparel",
+      "Metals & Steel",
+    ],
+    "Transportation & Logistics": [
+      "Air Freight & Airlines",
+      "Maritime Shipping",
+      "Rail Transport",
+      "Road & Trucking",
+      "Warehousing & Distribution",
+    ],
+    Technology: [
+      "Software Development",
+      "Hardware & Semiconductors",
+      "IT Services & Consulting",
+      "Data Centers & Cloud",
+      "Telecommunications",
+    ],
+    "Financial Services": [
+      "Banking",
+      "Insurance",
+      "Asset Management",
+      "Fintech",
+      "Real Estate Investment",
+    ],
+    "Construction & Real Estate": [
+      "Commercial Construction",
+      "Residential Construction",
+      "Property Management",
+      "Infrastructure Development",
+    ],
+    "Agriculture & Forestry": [
+      "Crop Production",
+      "Livestock & Dairy",
+      "Forestry & Logging",
+      "Fisheries & Aquaculture",
+      "Agricultural Services",
+    ],
+    Utilities: [
+      "Electric Utilities",
+      "Gas Utilities",
+      "Water & Wastewater",
+      "Waste Management & Recycling",
+    ],
+    Healthcare: [
+      "Hospitals & Health Systems",
+      "Pharmaceuticals & Biotech",
+      "Medical Devices",
+      "Health Services",
+    ],
+    "Consumer Goods & Retail": [
+      "Food & Beverage Retail",
+      "Consumer Products",
+      "Wholesale & Distribution",
+      "E-Commerce",
+    ],
+    "Hospitality & Tourism": [
+      "Hotels & Accommodation",
+      "Restaurants & Food Services",
+      "Travel & Leisure",
+    ],
+    "Mining & Extraction": [
+      "Coal Mining",
+      "Metal Ore Mining",
+      "Non-Metallic Mining",
+      "Quarrying",
+    ],
+  };
+
+  const SECTORS = Object.keys(SECTOR_SUB_SECTORS);
+
+  function getSubSectors(sector: string | null | undefined): string[] {
+    return sector ? (SECTOR_SUB_SECTORS[sector] ?? []) : [];
+  }
+
+  let subSectorOptions = $state(getSubSectors($form.sector));
+  let subSectorKey = $state(0);
+
+</script>
+
+<svelte:head>
+  <title>Company Settings | Akriva</title>
+</svelte:head>
+
+<div style="padding: var(--akriva-space-8) var(--akriva-space-10)">
+  <h1 class="wa-heading-l">Company Settings</h1>
+  <p class="wa-body-l wa-color-text-quiet">
+    Configure your organization's emissions accounting methodology and master
+    settings
+  </p>
+
+  {#if $message}
+    <wa-callout
+      variant={$message === "Settings saved successfully."
+        ? "success"
+        : "danger"}
+      style="margin-top: var(--akriva-space-4)"
+    >
+      {$message}
+    </wa-callout>
+  {/if}
+
+  {#if $allErrors.length > 0}
+    <wa-callout variant="danger" style="margin-top: var(--akriva-space-4)">
+      <strong>Please fix the following errors:</strong>
+      <ul style="margin: var(--akriva-space-2) 0 0; padding-left: var(--akriva-space-4)">
+        {#each $allErrors as error}
+          <li>{error.messages.join(", ")}</li>
+        {/each}
+      </ul>
+    </wa-callout>
+  {/if}
+
+  <form method="POST" use:enhance>
+    <div class="wa-stack wa-gap-xl" style="margin-top: var(--akriva-space-6)">
+      <!-- Company Master Settings Card -->
+      <wa-card style="--spacing: var(--wa-space-xl)">
+        <div class="wa-stack wa-gap-m">
+          <h2 class="wa-heading-s">Company Master Settings</h2>
+
+          <!-- Company Identification -->
+          <div class="section wa-stack wa-gap-m">
+            <h3 class="wa-body-l wa-font-weight-bold">
+              Company Identification
+            </h3>
+            <div class="field-row">
+              <div class="field">
+                <wa-input
+                  name="name"
+                  label="Company Name"
+                  placeholder="Acme Corporation"
+                  value={$form.name}
+                  oninput={(e: Event) => {
+                    $form.name = (e.target as HTMLInputElement).value;
+                  }}
+                  data-invalid={$errors.name ? "" : undefined}
+                ></wa-input>
+                {#if $errors.name}
+                  <small class="error-message">{$errors.name[0]}</small>
+                {/if}
+              </div>
+              <div class="field">
+                <wa-input
+                  name="slug"
+                  label="Company Slug"
+                  placeholder="acme-corp"
+                  value={$form.slug}
+                  oninput={(e: Event) => {
+                    $form.slug = (e.target as HTMLInputElement).value;
+                  }}
+                  data-invalid={$errors.slug ? "" : undefined}
+                ></wa-input>
+                {#if $errors.slug}
+                  <small class="error-message">{$errors.slug[0]}</small>
+                {/if}
+              </div>
+            </div>
+            <p class="helper">
+              The company slug is a unique identifier used in URLs and API
+              references (e.g., 'acme-corp')
+            </p>
+          </div>
+
+          <!-- Localization -->
+          <div class="section wa-stack wa-gap-m">
+            <h3 class="wa-body-l wa-font-weight-bold">Localization</h3>
+            <div class="field-row field-row--3">
+              <div class="field">
+                <CountrySelect
+                  label="HQ Country"
+                  name="hqCountry"
+                  bind:value={$form.hqCountry}
+                  data-invalid={$errors.hqCountry ? "" : undefined}
+                />
+                {#if $errors.hqCountry}
+                  <small class="error-message">{$errors.hqCountry[0]}</small>
+                {/if}
+              </div>
+              <div class="field">
+                <wa-input
+                  name="stateProvince"
+                  label="State/Province"
+                  placeholder="California"
+                  value={$form.stateProvince ?? ""}
+                  oninput={(e: Event) => {
+                    const val = (e.target as HTMLInputElement).value;
+                    $form.stateProvince = val || null;
+                  }}
+                  data-invalid={$errors.stateProvince ? "" : undefined}
+                ></wa-input>
+                {#if $errors.stateProvince}
+                  <small class="error-message"
+                    >{$errors.stateProvince[0]}</small
+                  >
+                {/if}
+              </div>
+              <div class="field">
+                <wa-input
+                  name="city"
+                  label="City"
+                  placeholder="San Francisco"
+                  value={$form.city ?? ""}
+                  oninput={(e: Event) => {
+                    const val = (e.target as HTMLInputElement).value;
+                    $form.city = val || null;
+                  }}
+                  data-invalid={$errors.city ? "" : undefined}
+                ></wa-input>
+                {#if $errors.city}
+                  <small class="error-message">{$errors.city[0]}</small>
+                {/if}
+              </div>
+            </div>
+            <p class="helper">
+              Location determines default Grid Factors for emissions
+              calculations
+            </p>
+
+            <div class="wa-stack wa-gap-xs" style="max-width: 400px">
+              <div class="field">
+                <wa-input
+                  name="reportingCurrency"
+                  label="Reporting Currency (ISO)"
+                  placeholder="USD"
+                  value={$form.reportingCurrency ?? ""}
+                  oninput={(e: Event) => {
+                    const val = (e.target as HTMLInputElement).value;
+                    $form.reportingCurrency = val || null;
+                  }}
+                  data-invalid={$errors.reportingCurrency ? "" : undefined}
+                ></wa-input>
+                {#if $errors.reportingCurrency}
+                  <small class="error-message"
+                    >{$errors.reportingCurrency[0]}</small
+                  >
+                {/if}
+              </div>
+              <p class="helper">Master currency for all spend-based data</p>
+            </div>
+          </div>
+
+          <!-- Temporal Logic -->
+          <div class="section wa-stack wa-gap-m">
+            <h3 class="wa-body-l wa-font-weight-bold">Temporal Logic</h3>
+            <div class="field-row">
+              <div class="wa-stack wa-gap-xs">
+                <div class="field-row">
+                  <div class="field">
+                    <input type="hidden" name="fiscalYearStartMonth" value={$form.fiscalYearStartMonth ?? ""} />
+                    <wa-select
+                      label="Fiscal Year (Month)"
+                      placeholder="Select month"
+                      value={$form.fiscalYearStartMonth != null ? String($form.fiscalYearStartMonth) : ""}
+                      clearable
+                      data-invalid={$errors.fiscalYearStartMonth ? "" : undefined}
+                      use:waChange={(val) => { $form.fiscalYearStartMonth = val ? Number(val) : null; }}
+                    >
+                      {#each MONTHS as month}
+                        <wa-option value={String(month.value)}>{month.label}</wa-option>
+                      {/each}
+                    </wa-select>
+                    {#if $errors.fiscalYearStartMonth}
+                      <small class="error-message">{$errors.fiscalYearStartMonth[0]}</small>
+                    {/if}
+                  </div>
+                  <div class="field">
+                    <input type="hidden" name="fiscalYearStartDay" value={$form.fiscalYearStartDay ?? ""} />
+                    <wa-select
+                      label="Fiscal Year (Day)"
+                      placeholder="Select day"
+                      value={$form.fiscalYearStartDay != null ? String($form.fiscalYearStartDay) : ""}
+                      clearable
+                      data-invalid={$errors.fiscalYearStartDay ? "" : undefined}
+                      use:waChange={(val) => { $form.fiscalYearStartDay = val ? Number(val) : null; }}
+                    >
+                      {#each Array.from({ length: 31 }, (_, i) => i + 1) as day}
+                        <wa-option value={String(day)}>{day}</wa-option>
+                      {/each}
+                    </wa-select>
+                    {#if $errors.fiscalYearStartDay}
+                      <small class="error-message">{$errors.fiscalYearStartDay[0]}</small>
+                    {/if}
+                  </div>
+                </div>
+                <p class="helper">
+                  Essential for aligning with financial reports
+                </p>
+              </div>
+              <div class="wa-stack wa-gap-xs">
+                <div class="field">
+                  <wa-input
+                    name="baseYear"
+                    label="Base Year"
+                    type="number"
+                    placeholder="2024"
+                    value={$form.baseYear ?? ""}
+                    oninput={(e: Event) => {
+                      const val = (e.target as HTMLInputElement).value;
+                      $form.baseYear = val ? Number(val) : null;
+                    }}
+                    data-invalid={$errors.baseYear ? "" : undefined}
+                  ></wa-input>
+                  {#if $errors.baseYear}
+                    <small class="error-message">{$errors.baseYear[0]}</small>
+                  {/if}
+                </div>
+                <p class="helper">
+                  Benchmark year for measuring reduction targets
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Future-Proofing -->
+          <div class="section wa-stack wa-gap-m">
+            <h3 class="wa-body-l wa-font-weight-bold">Future-Proofing</h3>
+            <div class="field-row">
+              <div class="field">
+                <input type="hidden" name="sector" value={$form.sector ?? ""} />
+                <wa-select
+                  label="Sector"
+                  placeholder="Select sector"
+                  value={$form.sector ?? ""}
+                  clearable
+                  data-invalid={$errors.sector ? "" : undefined}
+                  use:waChange={(val) => {
+                    $form.sector = val || null;
+                    subSectorOptions = getSubSectors($form.sector);
+                    if (!$form.sector || !subSectorOptions.includes($form.subSector ?? "")) {
+                      $form.subSector = null;
+                    }
+                    subSectorKey++;
+                  }}
+                >
+                  {#each SECTORS as sector}
+                    <wa-option value={sector}>{sector}</wa-option>
+                  {/each}
+                </wa-select>
+                {#if $errors.sector}
+                  <small class="error-message">{$errors.sector[0]}</small>
+                {/if}
+              </div>
+              <div class="field">
+                <input type="hidden" name="subSector" value={$form.subSector ?? ""} />
+                {#key subSectorKey}
+                  <wa-select
+                    label="Sub-sector"
+                    placeholder={subSectorOptions.length > 0 ? "Select sub-sector" : "Select a sector first"}
+                    value={$form.subSector ?? ""}
+                    clearable
+                    data-invalid={$errors.subSector ? "" : undefined}
+                    use:waChange={(val) => { $form.subSector = val || null; }}
+                  >
+                    {#each subSectorOptions as subSector}
+                      <wa-option value={subSector}>{subSector}</wa-option>
+                    {/each}
+                  </wa-select>
+                {/key}
+                {#if $errors.subSector}
+                  <small class="error-message">{$errors.subSector[0]}</small>
+                {/if}
+              </div>
+            </div>
+            <p class="helper">
+              Sector selection filters the Process Emissions library for
+              relevant emission factors
+            </p>
+          </div>
+        </div>
+      </wa-card>
+
+      <!-- Boundary Rules Card -->
+      <wa-card style="--spacing: var(--wa-space-xl)">
+        <div class="wa-stack wa-gap-m">
+          <h2 class="wa-heading-s">Boundary Rules (Consolidation Approach)</h2>
+          <p class="wa-body-s wa-color-text-quiet">
+            Determine which emissions belong to your company based on the GHG
+            Protocol
+          </p>
+
+          <input
+            type="hidden"
+            name="consolidationApproach"
+            value={$form.consolidationApproach ?? ""}
+          />
+
+          <wa-radio-group
+            value={consolidationApproach}
+            use:waChange={(val) => { $form.consolidationApproach = (val as ConsolidationApproach) || null; }}
+          >
+            <div class="wa-stack wa-gap-s">
+              <wa-callout
+                variant={consolidationApproach === "operational_control"
+                  ? "brand"
+                  : "neutral"}
+                appearance={consolidationApproach === "operational_control"
+                  ? "filled-outlined"
+                  : "outlined"}
+              >
+                <wa-radio slot="icon" value="operational_control"></wa-radio>
+                <span class="wa-body-l wa-font-weight-semibold"
+                  >Operational Control</span
+                ><br />
+                <span class="wa-body-s wa-color-text-quiet">
+                  100% accounting if you have full authority to
+                  introduce/implement operating policies
+                </span>
+              </wa-callout>
+
+              <wa-callout
+                variant={consolidationApproach === "financial_control"
+                  ? "brand"
+                  : "neutral"}
+                appearance={consolidationApproach === "financial_control"
+                  ? "filled-outlined"
+                  : "outlined"}
+              >
+                <wa-radio slot="icon" value="financial_control"></wa-radio>
+                <span class="wa-body-l wa-font-weight-semibold"
+                  >Financial Control</span
+                ><br />
+                <span class="wa-body-s wa-color-text-quiet">
+                  100% accounting if you have the power to direct financial and
+                  operating policies for economic benefit
+                </span>
+              </wa-callout>
+
+              <wa-callout
+                variant={consolidationApproach === "equity_share"
+                  ? "brand"
+                  : "neutral"}
+                appearance={consolidationApproach === "equity_share"
+                  ? "filled-outlined"
+                  : "outlined"}
+              >
+                <wa-radio slot="icon" value="equity_share"></wa-radio>
+                <span class="wa-body-l wa-font-weight-semibold"
+                  >Equity Share</span
+                ><br />
+                <span class="wa-body-s wa-color-text-quiet">
+                  Accounting based on your % of ownership interest
+                </span>
+              </wa-callout>
+            </div>
+          </wa-radio-group>
+
+          <wa-callout size="small">
+            <wa-icon slot="icon" library="heroicons" name="information-circle"
+            ></wa-icon>
+            If Equity Share is selected, an Ownership Percentage field will be
+            enabled in all Asset/Entry forms
+          </wa-callout>
+        </div>
+      </wa-card>
+
+      <!-- Action Buttons -->
+      <div
+        class="wa-cluster wa-gap-s"
+        style="justify-content: flex-end; padding: var(--akriva-space-4) 0"
+      >
+        <wa-button appearance="outlined" type="button" href="/settings/company"
+          >Cancel</wa-button
+        >
+        {#if $submitting}
+          <wa-button type="submit" loading disabled>Save Changes</wa-button>
+        {:else}
+          <wa-button type="submit">Save Changes</wa-button>
+        {/if}
+      </div>
+    </div>
+  </form>
+</div>
+
+<style>
+  /* Form sub-sections */
+  .section {
+    padding: var(--akriva-space-4) 0;
+  }
+
+  /* Field grid layouts */
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--akriva-space-4);
+    align-items: end;
+  }
+
+  .field-row--3 {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wa-space-xs);
+  }
+
+  .helper {
+    font-size: var(--akriva-size-body-sm);
+    font-style: italic;
+    color: var(--akriva-text-tertiary);
+    margin: 0;
+  }
+
+  .error-message {
+    color: var(--akriva-status-error);
+    font-size: var(--wa-font-size-s);
+  }
+</style>
+</file>
+
+<file path="src/routes/(app)/settings/methodology-calculation/+page.svelte">
+<script lang="ts">
+  import "@awesome.me/webawesome/dist/components/input/input.js";
+  import "@awesome.me/webawesome/dist/components/select/select.js";
+  import "@awesome.me/webawesome/dist/components/option/option.js";
+  import "@awesome.me/webawesome/dist/components/radio-group/radio-group.js";
+  import "@awesome.me/webawesome/dist/components/radio/radio.js";
+
+  let gwpVersion = $state("ar6");
+</script>
+
+<svelte:head>
+  <title>Methodology & Calculation | Akriva</title>
+</svelte:head>
+
+<div style="padding: var(--akriva-space-8) var(--akriva-space-10)">
+<h1 class="wa-heading-l">Methodology & Calculation Engine</h1>
+<p class="wa-body-l wa-color-text-quiet">
+  Configure calculation methodology, localization settings, and scientific
+  standards for emissions tracking
+</p>
+
+<div class="wa-stack wa-gap-xl" style="margin-top: var(--akriva-space-6)">
+  <!-- Localization (Numbers) Card -->
+  <wa-card style="--spacing: var(--wa-space-xl)">
+    <div class="wa-stack wa-gap-l">
+      <div class="wa-stack wa-gap-2xs">
+        <h2 class="wa-heading-s">Localization (Numbers)</h2>
+        <p class="wa-body-s wa-color-text-quiet">
+          Configure number formatting preferences for your organization
+        </p>
+      </div>
+
+      <div class="loc-fields">
+        <wa-select label="Decimal Separator" value="point" style="width: 280px">
+          <wa-option value="point">Point (.)</wa-option>
+          <wa-option value="comma">Comma (,)</wa-option>
+        </wa-select>
+
+        <wa-select
+          label="Thousands Separator"
+          value="comma"
+          style="width: 280px"
+        >
+          <wa-option value="comma">Comma (,)</wa-option>
+          <wa-option value="point">Point (.)</wa-option>
+          <wa-option value="space">Space ( )</wa-option>
+        </wa-select>
+
+        <div class="wa-stack wa-gap-xs" style="width: 200px">
+          <span class="wa-font-weight-semibold">Decimal Precision</span>
+          <div class="wa-cluster wa-gap-xs" style="align-items: center">
+            <wa-input type="number" value="2" style="width: 80px"></wa-input>
+          </div>
+        </div>
+      </div>
+
+      <!-- Format Examples -->
+      <div class="examples-section wa-stack wa-gap-s">
+        <span class="examples-title">Format Examples</span>
+        <div class="wa-cluster wa-gap-xl">
+          <div class="wa-stack wa-gap-2xs">
+            <span
+              style="font-size: var(--akriva-size-body-sm); color: var(--akriva-text-tertiary)"
+              >Carbon Emissions (tCO₂e)</span
+            >
+            <span class="mono-value">12,345.67</span>
+          </div>
+          <div class="wa-stack wa-gap-2xs">
+            <span
+              style="font-size: var(--akriva-size-body-sm); color: var(--akriva-text-tertiary)"
+              >Energy (MWh)</span
+            >
+            <span class="mono-value">987,654.32</span>
+          </div>
+          <div class="wa-stack wa-gap-2xs">
+            <span
+              style="font-size: var(--akriva-size-body-sm); color: var(--akriva-text-tertiary)"
+              >Reduction %</span
+            >
+            <span
+              class="mono-value"
+              style="color: var(--akriva-status-verified)">45.89</span
+            >
+          </div>
+          <div class="wa-stack wa-gap-2xs">
+            <span
+              style="font-size: var(--akriva-size-body-sm); color: var(--akriva-text-tertiary)"
+              >Total Emissions</span
+            >
+            <span class="mono-value">1,234,567,890.12</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </wa-card>
+
+  <!-- Scientific Authority Card -->
+  <wa-card style="--spacing: var(--wa-space-xl)">
+    <div class="wa-stack wa-gap-l">
+      <div class="wa-stack wa-gap-2xs">
+        <h2 class="wa-heading-s">Scientific Authority</h2>
+        <p class="wa-body-s wa-color-text-quiet">
+          Select authoritative sources for emissions calculations and global
+          warming potentials
+        </p>
+      </div>
+
+      <div class="wa-stack wa-gap-3xl">
+        <!-- GWP Version -->
+        <div class="wa-stack wa-gap-s" style="max-width: 400px">
+          <div class="wa-stack wa-gap-2xs">
+            <span class="wa-font-weight-semibold">GWP Version</span>
+            <span
+              style="font-size: var(--akriva-size-body-sm); color: var(--akriva-text-tertiary)"
+            >
+              Global Warming Potential values for CH₄ and N₂O
+            </span>
+          </div>
+          <wa-radio-group
+            value={gwpVersion}
+            onwa-change={(e: CustomEvent) => {
+              gwpVersion = (e.target as HTMLInputElement).value;
+            }}
+          >
+            <div class="wa-cluster wa-gap-s">
+              <wa-radio value="ar6">IPCC AR6</wa-radio>
+              <wa-radio value="ar5">IPCC AR5</wa-radio>
+            </div>
+          </wa-radio-group>
+        </div>
+
+        <!-- Standard Mapping -->
+        <div class="wa-stack wa-gap-s">
+          <div class="wa-stack wa-gap-2xs">
+            <span class="wa-font-weight-semibold">Standard Mapping</span>
+            <span
+              style="font-size: var(--akriva-size-body-sm); color: var(--akriva-text-tertiary)"
+            >
+              Assigning authorities for emission scopes
+            </span>
+          </div>
+          <div class="wa-cluster wa-gap-m">
+            <div class="wa-stack wa-gap-2xs" style="width: 240px">
+              <wa-select value="ipcc" label="Scope 1 - Direct">
+                <wa-option value="ipcc">IPCC Guidelines</wa-option>
+                <wa-option value="epa">EPA</wa-option>
+                <wa-option value="defra">DEFRA</wa-option>
+              </wa-select>
+            </div>
+            <div class="wa-stack wa-gap-2xs" style="width: 240px">
+              <wa-select value="defra-iea" label="Scope 2 - Energy">
+                <wa-option value="defra-iea">DEFRA / IEA</wa-option>
+                <wa-option value="epa">EPA eGRID</wa-option>
+                <wa-option value="ipcc">IPCC Guidelines</wa-option>
+              </wa-select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </wa-card>
+
+  <!-- Action Buttons -->
+  <div
+    class="wa-cluster wa-gap-s"
+    style="justify-content: flex-end; padding: var(--akriva-space-4) 0"
+  >
+    <wa-button appearance="outlined">Cancel</wa-button>
+    <wa-button>Save Changes</wa-button>
+  </div>
+</div>
+</div>
+
+<style>
+  .loc-fields {
+    display: flex;
+    gap: var(--akriva-space-8);
+    align-items: end;
+  }
+
+  .mono-value {
+    font-family: var(--akriva-font-mono);
+    font-size: var(--akriva-size-body-lg);
+    font-weight: var(--akriva-weight-medium);
+  }
+
+  .examples-section {
+    padding-top: var(--akriva-space-4);
+    border-top: var(--akriva-border-thin) solid var(--akriva-border-default);
+  }
+
+  .examples-title {
+    font-size: var(--akriva-size-body-sm);
+    font-weight: var(--akriva-weight-semibold);
+    color: var(--akriva-text-secondary);
+    letter-spacing: 0.5px;
+  }
+</style>
+</file>
+
+<file path="src/routes/(app)/settings/organizational-tree/+page.svelte">
+<script lang="ts">
+  import "@awesome.me/webawesome/dist/components/tree/tree.js";
+  import "@awesome.me/webawesome/dist/components/tree-item/tree-item.js";
+  import "@awesome.me/webawesome/dist/components/input/input.js";
+  import "@awesome.me/webawesome/dist/components/select/select.js";
+  import "@awesome.me/webawesome/dist/components/option/option.js";
+  import "@awesome.me/webawesome/dist/components/switch/switch.js";
+  import "@awesome.me/webawesome/dist/components/callout/callout.js";
+
+  let nodeActive = $state(true);
+  let overrideEquity = $state(true);
+  let overrideMapping = $state(false);
+</script>
+
+<svelte:head>
+  <title>Organizational Tree | Akriva</title>
+</svelte:head>
+
+<div class="org-layout">
+  <!-- Left: Tree Panel -->
+  <div class="tree-panel wa-stack wa-gap-s">
+    <div
+      class="wa-cluster"
+      style="justify-content: space-between; align-items: center"
+    >
+      <span class="wa-heading-s">Organization</span>
+      <wa-button size="small">
+        <wa-icon slot="start" library="heroicons" name="plus"></wa-icon>
+        Add
+      </wa-button>
+    </div>
+
+    <wa-divider></wa-divider>
+
+    <wa-tree selection="single">
+      <wa-tree-item expanded>
+        <wa-icon library="heroicons" name="building-office-2" slot="expand-icon"
+        ></wa-icon>
+        Acme Corporation
+
+        <wa-tree-item>
+          <wa-icon library="heroicons" name="building-office"></wa-icon>
+          Chicago HQ
+        </wa-tree-item>
+
+        <wa-tree-item selected expanded>
+          <wa-icon library="heroicons" name="wrench-screwdriver"></wa-icon>
+          Detroit Factory
+
+          <wa-tree-item>
+            <wa-icon library="heroicons" name="cpu-chip"></wa-icon>
+            Production Line A
+          </wa-tree-item>
+          <wa-tree-item>
+            <wa-icon library="heroicons" name="cpu-chip"></wa-icon>
+            Production Line B
+          </wa-tree-item>
+        </wa-tree-item>
+
+        <wa-tree-item>
+          <wa-icon library="heroicons" name="archive-box"></wa-icon>
+          Texas Warehouse
+        </wa-tree-item>
+      </wa-tree-item>
+    </wa-tree>
+  </div>
+
+  <!-- Right: Details Panel -->
+  <div class="details-panel wa-stack wa-gap-xl">
+    <h1 class="wa-heading-m">Facility Details</h1>
+
+    <!-- Basic Information Card -->
+    <wa-card style="--spacing: var(--wa-space-xl)">
+      <div class="wa-stack wa-gap-l">
+        <h2 class="wa-heading-s">Basic Information</h2>
+
+        <div class="wa-stack wa-gap-m">
+          <!-- Name + Type -->
+          <div class="wa-cluster wa-gap-m" style="align-items: end">
+            <wa-input
+              label="Node Name"
+              placeholder="Detroit Factory"
+              style="flex: 1"
+            ></wa-input>
+            <wa-select label="Type" value="factory" style="width: 280px">
+              <wa-option value="factory">Factory</wa-option>
+              <wa-option value="office">Office</wa-option>
+              <wa-option value="warehouse">Warehouse</wa-option>
+              <wa-option value="production-line">Production Line</wa-option>
+            </wa-select>
+          </div>
+
+          <!-- Status -->
+          <div class="wa-stack wa-gap-xs">
+            <span class="wa-font-weight-semibold">Status</span>
+            <div class="wa-cluster wa-gap-s" style="align-items: center">
+              <span style="color: var(--akriva-text-tertiary)">Passive</span>
+              <wa-switch
+                checked={nodeActive}
+                onchange={(e: Event) => {
+                  nodeActive = (e.target as HTMLInputElement).checked;
+                }}
+              ></wa-switch>
+              <span class="wa-font-weight-bold">Active</span>
+            </div>
+            <span
+              style="font-size: var(--akriva-size-body-sm); color: var(--akriva-text-tertiary)"
+            >
+              Active nodes are included in calculations
+            </span>
+          </div>
+
+          <!-- Location -->
+          <div
+            style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--akriva-space-4); align-items: end"
+          >
+            <wa-select label="Country" value="us">
+              <wa-option value="us">United States</wa-option>
+              <wa-option value="gb">United Kingdom</wa-option>
+              <wa-option value="de">Germany</wa-option>
+            </wa-select>
+            <wa-select label="State" value="mi">
+              <wa-option value="mi">Michigan</wa-option>
+              <wa-option value="ca">California</wa-option>
+              <wa-option value="ny">New York</wa-option>
+            </wa-select>
+            <wa-input label="City" placeholder="Detroit"></wa-input>
+          </div>
+        </div>
+      </div>
+    </wa-card>
+
+    <!-- Boundary & Inheritance Card -->
+    <wa-card style="--spacing: var(--wa-space-xl)">
+      <div class="wa-stack wa-gap-l">
+        <div class="wa-stack wa-gap-2xs">
+          <h2 class="wa-heading-s">Boundary & Inheritance</h2>
+          <p class="wa-body-s wa-color-text-quiet">
+            Configure equity share and boundary rules for this node
+          </p>
+        </div>
+
+        <div class="wa-stack wa-gap-m">
+          <div class="wa-cluster wa-gap-xl" style="align-items: center">
+            <wa-checkbox
+              checked={overrideEquity}
+              onchange={(e: Event) => {
+                overrideEquity = (e.target as HTMLInputElement).checked;
+              }}
+            >
+              Override Equity Share
+            </wa-checkbox>
+            <div class="wa-cluster wa-gap-xs" style="align-items: center">
+              <wa-input type="number" value="40" style="width: 100px"
+              ></wa-input>
+              <span class="wa-font-weight-semibold">%</span>
+            </div>
+          </div>
+
+          <wa-callout variant="success">
+            <wa-icon slot="icon" library="heroicons" name="information-circle"
+            ></wa-icon>
+            This factory is 40% owned by Acme Corporation. Emissions will be calculated
+            based on this equity share.
+          </wa-callout>
+        </div>
+      </div>
+    </wa-card>
+
+    <!-- Scientific Authority Override Card -->
+    <wa-card style="--spacing: var(--wa-space-xl)">
+      <div class="wa-stack wa-gap-l">
+        <div class="wa-stack wa-gap-2xs">
+          <h2 class="wa-heading-s">Scientific Authority Override</h2>
+          <p class="wa-body-s wa-color-text-quiet">
+            Override standard mapping for this specific node. GWP Version is
+            inherited from global settings.
+          </p>
+        </div>
+
+        <div class="wa-stack wa-gap-l">
+          <!-- GWP Version (locked/inherited) -->
+          <div class="wa-stack wa-gap-xs">
+            <span class="wa-font-weight-semibold"
+              >GWP Version (Global Setting)</span
+            >
+            <div
+              class="wa-cluster wa-gap-s"
+              style="padding: var(--akriva-space-3); background: var(--akriva-surface-tertiary); border-radius: var(--akriva-radius-xs); opacity: 0.7"
+            >
+              <wa-icon
+                library="heroicons"
+                name="lock-closed"
+                style="font-size: 16px; color: var(--akriva-text-tertiary)"
+              ></wa-icon>
+              <span class="wa-color-text-quiet">IPCC AR6 (Latest)</span>
+            </div>
+            <div class="wa-cluster wa-gap-xs" style="align-items: start">
+              <wa-icon
+                library="heroicons"
+                name="information-circle"
+                style="font-size: 12px; color: var(--akriva-text-tertiary); flex-shrink: 0; margin-top: 2px"
+              ></wa-icon>
+              <span
+                style="font-size: var(--akriva-size-body-sm); color: var(--akriva-text-tertiary)"
+              >
+                GWP Version cannot be overridden at node level. Change in global
+                settings to apply organization-wide.
+              </span>
+            </div>
+          </div>
+
+          <!-- Override Standard Mapping -->
+          <div class="wa-stack wa-gap-s">
+            <wa-checkbox
+              checked={overrideMapping}
+              onchange={(e: Event) => {
+                overrideMapping = (e.target as HTMLInputElement).checked;
+              }}
+            >
+              Override Standard Mapping for this node
+            </wa-checkbox>
+            <div
+              class="wa-cluster wa-gap-m"
+              style:opacity={overrideMapping ? "1" : "0.5"}
+              style:pointer-events={overrideMapping ? "auto" : "none"}
+            >
+              <div class="wa-stack wa-gap-2xs" style="flex: 1">
+                <wa-select label="Scope 1 - Direct Emissions" value="ipcc">
+                  <wa-option value="ipcc">IPCC Guidelines (Global)</wa-option>
+                  <wa-option value="epa">EPA</wa-option>
+                  <wa-option value="defra">DEFRA</wa-option>
+                </wa-select>
+              </div>
+              <div class="wa-stack wa-gap-2xs" style="flex: 1">
+                <wa-select label="Scope 2 - Energy Indirect" value="defra-iea">
+                  <wa-option value="defra-iea">DEFRA / IEA (Global)</wa-option>
+                  <wa-option value="epa">EPA eGRID</wa-option>
+                  <wa-option value="ipcc">IPCC Guidelines</wa-option>
+                </wa-select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </wa-card>
+
+    <!-- Danger Zone Card -->
+    <wa-card class="danger-zone" style="--spacing: var(--wa-space-xl)">
+      <div class="wa-stack wa-gap-m">
+        <div class="wa-cluster wa-gap-xs" style="align-items: center">
+          <wa-icon
+            library="heroicons"
+            name="exclamation-triangle"
+            style="font-size: 20px; color: var(--akriva-status-error)"
+          ></wa-icon>
+          <span class="wa-heading-s" style="color: var(--akriva-status-error)">
+            Danger Zone
+          </span>
+        </div>
+
+        <wa-callout variant="danger">
+          <wa-icon slot="icon" library="heroicons" name="information-circle"
+          ></wa-icon>
+          <span class="wa-font-weight-bold">This action cannot be undone</span
+          ><br />
+          <span
+            class="wa-color-text-quiet"
+            style="font-size: var(--akriva-size-body-sm)"
+          >
+            Deleting this node will permanently remove it and all its child
+            nodes from the organizational tree. Historical data will be
+            preserved in the audit trail, but the node will no longer be
+            available for active calculations.
+          </span>
+        </wa-callout>
+
+        <div
+          class="wa-cluster"
+          style="justify-content: space-between; align-items: center"
+        >
+          <div class="wa-stack wa-gap-2xs">
+            <span class="wa-font-weight-semibold">Delete this node</span>
+            <span
+              style="font-size: var(--akriva-size-body-sm); color: var(--akriva-text-tertiary)"
+            >
+              Remove Detroit Factory and all associated data
+            </span>
+          </div>
+          <wa-button variant="danger">
+            <wa-icon slot="start" library="heroicons" name="trash"></wa-icon>
+            Delete Node
+          </wa-button>
+        </div>
+      </div>
+    </wa-card>
+
+    <!-- Action Buttons -->
+    <div
+      class="wa-cluster wa-gap-s"
+      style="justify-content: flex-end; padding: var(--akriva-space-4) 0"
+    >
+      <wa-button appearance="outlined">Cancel</wa-button>
+      <wa-button>Save Changes</wa-button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .org-layout {
+    display: flex;
+    height: 100%;
+  }
+
+  .tree-panel {
+    width: 300px;
+    flex-shrink: 0;
+    background: var(--akriva-surface-primary);
+    border-right: var(--akriva-border-thin) solid var(--akriva-border-default);
+    padding: var(--akriva-space-6);
+    overflow-y: auto;
+  }
+
+  .details-panel {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--akriva-space-6) var(--akriva-space-8);
+  }
+
+  .danger-zone {
+    border-color: var(--akriva-status-error);
+  }
+
+  /* Tree item spacing */
+  wa-tree-item::part(item) {
+    padding-block: 2px;
+  }
+
+  wa-tree-item {
+    --wa-color-brand-fill-loud: transparent;
+    --wa-color-text-quiet: var(--akriva-text-tertiary);
+  }
+
+  /* Selected node: primary text, bold, left border accent, no background */
+  wa-tree-item[selected]::part(item) {
+    background-color: transparent;
+  }
+
+  wa-tree-item[selected]::part(label) {
+    color: var(--akriva-action-primary);
+    font-weight: var(--akriva-weight-semibold);
+  }
+
+  wa-tree-item[selected]::part(expand-button) {
+    color: var(--akriva-action-primary);
+  }
+</style>
+</file>
+
+<file path="src/routes/(app)/settings/+layout.svelte">
+<script lang="ts">
+  import { page } from "$app/state";
+
+  let { children } = $props();
+
+  const navItems = [
+    {
+      href: "/settings/company",
+      label: "Company",
+      icon: "adjustments-horizontal",
+    },
+    {
+      href: "/settings/methodology-calculation",
+      label: "Methodology & Calculation",
+      icon: "calculator",
+    },
+    {
+      href: "/settings/organizational-tree",
+      label: "Organizational Tree",
+      icon: "building-office-2",
+    },
+    { href: "/settings/security", label: "Security", icon: "shield-check" },
+    {
+      href: "/settings/integrations",
+      label: "Integrations",
+      icon: "puzzle-piece",
+    },
+    { href: "/settings/notifications", label: "Notifications", icon: "bell" },
+    { href: "/settings/api", label: "API & Webhooks", icon: "command-line" },
+  ];
+
+  let currentPath = $derived(page.url.pathname);
+</script>
+
+<div class="settings-shell">
+  <nav class="settings-nav">
+    <span class="nav-title">SETTINGS</span>
+    <div class="nav-items">
+      {#each navItems as item}
+        <a
+          href={item.href}
+          class="nav-item"
+          class:active={currentPath.startsWith(item.href)}
+        >
+          <wa-icon library="heroicons" name={item.icon}></wa-icon>
+          <span>{item.label}</span>
+        </a>
+      {/each}
+    </div>
+  </nav>
+  <div class="settings-content">
+    {@render children()}
+  </div>
+</div>
+
+<style>
+  .settings-shell {
+    display: flex;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .settings-nav {
+    width: 270px;
+    flex-shrink: 0;
+    background: var(--akriva-surface-tertiary);
+    border-right: var(--akriva-border-thin) solid var(--akriva-border-default);
+    padding: var(--akriva-space-5) var(--akriva-space-4);
+    overflow-y: auto;
+  }
+
+  .settings-content {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+  }
+
+  .nav-title {
+    font-size: 10px;
+    font-weight: var(--akriva-weight-semibold);
+    color: var(--akriva-text-secondary);
+    letter-spacing: 1.2px;
+  }
+
+  .nav-items {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: var(--akriva-space-2) 0;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: var(--akriva-space-2);
+    border-radius: var(--akriva-radius-sm);
+    height: 40px;
+    padding: var(--akriva-space-2) var(--akriva-space-3);
+    color: var(--akriva-text-tertiary);
+    text-decoration: none;
+    font-size: var(--akriva-size-body);
+    font-weight: var(--akriva-weight-medium);
+    position: relative;
+  }
+
+  .nav-item:hover {
+    background: var(--akriva-surface-secondary);
+  }
+
+  .nav-item.active {
+    background: color-mix(
+      in srgb,
+      var(--akriva-action-primary) 10%,
+      transparent
+    );
+    color: var(--akriva-action-primary);
+    padding-right: 0;
+    position: relative;
+  }
+
+  .nav-item.active:after {
+    border-radius: 0 var(--akriva-radius-sm) var(--akriva-radius-sm) 0;
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0px;
+    bottom: 0;
+    width: 4px;
+    background: var(--akriva-action-primary);
+  }
+</style>
+</file>
+
+<file path="src/routes/(app)/settings/+page.server.ts">
+import { redirect } from "@sveltejs/kit";
+
+export function load() {
+  redirect(302, "/settings/company");
+}
+</file>
+
+<file path="src/routes/(app)/+layout.server.ts">
+import { redirect } from '@sveltejs/kit';
+import type { LayoutServerLoad } from './$types.js';
+
+export const load: LayoutServerLoad = async ({ locals }) => {
+	if (!locals.session) {
+		redirect(302, '/signin');
+	}
+
+	return { user: locals.session.user };
+};
+</file>
+
+<file path="src/routes/(app)/+layout.svelte">
+<script lang="ts">
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
+  import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/divider/divider.js";
+  import "@awesome.me/webawesome/dist/components/breadcrumb/breadcrumb.js";
+  import "@awesome.me/webawesome/dist/components/breadcrumb-item/breadcrumb-item.js";
+  import "@awesome.me/webawesome/dist/components/avatar/avatar.js";
+  import "@awesome.me/webawesome/dist/components/dropdown/dropdown.js";
+  import "@awesome.me/webawesome/dist/components/dropdown-item/dropdown-item.js";
+  import "@awesome.me/webawesome/dist/components/badge/badge.js";
+  import "@awesome.me/webawesome/dist/components/card/card.js";
+  import "@awesome.me/webawesome/dist/components/progress-bar/progress-bar.js";
+  import "@awesome.me/webawesome/dist/components/copy-button/copy-button.js";
+  import "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
+  import { registerIconLibrary } from "@awesome.me/webawesome/dist/components/icon/library.js";
+
+  import AkrivaLogo from "$components/AkrivaLogo.svelte";
+
+  registerIconLibrary("heroicons", {
+    resolver: (name) =>
+      `https://cdn.jsdelivr.net/npm/heroicons@2.1.5/24/outline/${name}.svg`,
+    mutator: (svg) =>
+      svg.querySelectorAll("path").forEach((path) => {
+        path.setAttribute("fill", "none");
+        path.setAttribute("stroke", "currentColor");
+      }),
+  });
+
+  let { data, children } = $props();
+
+  let logoutForm: HTMLFormElement;
+  const userInitial = $derived(data.user.givenName.charAt(0).toUpperCase());
+</script>
+
+<div class="app-shell">
+  <!-- Sidebar -->
+  <aside class="sidebar wa-dark">
+    <div class="sidebar-top wa-stack wa-gap-m">
+      <!-- Logo -->
+      <div class="sidebar-logo">
+        <AkrivaLogo />
+      </div>
+
+      <wa-divider></wa-divider>
+
+      <!-- Navigation -->
+      <div class="wa-stack wa-gap-l">
+        <!-- Data Section -->
+        <nav class="wa-stack wa-gap-3xs">
+          <a href="/dashboard" class="active">
+            <wa-icon library="heroicons" name="squares-2x2"></wa-icon>
+            Dashboard
+          </a>
+          <a href="/#">
+            <wa-icon library="heroicons" name="globe-alt"></wa-icon>
+            Scope 1-3
+          </a>
+          <a href="/#">
+            <wa-icon library="heroicons" name="archive-box"></wa-icon>
+            Evidence Vault
+          </a>
+          <a href="/#">
+            <wa-icon library="heroicons" name="document-text"></wa-icon>
+            Reports
+          </a>
+          <a href="/#">
+            <wa-icon library="heroicons" name="cube"></wa-icon>
+            Assets
+          </a>
+          <a href="/#">
+            <wa-icon library="heroicons" name="user-group"></wa-icon>
+            Team
+          </a>
+          <a href="/#">
+            <wa-icon library="heroicons" name="clipboard-document-list"
+            ></wa-icon>
+            Inventory
+          </a>
+          <a href="/#">
+            <wa-icon library="heroicons" name="document-check"></wa-icon>
+            Evidence
+          </a>
+        </nav>
+
+        <!-- Admin Section -->
+        <nav class="wa-stack wa-gap-3xs">
+          <a href="/#">
+            <wa-icon library="heroicons" name="cog-6-tooth"></wa-icon>
+            Settings
+          </a>
+          <a href="/#">
+            <wa-icon library="heroicons" name="users"></wa-icon>
+            Team Members
+          </a>
+        </nav>
+      </div>
+    </div>
+
+    <div class="sidebar-bottom wa-stack wa-gap-m">
+      <wa-divider></wa-divider>
+      <!-- Audit Score -->
+      <div class="audit-score wa-cluster wa-gap-xs wa-align-items-center">
+        <span class="audit-dot"></span>
+        <span class="audit-label">Audit Ready</span>
+        <span class="audit-value">0%</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Area -->
+  <div class="main-area">
+    <!-- Header -->
+    <header class="app-header wa-cluster wa-gap-m wa-align-items-center">
+      <wa-button appearance="outlined" size="small">
+        <wa-icon library="heroicons" name="view-columns" style="font-size: 16px"
+        ></wa-icon>
+      </wa-button>
+      <wa-breadcrumb>
+        <wa-breadcrumb-item href="/dashboard">Dashboard</wa-breadcrumb-item>
+        <wa-breadcrumb-item>Overview</wa-breadcrumb-item>
+      </wa-breadcrumb>
+      <div class="header-end wa-cluster wa-gap-m wa-align-items-center">
+        <wa-dropdown placement="bottom-end" distance="4">
+          <wa-avatar
+            slot="trigger"
+            initials={userInitial}
+            shape="circle"
+            style="--size: 32px; cursor: pointer;"
+          ></wa-avatar>
+          <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
+          <wa-dropdown-item
+            onclick={() => (window.location.href = "/settings/profile")}
+          >
+            <wa-icon slot="icon" library="heroicons" name="user"></wa-icon>
+            Profile
+          </wa-dropdown-item>
+          <wa-divider></wa-divider>
+          <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
+          <wa-dropdown-item onclick={() => logoutForm.requestSubmit()}>
+            <wa-icon
+              slot="icon"
+              library="heroicons"
+              name="arrow-right-start-on-rectangle"
+            ></wa-icon>
+            Logout
+          </wa-dropdown-item>
+        </wa-dropdown>
+        <wa-button appearance="plain" size="small">
+          <wa-icon library="heroicons" name="bell" style="font-size: 20px"
+          ></wa-icon>
+        </wa-button>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <main class="app-content">
+      {@render children()}
+    </main>
+
+    <!-- Status Bar -->
+    <footer class="status-bar wa-cluster wa-align-items-center">
+      <div class="wa-cluster wa-gap-xs wa-align-items-center">
+        <span class="wa-caption-xs wa-color-text-quiet">Tenant ID:</span>
+        <code class="tenant-id">TENANT-XXXX-XXXX</code>
+        <wa-copy-button value="TENANT-XXXX-XXXX"></wa-copy-button>
+      </div>
+      <div class="wa-cluster wa-gap-xs wa-align-items-center">
+        <span class="status-dot"></span>
+        <span class="wa-caption-xs wa-color-text-quiet">Production</span>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<form bind:this={logoutForm} method="POST" action="/logout" hidden></form>
+
+<style>
+  .app-shell {
+    display: flex;
+    height: 100vh;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    width: 240px;
+    background: var(--akriva-brand-primary);
+    display: flex;
+    flex-direction: column;
+    padding: var(--akriva-space-5) var(--akriva-space-4);
+    flex-shrink: 0;
+  }
+
+  .sidebar-top {
+    flex: 1;
+    overflow: auto;
+  }
+
+  .sidebar-bottom {
+    flex-shrink: 0;
+  }
+
+  /* Dark logo override */
+  .sidebar-logo {
+    --akriva-brand-primary: #ffffff;
+    --akriva-size-display: 28px;
+  }
+
+  .sidebar-logo :global(svg) {
+    width: 32px;
+    height: 32px;
+  }
+
+  /* Audit score */
+  .audit-score {
+    padding: var(--akriva-space-2) var(--akriva-space-3);
+    background: #431407;
+    border: var(--akriva-border-thin) solid var(--akriva-status-risk);
+    border-radius: var(--akriva-radius-xs);
+  }
+
+  .audit-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: var(--akriva-radius-full);
+    background: var(--akriva-status-risk);
+  }
+
+  .audit-label {
+    font-size: var(--akriva-size-body-sm);
+    color: var(--akriva-status-risk-light);
+  }
+
+  .audit-value {
+    font-family: var(--akriva-font-mono);
+    font-size: var(--akriva-size-body);
+    font-weight: var(--akriva-weight-semibold);
+    color: var(--akriva-status-risk);
+    margin-inline-start: auto;
+  }
+
+  /* Main area */
+  .main-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .app-header {
+    height: 56px;
+    padding: 0 var(--akriva-space-6);
+    background: var(--akriva-surface-primary);
+    border-bottom: var(--akriva-border-thin) solid var(--akriva-border-default);
+    flex-shrink: 0;
+  }
+
+  .app-header wa-button[appearance="outlined"]::part(base) {
+    background: var(--akriva-surface-secondary);
+    border-color: var(--akriva-border-default);
+  }
+
+  .header-end {
+    margin-inline-start: auto;
+  }
+
+  .app-content {
+    flex: 1;
+    overflow: auto;
+    background: var(--akriva-surface-secondary);
+  }
+
+  .status-bar {
+    height: 32px;
+    padding: 0 var(--akriva-space-6);
+    background: var(--akriva-surface-primary);
+    border-top: var(--akriva-border-thin) solid var(--akriva-border-default);
+    flex-shrink: 0;
+    justify-content: space-between;
+  }
+
+  .tenant-id {
+    font-family: var(--akriva-font-mono);
+    font-size: var(--akriva-size-body-sm);
+    color: var(--akriva-text-tertiary);
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: var(--akriva-radius-full);
+    background: var(--akriva-status-verified);
+  }
+
+  /* Breadcrumb: gray parent, dark current */
+  wa-breadcrumb-item::part(label) {
+    color: var(--akriva-text-secondary);
+  }
+  wa-breadcrumb-item:last-child::part(label) {
+    color: var(--akriva-text-primary);
+    font-weight: var(--akriva-weight-medium);
+  }
+
+  nav a {
+    width: 100%;
+    padding: var(--akriva-space-2) var(--akriva-space-3);
+    border-radius: var(--akriva-radius-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--akriva-space-2);
+    text-decoration: none;
+    font-size: var(--akriva-size-body-lg);
+    position: relative;
+    color: hsl(from var(--akriva-text-tertiary) h s 80%);
+  }
+
+  nav wa-icon {
+    font-size: 20px;
+  }
+
+  nav .active {
+    background-color: hsl(from var(--akriva-action-primary) h s 32%);
+    color: var(--akriva-text-inverse);
+  }
+
+  nav .active:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 4px;
+    border-radius: 0 var(--akriva-radius-sm) var(--akriva-radius-sm) 0;
+    background: var(--akriva-action-primary);
+  }
+</style>
+</file>
+
+<file path="src/routes/(auth)/signin/+page.server.ts">
+import { fail, redirect } from '@sveltejs/kit';
+import { message, superValidate } from 'sveltekit-superforms';
+import { zod4 } from 'sveltekit-superforms/adapters';
+import type { Actions, PageServerLoad } from './$types.js';
+import { signin, verifyMfa } from '$lib/api/auth.js';
+import { ApiError } from '$lib/api/client.js';
+import { setAuthCookies } from '$lib/server/auth.js';
+import { signinSchema, mfaVerifySchema } from '$lib/schemas/signin.js';
+
+export const load: PageServerLoad = async () => {
+	const signinForm = await superValidate(zod4(signinSchema), { id: 'signin' });
+	const mfaForm = await superValidate(zod4(mfaVerifySchema), { id: 'mfa' });
+	return { signinForm, mfaForm };
+};
+
+export const actions: Actions = {
+	signin: async ({ request, cookies }) => {
+		const form = await superValidate(request, zod4(signinSchema), { id: 'signin' });
+
+		if (!form.valid) {
+			return fail(400, { form });
+		}
+
+		try {
+			const response = await signin({
+				email: form.data.email,
+				password: form.data.password
+			});
+
+			if (response.type === 'mfa_challenge') {
+				return { form, mfaRequired: true as const, mfaSession: response.challenge.session };
+			}
+
+			setAuthCookies(cookies, response.tokens);
+		} catch (err) {
+			if (err instanceof ApiError && err.status === 401) {
+				return message(form, 'Invalid email or password.', { status: 401 });
+			}
+
+			return message(form, 'Something went wrong. Please try again.', { status: 500 });
+		}
+
+		redirect(302, '/dashboard');
+	},
+
+	mfa: async ({ request, cookies }) => {
+		const form = await superValidate(request, zod4(mfaVerifySchema), { id: 'mfa' });
+
+		if (!form.valid) {
+			return fail(400, { form });
+		}
+
+		try {
+			const tokens = await verifyMfa({
+				session: form.data.session,
+				code: form.data.code
+			});
+
+			setAuthCookies(cookies, tokens);
+		} catch (err) {
+			if (err instanceof ApiError && err.status === 401) {
+				return message(form, 'Invalid verification code. Please try again.', { status: 401 });
+			}
+
+			return message(form, 'Something went wrong. Please try again.', { status: 500 });
+		}
+
+		redirect(302, '/dashboard');
+	}
+};
+</file>
+
+<file path="src/routes/(auth)/signin/+page.svelte">
+<script lang="ts">
+  import { superForm } from "sveltekit-superforms";
+  import { zod4Client } from "sveltekit-superforms/adapters";
+  import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/input/input.js";
+  import "@awesome.me/webawesome/dist/components/card/card.js";
+  import "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
+  import "@awesome.me/webawesome/dist/components/callout/callout.js";
+
+  import TextDivider from "$components/TextDivider.svelte";
+  import { signinSchema, mfaVerifySchema } from "$lib/schemas/signin.js";
+
+  let { data } = $props();
+
+  let showMfa = $state(false);
+  let mfaSession = $state("");
+
+  const {
+    form: signinData,
+    errors: signinErrors,
+    enhance: signinEnhance,
+    message: signinMessage,
+    submitting: signinSubmitting,
+  } = superForm(data.signinForm, {
+    validators: zod4Client(signinSchema),
+    onResult({ result }) {
+      if (result.type === "success") {
+        const d = result.data as Record<string, unknown> | undefined;
+        if (d?.mfaRequired) {
+          mfaSession = d.mfaSession as string;
+          showMfa = true;
+        }
+      }
+    },
+  });
+
+  const {
+    form: mfaData,
+    errors: mfaErrors,
+    enhance: mfaEnhance,
+    message: mfaMessage,
+    submitting: mfaSubmitting,
+  } = superForm(data.mfaForm, {
+    validators: zod4Client(mfaVerifySchema),
+  });
+</script>
+
+<svelte:head>
+  <title>Sign In | Akriva</title>
+</svelte:head>
+
+<wa-card>
+  <div class="wa-stack wa-gap-l">
+    {#if !showMfa}
+      <!-- Signin form -->
+      <div class="wa-stack wa-gap-xs wa-align-items-center">
+        <h2>Welcome Back</h2>
+        <p class="wa-body-l wa-color-text-quiet">
+          Access your institutional ledger
+        </p>
+      </div>
+
+      {#if $signinMessage}
+        <wa-callout variant="danger">
+          {$signinMessage}
+        </wa-callout>
+      {/if}
+
+      <form
+        method="POST"
+        action="?/signin"
+        use:signinEnhance
+        class="wa-stack wa-gap-l"
+      >
+        <div class="field">
+          <wa-input
+            id="email"
+            name="email"
+            type="email"
+            placeholder="john.doe@company.com"
+            label="Email Address"
+            value={$signinData.email}
+            oninput={(e: Event) => {
+              $signinData.email = (e.target as HTMLInputElement).value;
+            }}
+            data-invalid={$signinErrors.email ? "" : undefined}
+          ></wa-input>
+          {#if $signinErrors.email}
+            <small class="error-message">{$signinErrors.email[0]}</small>
+          {/if}
+        </div>
+
+        <div class="wa-stack wa-gap-xs">
+          <div class="password-label-row">
+            <label for="password">Password</label>
+            <a href="/forgot-password" class="forgot-link">Forgot password?</a>
+          </div>
+          <wa-input
+            id="password"
+            name="password"
+            type="password"
+            placeholder="••••••••"
+            password-toggle
+            value={$signinData.password}
+            oninput={(e: Event) => {
+              $signinData.password = (e.target as HTMLInputElement).value;
+            }}
+            data-invalid={$signinErrors.password ? "" : undefined}
+          ></wa-input>
+          {#if $signinErrors.password}
+            <small class="error-message">{$signinErrors.password[0]}</small>
+          {/if}
+        </div>
+
+        <wa-checkbox name="rememberMe">Remember me for 30 days</wa-checkbox>
+
+        {#if $signinSubmitting}
+          <wa-button type="submit" variant="brand" size="large" style="width:100%" loading disabled>
+            Sign In
+          </wa-button>
+        {:else}
+          <wa-button type="submit" variant="brand" size="large" style="width:100%">
+            Sign In
+          </wa-button>
+        {/if}
+      </form>
+
+      <TextDivider />
+      <div class="wa-cluster wa-gap-xs wa-justify-content-center">
+        <span class="wa-body-s wa-color-text-quiet"
+          >Don't have an account?</span
+        >
+        <a href="/signup" class="wa-link wa-font-size-s wa-font-weight-bold"
+          >Sign up</a
+        >
+      </div>
+    {:else}
+      <!-- MFA verification form -->
+      <div class="wa-stack wa-gap-xs wa-align-items-center">
+        <h2>Two-Factor Authentication</h2>
+        <p class="wa-body-l wa-color-text-quiet">
+          Enter the code from your authenticator app
+        </p>
+      </div>
+
+      {#if $mfaMessage}
+        <wa-callout variant="danger">
+          {$mfaMessage}
+        </wa-callout>
+      {/if}
+
+      <form
+        method="POST"
+        action="?/mfa"
+        use:mfaEnhance
+        class="wa-stack wa-gap-l"
+      >
+        <input type="hidden" name="session" value={mfaSession} />
+
+        <div class="field">
+          <wa-input
+            id="code"
+            name="code"
+            placeholder="000000"
+            label="Verification Code"
+            value={$mfaData.code}
+            oninput={(e: Event) => {
+              $mfaData.code = (e.target as HTMLInputElement).value;
+            }}
+            data-invalid={$mfaErrors.code ? "" : undefined}
+          ></wa-input>
+          {#if $mfaErrors.code}
+            <small class="error-message">{$mfaErrors.code[0]}</small>
+          {/if}
+        </div>
+
+        {#if $mfaSubmitting}
+          <wa-button type="submit" variant="brand" size="large" style="width:100%" loading disabled>
+            Verify
+          </wa-button>
+        {:else}
+          <wa-button type="submit" variant="brand" size="large" style="width:100%">
+            Verify
+          </wa-button>
+        {/if}
+      </form>
+
+      <div class="wa-cluster wa-justify-content-center">
+        <button
+          type="button"
+          class="back-link wa-body-s"
+          onclick={() => {
+            showMfa = false;
+          }}
+        >
+          Back to sign in
+        </button>
+      </div>
+    {/if}
+  </div>
+</wa-card>
+
+<style>
+  wa-card {
+    width: 100%;
+    max-width: 420px;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wa-space-xs);
+  }
+
+  .error-message {
+    color: var(--akriva-status-error);
+    font-size: var(--wa-font-size-s);
+  }
+
+  .password-label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .forgot-link {
+    font-size: var(--akriva-size-caption);
+    text-decoration: underline;
+  }
+
+  .back-link {
+    background: none;
+    border: none;
+    color: var(--wa-color-text-quiet);
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0;
+  }
+
+  .back-link:hover {
+    color: var(--wa-color-text);
+  }
+</style>
+</file>
+
+<file path="src/routes/(auth)/signup/invited/+page.svelte">
+<script lang="ts">
+  import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/input/input.js";
+  import "@awesome.me/webawesome/dist/components/card/card.js";
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
+  import "@awesome.me/webawesome/dist/components/callout/callout.js";
+
+  import TextDivider from "$components/TextDivider.svelte";
+  import { page } from "$app/state";
+
+  const token = $derived(page.url.searchParams.get("token") ?? "");
+  const orgName = $derived(page.url.searchParams.get("org") ?? "Organization");
+</script>
+
+<svelte:head>
+  <title>Join Organization | Akriva</title>
+</svelte:head>
+
+<wa-card>
+  <div class="wa-stack wa-gap-l">
+    <!-- Invitation Badge -->
+    <wa-callout variant="success">
+      <wa-icon slot="icon" name="circle-check" variant="regular"></wa-icon>
+      Valid Invitation
+    </wa-callout>
+
+    <!-- Title Section -->
+    <div class="wa-stack wa-gap-xs wa-align-items-center">
+      <h2>Join Your Organization</h2>
+      <p class="wa-body-l wa-color-text-quiet">
+        Joining <strong class="org-name">{orgName}</strong>
+      </p>
+    </div>
+
+    <!-- Form -->
+    <form class="wa-stack wa-gap-l">
+      <div class="wa-grid">
+        <wa-input
+          id="firstName"
+          name="firstName"
+          placeholder="Jane"
+          label="First Name"
+        ></wa-input>
+        <wa-input
+          id="lastName"
+          name="lastName"
+          placeholder="Smith"
+          label="Last Name"
+        ></wa-input>
+      </div>
+      <wa-input
+        id="email"
+        name="email"
+        type="email"
+        placeholder="jane.smith@company.com"
+        label="Email Address"
+      ></wa-input>
+      <div class="wa-stack wa-gap-xs">
+        <wa-input
+          id="password"
+          name="password"
+          type="password"
+          placeholder="••••••••"
+          label="Password"
+          help-text="8-256 characters"
+          password-toggle
+        ></wa-input>
+      </div>
+
+      <!-- Invitation Token Display -->
+      <wa-input
+        id="token"
+        name="token"
+        label="Invitation Token"
+        value={token || "INV-XXXX-XXXX-XXXX"}
+        disabled
+      ></wa-input>
+
+      <wa-button type="submit">Join Organization</wa-button>
+    </form>
+
+    <TextDivider />
+
+    <div class="wa-cluster wa-gap-xs wa-justify-content-center">
+      <span class="wa-body-s wa-color-text-quiet">Already have an account?</span
+      >
+      <a href="/signin" class="wa-link wa-font-size-s wa-font-weight-bold"
+        >Sign in</a
+      >
+    </div>
+  </div>
+</wa-card>
+
+<style>
+  wa-card {
+    width: 100%;
+    max-width: 490px;
+  }
+
+  .org-name {
+    color: var(--akriva-text-primary);
+  }
+
+  wa-callout {
+    --wa-form-control-padding-inline: var(--akriva-space-5) !important;
+  }
+</style>
+</file>
+
+<file path="src/routes/(auth)/signup/+page.server.ts">
+import { fail, redirect } from '@sveltejs/kit';
+import { message, superValidate } from 'sveltekit-superforms';
+import { zod4 } from 'sveltekit-superforms/adapters';
+import type { Actions, PageServerLoad } from './$types.js';
+import { signup } from '$lib/api/auth.js';
+import { ApiError } from '$lib/api/client.js';
+import { setAuthCookies } from '$lib/server/auth.js';
+import { signupSchema } from '$lib/schemas/signup.js';
+
+export const load: PageServerLoad = async () => {
+	const form = await superValidate(zod4(signupSchema));
+	return { form };
+};
+
+export const actions: Actions = {
+	default: async ({ request, cookies }) => {
+		const form = await superValidate(request, zod4(signupSchema));
+
+		if (!form.valid) {
+			return fail(400, { form });
+		}
+
+		try {
+			const response = await signup({
+				email: form.data.email,
+				password: form.data.password,
+				givenName: form.data.firstName,
+				familyName: form.data.lastName,
+				companyName: form.data.companyName
+			});
+
+			setAuthCookies(cookies, response.tokens);
+		} catch (err) {
+			if (err instanceof ApiError) {
+				if (err.status === 409) {
+					return message(form, 'An account with this email already exists.', { status: 409 });
+				}
+
+				if (err.status === 400 && err.body.code === 'VALIDATION_FAILED') {
+					return message(
+						form,
+						err.body.error || 'Please check your information and try again.',
+						{ status: 400 }
+					);
+				}
+			}
+
+			return message(form, 'Something went wrong. Please try again.', { status: 500 });
+		}
+
+		redirect(302, '/dashboard');
+	}
+};
+</file>
+
+<file path="src/routes/(auth)/signup/+page.svelte">
+<script lang="ts">
+  import { superForm } from "sveltekit-superforms";
+  import { zod4Client } from "sveltekit-superforms/adapters";
+  import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/input/input.js";
+  import "@awesome.me/webawesome/dist/components/card/card.js";
+  import "@awesome.me/webawesome/dist/components/callout/callout.js";
+
+  import TextDivider from "$components/TextDivider.svelte";
+  import { signupSchema } from "$lib/schemas/signup.js";
+
+  let { data } = $props();
+
+  const { form, errors, enhance, message, submitting } = superForm(data.form, {
+    validators: zod4Client(signupSchema),
+  });
+</script>
+
+<svelte:head>
+  <title>Sign Up | Akriva</title>
+</svelte:head>
+
+<wa-card>
+  <div class="wa-stack wa-gap-l">
+    <div class="wa-stack wa-gap-xs wa-align-items-center">
+      <h2>Create Your Organization</h2>
+      <p class="wa-body-l wa-color-text-quiet">
+        Set up your institutional ledger environment
+      </p>
+    </div>
+
+    <!-- API error message -->
+    {#if $message}
+      <wa-callout variant="danger">
+        {$message}
+      </wa-callout>
+    {/if}
+
+    <form method="POST" use:enhance class="wa-stack wa-gap-l">
+      <div class="wa-grid wa-gap-m">
+        <div class="field">
+          <wa-input
+            id="firstName"
+            name="firstName"
+            placeholder="Jane"
+            label="First Name"
+            value={$form.firstName}
+            oninput={(e: Event) => {
+              $form.firstName = (e.target as HTMLInputElement).value;
+            }}
+            data-invalid={$errors.firstName ? "" : undefined}
+          ></wa-input>
+          {#if $errors.firstName}
+            <small class="error-message">{$errors.firstName[0]}</small>
+          {/if}
+        </div>
+
+        <div class="field">
+          <wa-input
+            id="lastName"
+            name="lastName"
+            placeholder="Doe"
+            label="Last Name"
+            value={$form.lastName}
+            oninput={(e: Event) => {
+              $form.lastName = (e.target as HTMLInputElement).value;
+            }}
+            data-invalid={$errors.lastName ? "" : undefined}
+          ></wa-input>
+          {#if $errors.lastName}
+            <small class="error-message">{$errors.lastName[0]}</small>
+          {/if}
+        </div>
+      </div>
+
+      <div class="field">
+        <wa-input
+          id="companyName"
+          name="companyName"
+          placeholder="Acme Corporation"
+          label="Company Name"
+          value={$form.companyName}
+          oninput={(e: Event) => {
+            $form.companyName = (e.target as HTMLInputElement).value;
+          }}
+          data-invalid={$errors.companyName ? "" : undefined}
+        ></wa-input>
+        {#if $errors.companyName}
+          <small class="error-message">{$errors.companyName[0]}</small>
+        {/if}
+      </div>
+
+      <div class="field">
+        <wa-input
+          id="email"
+          name="email"
+          placeholder="john.doe@company.com"
+          label="Email Address"
+          value={$form.email}
+          oninput={(e: Event) => {
+            $form.email = (e.target as HTMLInputElement).value;
+          }}
+          data-invalid={$errors.email ? "" : undefined}
+        ></wa-input>
+        {#if $errors.email}
+          <small class="error-message">{$errors.email[0]}</small>
+        {/if}
+      </div>
+
+      <div class="field">
+        <wa-input
+          id="password"
+          name="password"
+          type="password"
+          placeholder="••••••••"
+          label="Password"
+          password-toggle
+          value={$form.password}
+          oninput={(e: Event) => {
+            $form.password = (e.target as HTMLInputElement).value;
+          }}
+          data-invalid={$errors.password ? "" : undefined}
+        ></wa-input>
+        {#if $errors.password}
+          <small class="error-message">{$errors.password[0]}</small>
+        {/if}
+      </div>
+
+      {#if $submitting}
+        <wa-button type="submit" variant="brand" loading disabled>
+          Create Organization
+        </wa-button>
+      {:else}
+        <wa-button type="submit" variant="brand">
+          Create Organization
+        </wa-button>
+      {/if}
+    </form>
+
+    <TextDivider />
+
+    <div class="wa-cluster wa-gap-xs wa-justify-content-center">
+      <span class="wa-body-s wa-color-text-quiet">Already have an account?</span
+      >
+      <a href="/signin" class="wa-link wa-font-size-s wa-font-weight-bold"
+        >Sign in</a
+      >
+    </div>
+  </div>
+</wa-card>
+
+<style>
+  wa-card {
+    width: 100%;
+    max-width: 490px;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wa-space-xs);
+  }
+
+  .error-message {
+    color: var(--akriva-status-error);
+    font-size: var(--wa-font-size-s);
+  }
+</style>
+</file>
+
+<file path="src/routes/(auth)/verify-email/+page.svelte">
+<script lang="ts">
+  import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/input/input.js";
+  import "@awesome.me/webawesome/dist/components/card/card.js";
+  import "@awesome.me/webawesome/dist/components/callout/callout.js";
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
+
+  import TextDivider from "$components/TextDivider.svelte";
+</script>
+
+<svelte:head>
+  <title>Verify Email | Akriva</title>
+</svelte:head>
+
+<wa-card>
+  <div class="wa-stack wa-gap-2xl">
+    <!-- Title -->
+    <div class="wa-stack wa-gap-s wa-align-items-center">
+      <h2>Verify Your Email</h2>
+      <p class="wa-body-l wa-color-text-quiet">
+        Enter the 6-digit verification code sent to your email
+      </p>
+    </div>
+
+    <!-- Code Input -->
+    <div class="wa-stack wa-gap-xl wa-align-items-center">
+      <div class="wa-cluster">
+        {#each Array(6) as _, i}
+          <wa-input
+            type="text"
+            maxlength="1"
+            inputmode="numeric"
+            no-spin-buttons
+            size="large"
+          ></wa-input>
+        {/each}
+      </div>
+      <span class="wa-body-s" style="color: var(--akriva-text-tertiary);">
+        Didn't receive a code? Check your spam folder
+      </span>
+    </div>
+
+    <!-- Verify Button -->
+    <wa-button type="submit" style="width: 100%;">Verify Email</wa-button>
+
+    <!-- Resend -->
+    <div class="wa-cluster wa-gap-xs wa-justify-content-center">
+      <span class="wa-body-s wa-color-text-quiet">Didn't receive the code?</span
+      >
+      <a href="/verify-email" class="wa-link wa-font-size-s wa-font-weight-bold"
+        >Resend code</a
+      >
+    </div>
+
+    <TextDivider />
+
+    <!-- Back to signup -->
+    <div class="wa-cluster wa-gap-xs wa-justify-content-center">
+      <span class="wa-body-s wa-color-text-quiet">Changed your mind?</span>
+      <a href="/signup" class="wa-link wa-font-size-s wa-font-weight-bold"
+        >Go back to signup</a
+      >
+    </div>
+
+    <!-- Security Note -->
+    <wa-callout variant="success">
+      <wa-icon
+        slot="icon"
+        name="circle-check"
+        variant="regular"
+        style="margin-right: 20px"
+      ></wa-icon>
+      <strong> Identity Chain Verification:</strong>
+      This code establishes your cryptographic identity for all future audit entries
+    </wa-callout>
+  </div>
+</wa-card>
+
+<style>
+  wa-input {
+    max-width: 56px;
+    --wa-form-control-background-color: var(--akriva-surface-secondary);
+  }
+  wa-callout {
+    --wa-form-control-padding-inline: var(--akriva-space-5) !important;
+  }
+  wa-card {
+    width: 100%;
+    max-width: 490px;
+  }
+</style>
+</file>
+
+<file path="src/routes/(auth)/+layout.server.ts">
+import { redirect } from '@sveltejs/kit';
+import type { LayoutServerLoad } from './$types.js';
+
+export const load: LayoutServerLoad = async ({ locals }) => {
+	if (locals.session) {
+		redirect(302, '/dashboard');
+	}
+};
+</file>
+
+<file path="src/routes/(auth)/+layout.svelte">
+<script lang="ts">
+  import AkrivaLogo from "$components/AkrivaLogo.svelte";
+  let { children } = $props();
+</script>
+
+<div
+  class="wa-stack wa-gap-m wa-align-items-center wa-justify-content-center"
+  style="height:100vh"
+>
+  <AkrivaLogo />
+  {@render children()}
+</div>
+</file>
+
+<file path="src/routes/+layout.svelte">
+<script lang="ts">
+	import favicon from '$lib/assets/favicon.svg';
+	import '../styles/global.css';
+
+	let { children } = $props();
+</script>
+
+<svelte:head>
+	<link rel="icon" href={favicon} />
+</svelte:head>
+
+{@render children()}
+</file>
+
+<file path="src/styles/akriva-tokens.css">
+/* Akriva design tokens (from Pencil design system) */
+:root {
+  /* Colors — Actions */
+  --akriva-action-primary: #2563eb;
+  --akriva-action-hover: #1d4ed8;
+  --akriva-action-pressed: #1e40af;
+
+  /* Colors — Brand */
+  --akriva-brand-primary: #1e293b;
+  --akriva-brand-secondary: #64748b;
+
+  /* Colors — Surfaces */
+  --akriva-surface-primary: #ffffff;
+  --akriva-surface-secondary: #f7f8f9;
+  --akriva-surface-tertiary: #f1f5f9;
+
+  /* Colors — Text */
+  --akriva-text-primary: #1e293b;
+  --akriva-text-secondary: #64748b;
+  --akriva-text-tertiary: #94a3b8;
+  --akriva-text-disabled: #cbd5e1;
+  --akriva-text-inverse: #ffffff;
+
+  /* Colors — Borders */
+  --akriva-border-default: #e5e7eb;
+  --akriva-border-strong: #cbd5e1;
+  --akriva-border-subtle: #f1f5f9;
+  --akriva-border-focus: #2563eb;
+
+  /* Colors — Status */
+  --akriva-status-error: #ef4444;
+  --akriva-status-error-light: #fee2e2;
+  --akriva-status-risk: #fb923c;
+  --akriva-status-risk-light: #fed7aa;
+  --akriva-status-verified: #10b981;
+  --akriva-status-verified-light: #d1fae5;
+
+  /* Typography — Fonts */
+  --akriva-font-primary: "Inter", system-ui, -apple-system, sans-serif;
+  --akriva-font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  /* Typography — Sizes */
+  --akriva-size-display: 48px;
+  --akriva-size-h1: 32px;
+  --akriva-size-h2: 24px;
+  --akriva-size-h3: 20px;
+  --akriva-size-h4: 18px;
+  --akriva-size-body-lg: 16px;
+  --akriva-size-body: 14px;
+  --akriva-size-body-sm: 12px;
+  --akriva-size-caption: 12px;
+  --akriva-size-micro: 10px;
+
+  /* Typography — Weights */
+  --akriva-weight-light: 300;
+  --akriva-weight-regular: 400;
+  --akriva-weight-medium: 500;
+  --akriva-weight-semibold: 600;
+  --akriva-weight-bold: 700;
+
+  /* Typography — Line Heights */
+  --akriva-height-tight: 1.2;
+  --akriva-height-base: 1.5;
+  --akriva-height-relaxed: 1.75;
+
+  /* Spacing */
+  --akriva-space-0: 0px;
+  --akriva-space-1: 4px;
+  --akriva-space-2: 8px;
+  --akriva-space-3: 12px;
+  --akriva-space-4: 16px;
+  --akriva-space-5: 20px;
+  --akriva-space-6: 24px;
+  --akriva-space-8: 32px;
+  --akriva-space-10: 40px;
+  --akriva-space-12: 48px;
+  --akriva-space-16: 64px;
+  --akriva-space-20: 80px;
+
+  /* Radius */
+  --akriva-radius-none: 0px;
+  --akriva-radius-xs: 2px;
+  --akriva-radius-sm: 4px;
+  --akriva-radius-md: 8px;
+  --akriva-radius-lg: 12px;
+  --akriva-radius-xl: 16px;
+  --akriva-radius-full: 9999px;
+
+  /* Border Widths */
+  --akriva-border-thin: 1px;
+  --akriva-border-medium: 2px;
+  --akriva-border-thick: 3px;
+
+  /* Shadows */
+  --akriva-shadow-xs: 0 1px 2px 0 rgba(30, 41, 59, 0.05);
+  --akriva-shadow-sm: 0 2px 4px 0 rgba(30, 41, 59, 0.06);
+  --akriva-shadow-md: 0 4px 8px -1px rgba(30, 41, 59, 0.08);
+  --akriva-shadow-lg: 0 10px 20px -3px rgba(30, 41, 59, 0.1);
+  --akriva-shadow-xl: 0 20px 40px -5px rgba(30, 41, 59, 0.15);
+
+  /* Opacity */
+  --akriva-opacity-0: 0;
+  --akriva-opacity-25: 0.25;
+  --akriva-opacity-50: 0.5;
+  --akriva-opacity-75: 0.75;
+  --akriva-opacity-100: 1;
+
+  /* Duration */
+  --akriva-duration-instant: 100ms;
+  --akriva-duration-fast: 200ms;
+  --akriva-duration-normal: 300ms;
+  --akriva-duration-slow: 500ms;
+}
+</file>
+
+<file path="src/styles/flatpickr-akriva.css">
+/* Flatpickr base + Akriva token overrides */
+@import "flatpickr/dist/flatpickr.css";
+
+/* Calendar popup container */
+.flatpickr-calendar {
+  font-family: var(--akriva-font-primary);
+  background: var(--akriva-surface-primary);
+  border: var(--akriva-border-thin) solid var(--akriva-border-default);
+  border-radius: var(--akriva-radius-md);
+  box-shadow: var(--akriva-shadow-md);
+  width: 280px;
+}
+
+.flatpickr-calendar::before,
+.flatpickr-calendar::after {
+  display: none;
+}
+
+/* Month navigation header */
+.flatpickr-months {
+  padding: var(--akriva-space-2) var(--akriva-space-2) 0;
+}
+
+.flatpickr-months .flatpickr-month {
+  color: var(--akriva-text-primary);
+  fill: var(--akriva-text-primary);
+  height: 36px;
+}
+
+.flatpickr-current-month {
+  font-size: var(--akriva-size-body);
+  font-weight: var(--akriva-weight-semibold);
+  color: var(--akriva-text-primary);
+  padding-top: 6px;
+}
+
+.flatpickr-current-month .flatpickr-monthDropdown-months,
+.flatpickr-current-month input.cur-year {
+  font-weight: var(--akriva-weight-semibold);
+  color: var(--akriva-text-primary);
+}
+
+.flatpickr-current-month .flatpickr-monthDropdown-months:hover,
+.flatpickr-current-month input.cur-year:hover {
+  background: var(--akriva-surface-tertiary);
+}
+
+/* Prev/next arrows */
+.flatpickr-months .flatpickr-prev-month,
+.flatpickr-months .flatpickr-next-month {
+  color: var(--akriva-text-secondary);
+  fill: var(--akriva-text-secondary);
+  padding: var(--akriva-space-2);
+  border-radius: var(--akriva-radius-sm);
+}
+
+.flatpickr-months .flatpickr-prev-month:hover,
+.flatpickr-months .flatpickr-next-month:hover {
+  color: var(--akriva-text-primary);
+  fill: var(--akriva-text-primary);
+  background: var(--akriva-surface-tertiary);
+}
+
+.flatpickr-months .flatpickr-prev-month svg,
+.flatpickr-months .flatpickr-next-month svg {
+  fill: inherit;
+}
+
+/* Weekday headers */
+.flatpickr-weekdays {
+  padding: 0 var(--akriva-space-2);
+}
+
+span.flatpickr-weekday {
+  color: var(--akriva-text-tertiary);
+  font-size: var(--akriva-size-body-sm);
+  font-weight: var(--akriva-weight-medium);
+}
+
+/* Day grid */
+.flatpickr-innerContainer {
+  padding: 0 var(--akriva-space-2) var(--akriva-space-2);
+}
+
+.flatpickr-days {
+  border: none;
+}
+
+.dayContainer {
+  min-width: 256px;
+  max-width: 256px;
+}
+
+/* Individual day cells */
+.flatpickr-day {
+  color: var(--akriva-text-primary);
+  font-size: var(--akriva-size-body-sm);
+  font-weight: var(--akriva-weight-regular);
+  border-radius: var(--akriva-radius-sm);
+  border: 2px solid transparent;
+  max-width: 36px;
+  height: 36px;
+  line-height: 32px;
+  margin: 1px;
+}
+
+.flatpickr-day:hover {
+  background: var(--akriva-surface-tertiary);
+  border-color: transparent;
+}
+
+/* Today */
+.flatpickr-day.today {
+  border-color: var(--akriva-action-primary);
+}
+
+.flatpickr-day.today:hover {
+  background: var(--akriva-surface-tertiary);
+  border-color: var(--akriva-action-primary);
+  color: var(--akriva-text-primary);
+}
+
+/* Selected day */
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange {
+  background: var(--akriva-action-primary);
+  border-color: var(--akriva-action-primary);
+  color: var(--akriva-text-inverse);
+}
+
+.flatpickr-day.selected:hover,
+.flatpickr-day.startRange:hover,
+.flatpickr-day.endRange:hover {
+  background: var(--akriva-action-hover);
+  border-color: var(--akriva-action-hover);
+  color: var(--akriva-text-inverse);
+}
+
+/* Range in-between days */
+.flatpickr-day.inRange {
+  background: color-mix(in srgb, var(--akriva-action-primary) 10%, transparent);
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.flatpickr-day.inRange:hover {
+  background: color-mix(in srgb, var(--akriva-action-primary) 20%, transparent);
+  border-color: transparent;
+}
+
+/* Range start/end rounding */
+.flatpickr-day.startRange {
+  border-radius: var(--akriva-radius-sm) 0 0 var(--akriva-radius-sm);
+}
+
+.flatpickr-day.endRange {
+  border-radius: 0 var(--akriva-radius-sm) var(--akriva-radius-sm) 0;
+}
+
+.flatpickr-day.startRange.endRange {
+  border-radius: var(--akriva-radius-sm);
+}
+
+/* Disabled / other-month days */
+.flatpickr-day.flatpickr-disabled,
+.flatpickr-day.flatpickr-disabled:hover {
+  color: var(--akriva-text-disabled);
+  background: transparent;
+  border-color: transparent;
+  cursor: not-allowed;
+}
+
+.flatpickr-day.prevMonthDay,
+.flatpickr-day.nextMonthDay {
+  color: var(--akriva-text-disabled);
+}
+
+.flatpickr-day.prevMonthDay:hover,
+.flatpickr-day.nextMonthDay:hover {
+  background: var(--akriva-surface-tertiary);
+  border-color: transparent;
+}
+</file>
+
+<file path="src/styles/global.css">
+@import "./theme.css";
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -moz-tab-size: 4;
+  tab-size: 4;
+}
+
+body {
+  font-family: var(--akriva-font-primary);
+  color: var(--akriva-text-primary);
+  background-color: var(--akriva-surface-secondary);
+  font-size: var(--akriva-size-body);
+  line-height: var(--akriva-height-base);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  line-height: var(--leading-tight);
+  font-weight: var(--weight-semibold);
+}
+
+a {
+  text-decoration: underline;
+}
+
+code,
+pre {
+  font-family: var(--font-mono);
+}
+
+/* Card defaults */
+wa-card {
+  border-radius: var(--wa-border-radius-s);
+  border-color: var(--wa-color-surface-border);
+  --spacing: var(--wa-space-2xl);
+  box-shadow: none;
+}
+
+h1 {
+  font-size: var(--akriva-size-h1);
+}
+
+h2 {
+  font-size: var(--akriva-size-h2);
+}
+
+h3 {
+  font-size: var(--akriva-size-h3);
+  font-weight: var(--akriva-weight-medium);
+}
+
+h4 {
+  font-size: var(--akriva-size-h4);
+}
+
+wa-input[disabled] {
+  --wa-form-control-background-color: var(--akriva-surface-tertiary);
+  --wa-form-control-value-color): var(--akriva-text-tertiary);
+}
+</file>
+
+<file path="src/styles/theme.css">
+/* Akriva Design System — WA base + brand overrides + Akriva tokens */
+@import "@awesome.me/webawesome/dist/styles/webawesome.css";
+@import "@awesome.me/webawesome/dist/styles/utilities.css";
+@import "./akriva-tokens.css";
+@import "./wa-overrides.css";
+</file>
+
+<file path="src/styles/wa-overrides.css">
+/* Web Awesome token overrides — maps WA tokens to Akriva design tokens */
+:root {
+  /* Brand color scale */
+  --wa-color-brand-50: var(--akriva-action-primary);
+  --wa-color-brand-40: var(--akriva-action-hover);
+  --wa-color-brand-30: var(--akriva-action-pressed);
+  --wa-color-brand-60: #3b82f6;
+  --wa-color-brand-80: #bfdbfe;
+  --wa-color-brand-90: #dbeafe;
+  --wa-color-brand-95: #eff6ff;
+
+  /* Surfaces */
+  --wa-color-surface-default: var(--akriva-surface-primary);
+  --wa-color-surface-lowered: var(--akriva-surface-secondary);
+  --wa-color-surface-border: var(--akriva-border-default);
+
+  /* Text */
+  --wa-color-text-normal: var(--akriva-text-primary);
+  --wa-color-text-quiet: var(--akriva-text-secondary);
+  --wa-color-neutral-fill-loud: var(--akriva-action-primary);
+
+  /* Typography — Font families */
+  --wa-font-sans: var(--akriva-font-primary);
+  --wa-font-mono: var(--akriva-font-mono);
+  --wa-font-family-body: var(--akriva-font-primary);
+  --wa-font-family-heading: var(--akriva-font-primary);
+  --wa-font-family-code: var(--akriva-font-mono);
+
+  /* Typography — Font sizes
+       Note: akriva-size-h4/body-lg (both 18px) share wa-font-size-l */
+  --wa-font-size-2xs: var(--akriva-size-micro); /* 10px */
+  --wa-font-size-xs: var(--akriva-size-caption); /* 12px */
+  --wa-font-size-s: var(--akriva-size-body-sm); /* 14px */
+  --wa-font-size-m: var(--akriva-size-body); /* 16px */
+  --wa-font-size-l: var(--akriva-size-body-lg); /* 18px */
+  --wa-font-size-xl: var(--akriva-size-h3); /* 20px */
+  --wa-font-size-2xl: var(--akriva-size-h2); /* 24px */
+  --wa-font-size-3xl: var(--akriva-size-h1); /* 32px */
+  --wa-font-size-4xl: var(--akriva-size-display); /* 48px */
+
+  /* Typography — Font weights (WA semibold=500, bold=600)
+       Note: akriva-weight-bold (700) has no wa-font-weight class */
+  --wa-font-weight-light: var(--akriva-weight-light); /* 300 */
+  --wa-font-weight-normal: var(--akriva-weight-regular); /* 400 */
+  --wa-font-weight-semibold: var(--akriva-weight-medium); /* 500 */
+  --wa-font-weight-bold: var(--akriva-weight-semibold); /* 600 */
+
+  /* Typography — Line heights */
+  --wa-line-height-condensed: var(--akriva-height-tight); /* 1.2 */
+  --wa-line-height-normal: var(--akriva-height-base); /* 1.5 */
+  --wa-line-height-expanded: var(--akriva-height-relaxed); /* 1.75 */
+
+  /* Links */
+  --wa-color-text-link: var(--akriva-action-primary);
+  --wa-link-decoration-default: none;
+
+  /* Form controls */
+  --wa-form-control-border-color: var(--akriva-border-default);
+  --wa-form-control-border-radius: var(--akriva-radius-xs); /* 2px */
+  --wa-form-control-activated-color: var(--akriva-action-primary);
+  --wa-form-control-label-color: var(--akriva-text-primary);
+  --wa-form-control-label-font-weight: var(--akriva-weight-medium); /* 500 */
+  --wa-form-control-value-color: var(--akriva-text-primary);
+  --wa-form-control-hint-color: var(--akriva-text-tertiary);
+  --wa-form-control-placeholder-color: var(--akriva-text-tertiary);
+
+  /* Input component */
+  --wa-input-height-medium: 44px;
+  --wa-input-border-radius-medium: var(--akriva-radius-xs);
+
+  /* Panel */
+  --wa-panel-border-radius: var(--akriva-radius-xs); /* 2px */
+
+  /* Button */
+  --wa-button-font-size-large: var(--akriva-size-body);
+
+  /* Spacing (wa-gap-* → akriva-space-*)
+       Note: akriva-space-16 (64px) and space-20 (80px) have no wa-gap class */
+  --wa-space-3xs: 2px;
+  --wa-space-2xs: var(--akriva-space-1); /* 4px */
+  --wa-space-xs: var(--akriva-space-2); /* 8px */
+  --wa-space-s: var(--akriva-space-3); /* 12px */
+  --wa-space-m: var(--akriva-space-4); /* 16px */
+  --wa-space-l: var(--akriva-space-5); /* 20px */
+  --wa-space-xl: var(--akriva-space-6); /* 24px */
+  --wa-space-2xl: var(--akriva-space-8); /* 32px */
+  --wa-space-3xl: var(--akriva-space-10); /* 40px */
+  --wa-space-4xl: var(--akriva-space-12); /* 48px */
+
+  /* Border widths */
+  --wa-border-width-s: var(--akriva-border-thin); /* 1px */
+  --wa-border-width-m: var(--akriva-border-medium); /* 2px */
+  --wa-border-width-l: var(--akriva-border-thick); /* 3px */
+
+  /* Border radius
+       Note: akriva-radius-xs (2px) and radius-xl (16px) have no wa-border-radius class */
+  --wa-border-radius-square: var(--akriva-radius-none); /* 0px */
+  --wa-border-radius-s: var(--akriva-radius-sm); /* 4px */
+  --wa-border-radius-m: var(--akriva-radius-md); /* 8px */
+  --wa-border-radius-l: var(--akriva-radius-lg); /* 12px */
+  --wa-border-radius-pill: var(--akriva-radius-full); /* 9999px */
+
+  --wa-color-neutral-border-loud: var(--akriva-border-default);
+}
+</file>
+
+<file path="src/app.html">
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		%sveltekit.head%
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents">%sveltekit.body%</div>
+	</body>
+</html>
+</file>
+
+<file path="static/robots.txt">
+# allow crawling everything by default
+User-agent: *
+Disallow:
+</file>
+
+<file path=".env.example">
+# API Configuration
+# Base URL for the Akriva API (v1)
+VITE_API_URL=https://api.akriva.com/v1
+
+# Optional: Override for local development
+# VITE_API_URL=http://localhost:3000/v1
+</file>
+
+<file path=".gitignore">
+node_modules
+
+# Output
+.output
+.vercel
+.netlify
+.wrangler
+/.svelte-kit
+/build
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.*
+!.env.example
+!.env.test
+
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+</file>
+
+<file path=".npmrc">
+engine-strict=true
+</file>
+
+<file path="CLAUDE.md">
+# Akriva App — Frontend Guidelines
+
+## Architecture — Thin Presentational Layer
+
+**IMPORTANT: This frontend contains NO business logic.** It is a lightweight presentational layer only. All validation, authorization, data processing, and business rules live in the backend API services. The frontend's sole responsibilities are:
+
+- Rendering UI from data received via API
+- Collecting user input and forwarding it to the backend
+- Displaying errors/feedback returned by the backend
+- Client-side UI state (loading spinners, toggling visibility, form field state)
+
+Never implement business logic, data transformation, or decision-making in the frontend. If you're tempted to add an `if` that decides something based on domain rules, it belongs in the backend.
+
+## Stack
+
+- **SvelteKit 2** with Svelte 5 (runes: `$props`, `$state`, `$derived`)
+- **Web Awesome 3.2** — UI component library (`<wa-*>` custom elements)
+- **Zod 4** — schema validation for API response types
+- **Superforms** — form handling with client-side Zod validation (`sveltekit-superforms`)
+- **TypeScript strict** mode
+- **Vite 7** — build tool
+- npm package manager
+
+## Second Brain
+
+All project knowledge - architecture decisions, error patterns, dependency choices, discussions, and context - lives in the **NotebookLM notebook**. This file does NOT store knowledge.
+The notebook is the single source of truth. Always use nlm-cli-skill to interact with notebooklm.
+
+### Notebooks
+
+#### 1. Project Knowledge (Second Brain)
+
+- **Notebook Name**: Akriva Frontend - Second Brain
+- **Notebook ID**: `f0188b2a-2b42-4db1-9421-d5f4df9b17e6`
+- **Alias**: `fe-akriva`
+- **Contents**: Frontend project knowledge — architecture, codebase structure, coding patterns, API integration, authentication system, UI components, design system, company settings feature, and Product Requirement Document
+
+#### 2. Tech Documentation
+
+- **Notebook Name**: Akriva - Tech Documentation
+- **Notebook ID**: `07cbc727-79f2-48e5-be8e-d35144178637`
+- **Alias**: `techdocs`
+- **Contents**: Frontend tech stack documentation — Svelte 5 runes ($state, $derived, $effect, $props, $bindable, snippets), SvelteKit 2 (routing, load, form actions, hooks), Superforms (setup, validation, events, error handling), Zod 4 (types, refinements, coercion, transforms), Web Awesome 3.2 (input, select, radio, dialog, tabs, tokens), Vite 7 (config, proxy, env vars, plugins). Also includes backend references: Zod v3, Vitest, Drizzle ORM, AWS CDK/DynamoDB/Cognito, tsyringe, Stripe, Neon
+
+#### 3. Full Codebase (Repomix)
+
+- **Notebook Name**: Akriva - Repomix Codebase
+- **Notebook ID**: `905dbd90-acd9-4870-ae4d-c5aedebbe654`
+- **Alias**: `akriva-repomix`
+- **Contents**: Complete frontend codebase packed as XML via Repomix
+
+#### 4. GHG Domain Knowledge
+
+- **Notebook Name**: Akriva - GHG Domain Knowledge
+- **Notebook ID**: `03d2f415-5cb6-4922-a6d8-3dd7c34d2463`
+- **Alias**: `ghg-domain`
+- **Contents**: Deep research on GHG reporting business domain — GHG Protocol (Scope 1/2/3), ISO 14064, CSRD, SEC climate disclosure, emission factor management (DEFRA/EPA/IPCC), consolidation approaches, audit/verification standards, data quality frameworks, multi-entity reporting structures
+
+### Search-First Rule
+
+**When you need to search for anything related to this project — ALWAYS query the appropriate NotebookLM notebook FIRST before searching the codebase or web.**
+
+Use the nlm CLI:
+
+```bash
+# Project architecture, patterns, decisions, codebase knowledge
+nlm notebook query fe-akriva "your question here"
+
+# Library/framework API usage, syntax, examples
+nlm notebook query techdocs "your question here"
+
+# Full codebase context / cross-domain search
+nlm notebook query akriva-repomix "your question here"
+
+# GHG business domain knowledge (emissions, compliance, audit standards)
+nlm notebook query ghg-domain "your question here"
+```
+
+The Second Brain notebook (`fe-akriva`) contains these source documents:
+
+1. **Product Requirement Document** — GHG reporting platform vision, product pillars, personas, functional requirements, compliance, success metrics, roadmap
+2. **Project Overview & Architecture** — Tech stack, project structure, package dependencies, architecture flow, backend API overview
+3. **API Layer — Client, Types & Domain APIs** — ApiError class, fetch wrappers, all TypeScript interfaces (auth, tenant, shared types), auth API functions, tenant API functions
+4. **Authentication System** — Server auth utilities, JWT handling, session types, hooks.server.ts middleware, route guards, auth store, signin/signup/logout flows
+5. **Company Settings Page** — Tenant settings feature: server load/action, Superforms configuration, form sections, sector cascade, Zod schema, error handling
+6. **UI Components, Layouts & Design System** — Reusable components (CountrySelect, DatePicker, TextDivider, AkrivaLogo), app shell layout, settings layout, waChange action, design token system
+7. **Coding Patterns & Conventions** — Svelte 5 runes usage, Superforms+Zod patterns, WA event handling, nullable field patterns, error handling, cascading select, file organization, CSS conventions
+
+### When to Search Notebook vs Code
+
+| Question Type                                           | Search First               | Fallback |
+| ------------------------------------------------------- | -------------------------- | -------- |
+| Product requirements and features                       | Notebook                   | —        |
+| Business logic and domain rules                         | Notebook                   | Code     |
+| User stories and acceptance criteria                    | Notebook                   | —        |
+| GHG/emissions/sustainability scope                      | GHG Domain (`ghg-domain`)  | Notebook |
+| Emission factor databases / versioning                  | GHG Domain (`ghg-domain`)  | Web      |
+| GHG Protocol / ISO 14064 / CSRD / SEC rules             | GHG Domain (`ghg-domain`)  | Web      |
+| Audit/verification standards for GHG                    | GHG Domain (`ghg-domain`)  | Web      |
+| Scope 1/2/3 calculation methodologies                   | GHG Domain (`ghg-domain`)  | Web      |
+| Consolidation approaches (operational/financial/equity) | GHG Domain (`ghg-domain`)  | Notebook |
+| Library/framework API usage                             | Tech Docs (`techdocs`)     | Web      |
+| Full codebase context / cross-domain search             | Repomix (`akriva-repomix`) | Code     |
+| Specific implementation details                         | Code                       | Notebook |
+| Runtime debugging                                       | Code                       | Notebook |
+
+### Planning Rules (STRICT)
+
+These rules are **mandatory** for every planning session. No exceptions.
+
+#### Before Planning: Search First
+
+Before creating ANY implementation plan, you MUST query NotebookLM to gather context:
+
+1. **Query `fe-akriva`** for architecture decisions, domain patterns, existing conventions, and related prior plans
+2. **Query `techdocs`** if the plan involves library/framework usage (SvelteKit, Superforms, Zod, Web Awesome, etc.)
+3. **Query `ghg-domain`** if the plan involves emissions, GHG calculations, compliance frameworks, emission factors, audit/verification, or any sustainability business logic
+4. **Query `akriva-repomix`** if you need to understand full codebase context or cross-file interactions
+
+```bash
+# Example: before planning a new "emissions" feature
+nlm notebook query fe-akriva "emissions module architecture plans existing decisions"
+nlm notebook query fe-akriva "what patterns are used for new page creation"
+nlm notebook query ghg-domain "scope 1 emission calculation methodology data requirements"
+nlm notebook query techdocs "superforms zod validation patterns"
+```
+
+Do NOT skip this step. Do NOT rely solely on codebase search or your own knowledge. The notebooks contain decisions and context that may not be visible in the code.
+
+#### After Plan Approval: Save to Second Brain
+
+When the user **accepts** an implementation plan, you MUST save it to the Second Brain notebook (`fe-akriva`) as a source:
+
+```bash
+nlm source add fe-akriva --text "PLAN CONTENT HERE" --title "Plan: [Feature/Task Name] - [Date]"
+```
+
+The saved plan must include:
+
+- **Goal**: What the plan aims to achieve
+- **Key decisions**: Architecture choices and trade-offs made
+- **Files to create/modify**: Full list of affected files
+- **Implementation steps**: The ordered steps from the plan
+- **Dependencies**: Any blockers or prerequisites
+
+This ensures all accepted plans are searchable for future planning sessions, preventing contradictory decisions and enabling plan continuity across sessions.
+
+### Updating the Notebooks
+
+When significant changes are made to the codebase (new domains, API changes, architectural decisions), update the notebook sources:
+
+```bash
+# List current sources
+nlm source list fe-akriva
+nlm source list techdocs
+nlm source list akriva-repomix
+
+# Add a new source to Second Brain
+nlm source add fe-akriva --text "content" --title "Title"
+
+# Add a new tech doc URL
+nlm source add techdocs --url "https://docs.example.com/guide" --title "Library - Guide"
+
+# Regenerate repomix codebase snapshot (run from project root)
+repomix --style xml --output repomix-output.xml
+# Then upsert via Python to bypass ARG_MAX (file > 1MB)
+
+# Query to verify
+nlm notebook query fe-akriva "question about the change"
+nlm notebook query techdocs "how to use X in library Y"
+nlm notebook query akriva-repomix "cross-file question about codebase"
+```
+
+Reference documents are stored in `.claude/docs/ai/` for regeneration if needed.
+</file>
+
+<file path="README.md">
+# sv
+
+Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+
+## Creating a project
+
+If you're seeing this, you've probably already done this step. Congrats!
+
+```sh
+# create a new project
+npx sv create my-app
+```
+
+To recreate this project with the same configuration:
+
+```sh
+# recreate this project
+npx sv create --template minimal --types ts --install npm .
+```
+
+## Developing
+
+Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+
+```sh
+npm run dev
+
+# or start the server and open the app in a new browser tab
+npm run dev -- --open
+```
+
+## Building
+
+To create a production version of your app:
+
+```sh
+npm run build
+```
+
+You can preview the production build with `npm run preview`.
+
+> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+</file>
+
+<file path="svelte.config.js">
+import adapter from '@sveltejs/adapter-auto';
+
+/** @type {import('@sveltejs/kit').Config} */
+const config = {
+	kit: {
+		adapter: adapter(),
+		alias: {
+			'$components': 'src/components',
+			'$components/*': 'src/components/*'
+		}
+	}
+};
+
+export default config;
+</file>
+
+<file path="tsconfig.json">
+{
+	"extends": "./.svelte-kit/tsconfig.json",
+	"compilerOptions": {
+		"rewriteRelativeImportExtensions": true,
+		"allowJs": true,
+		"checkJs": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"resolveJsonModule": true,
+		"skipLibCheck": true,
+		"sourceMap": true,
+		"strict": true,
+		"moduleResolution": "bundler"
+	}
+	// Path aliases are handled by https://svelte.dev/docs/kit/configuration#alias
+	// except $lib which is handled by https://svelte.dev/docs/kit/configuration#files
+	//
+	// To make changes to top-level options such as include and exclude, we recommend extending
+	// the generated config; see https://svelte.dev/docs/kit/configuration#typescript
+}
+</file>
+
+<file path="vite.config.ts">
+import { sveltekit } from '@sveltejs/kit/vite';
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+	plugins: [sveltekit()]
+});
+</file>
+
+<file path="src/lib/api/types.ts">
+/**
+ * Authentication API types
+ * Mirrors the API handoff document exactly
+ */
+
+/** Signup request - POST /auth/signup */
+export interface SignupRequest {
+	email: string;
+	password: string;
+	givenName: string;
+	familyName: string;
+	companyName: string;
+	invitationToken?: string;
+}
+
+/** Signin request - POST /auth/signin */
+export interface SigninRequest {
+	email: string;
+	password: string;
+}
+
+/** MFA verify request - POST /auth/mfa/verify */
+export interface MfaVerifyRequest {
+	session: string;
+	code: string;
+}
+
+/** Refresh token request - POST /auth/refresh */
+export interface RefreshRequest {
+	refreshToken: string;
+}
+
+/** Forgot password request - POST /auth/forgot-password */
+export interface ForgotPasswordRequest {
+	email: string;
+}
+
+/** Confirm forgot password request - POST /auth/confirm-forgot-password */
+export interface ConfirmForgotPasswordRequest {
+	email: string;
+	confirmationCode: string;
+	newPassword: string;
+}
+
+/** Change password request - POST /auth/change-password (authenticated) */
+export interface ChangePasswordRequest {
+	previousPassword: string;
+	proposedPassword: string;
+}
+
+/** Shared token shape */
+export interface AuthTokens {
+	accessToken: string; // JWT — use for Authorization header
+	idToken: string; // JWT — contains user claims
+	refreshToken: string; // Opaque — use for token refresh
+	expiresIn: number; // Seconds until accessToken expires (typically 3600)
+}
+
+/** Valid user roles */
+export type UserRole = 'owner' | 'admin' | 'user';
+
+/** User info returned by signup */
+export interface UserInfo {
+	id: string; // UUID
+	email: string;
+	tenantId: string; // UUID
+	role: UserRole;
+}
+
+/** Signup response - 201 Created */
+export interface SignupResponse {
+	tokens: AuthTokens;
+	user: UserInfo;
+}
+
+/** MFA challenge from signin */
+export interface MfaChallenge {
+	challengeName: string; // e.g., "SOFTWARE_TOKEN_MFA"
+	session: string; // Pass to /auth/mfa/verify
+	challengeParameters: Record<string, string>;
+}
+
+/** Signin response - discriminated union */
+export type SigninResponse =
+	| { type: 'tokens'; tokens: AuthTokens }
+	| { type: 'mfa_challenge'; challenge: MfaChallenge };
+
+/** MFA verify response — same shape as AuthTokens */
+export type MfaVerifyResponse = AuthTokens;
+
+/** Refresh token response — same shape as AuthTokens */
+export type RefreshResponse = AuthTokens;
+
+/** Standard success message response */
+export interface MessageResponse {
+	message: string;
+}
+
+/** Standard error response */
+export interface ApiErrorResponse {
+	error: string; // Human-readable message
+	code: string; // Machine-readable code
+	details?: {
+		// Present for Zod validation errors
+		issues: Array<{
+			code: string;
+			path: string[];
+			message: string;
+			[key: string]: unknown;
+		}>;
+	};
+}
+
+/** Error codes from API */
+export type ErrorCode =
+	| 'VALIDATION_FAILED'
+	| 'UNAUTHORIZED'
+	| 'FORBIDDEN'
+	| 'NOT_FOUND'
+	| 'CONFLICT'
+	| 'MFA_CHALLENGE_REQUIRED'
+	| 'COGNITO_OPERATION_FAILED';
+
+/** Tenant status */
+export type TenantStatus = 'init' | 'active' | 'inactive' | 'removed';
+
+/** Consolidation approach (GHG Protocol) */
+export type ConsolidationApproach = 'operational_control' | 'financial_control' | 'equity_share';
+
+/** Tenant response DTO — returned by GET /v1/tenants/{id} and PATCH /v1/tenants/settings */
+export interface TenantResponseDto {
+	id: string;
+	name: string;
+	slug: string;
+	status: TenantStatus;
+	hqCountry: string | null;
+	stateProvince: string | null;
+	city: string | null;
+	reportingCurrency: string | null;
+	fiscalYearStartMonth: number | null;
+	fiscalYearStartDay: number | null;
+	baseYear: number | null;
+	sector: string | null;
+	subSector: string | null;
+	consolidationApproach: ConsolidationApproach | null;
+	createdAt: string;
+	updatedAt: string;
+	deletedAt: string | null;
+}
+
+/** Update tenant settings request — PATCH /v1/tenants/settings (all fields optional) */
+export interface UpdateTenantSettingsRequest {
+	name?: string;
+	slug?: string;
+	hqCountry?: string | null;
+	stateProvince?: string | null;
+	city?: string | null;
+	reportingCurrency?: string | null;
+	fiscalYearStartMonth?: number | null;
+	fiscalYearStartDay?: number | null;
+	baseYear?: number | null;
+	sector?: string | null;
+	subSector?: string | null;
+	consolidationApproach?: ConsolidationApproach | null;
+}
+
+/** JWT Claims (from idToken) */
+export interface JwtCustomClaims {
+	sub: string; // Cognito user sub (UUID)
+	email: string;
+	given_name: string;
+	family_name: string;
+	'custom:tenant_id': string; // UUID — snake_case, NOT camelCase
+	'custom:user_id': string; // UUID
+	'custom:tenant_role': UserRole;
+}
+</file>
+
+<file path="src/hooks.server.ts">
+import type { Handle } from '@sveltejs/kit';
+import { refreshTokens } from '$lib/api/auth.js';
+import { ApiError } from '$lib/api/client.js';
+import {
+	setAuthCookies,
+	clearAuthCookies,
+	isTokenExpired,
+	getSessionFromTokens
+} from '$lib/server/auth.js';
+
+export const handle: Handle = async ({ event, resolve }) => {
+	const accessToken = event.cookies.get('accessToken');
+	const idToken = event.cookies.get('idToken');
+	const refreshToken = event.cookies.get('refreshToken');
+
+	if (accessToken && idToken && !isTokenExpired(accessToken)) {
+		// Both tokens present and access token not expired — establish session from claims
+		event.locals.session = getSessionFromTokens(accessToken, idToken);
+	} else if (refreshToken) {
+		// Access token missing or expired — attempt refresh
+		try {
+			const newTokens = await refreshTokens({ refreshToken });
+			setAuthCookies(event.cookies, newTokens);
+			event.locals.session = getSessionFromTokens(newTokens.accessToken, newTokens.idToken);
+		} catch (error) {
+			clearAuthCookies(event.cookies);
+			event.locals.session = null;
+
+			if (error instanceof ApiError && error.status === 401) {
+				console.info('[auth] Refresh token expired or revoked, session cleared');
+			} else {
+				console.error('[auth] Token refresh failed:', error instanceof Error ? error.message : error);
+			}
+		}
+	} else {
+		// No tokens present — unauthenticated request
+		event.locals.session = null;
+	}
+
+	return resolve(event);
+};
+</file>
+
+<file path="package.json">
+{
+	"name": "akriva-app",
+	"private": true,
+	"version": "0.0.1",
+	"type": "module",
+	"scripts": {
+		"dev": "vite dev",
+		"build": "vite build",
+		"preview": "vite preview",
+		"prepare": "svelte-kit sync || echo ''",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
+	},
+	"devDependencies": {
+		"@sveltejs/adapter-auto": "^7.0.0",
+		"@sveltejs/kit": "^2.50.2",
+		"@sveltejs/vite-plugin-svelte": "^6.2.4",
+		"@types/node": "^25.2.3",
+		"svelte": "^5.49.2",
+		"svelte-check": "^4.3.6",
+		"typescript": "^5.9.3",
+		"valibot": "^1.2.0",
+		"vite": "^7.3.1"
+	},
+	"dependencies": {
+		"@awesome.me/webawesome": "^3.2.1",
+		"flatpickr": "^4.6.13",
+		"sveltekit-superforms": "^2.29.1",
+		"zod": "^4.3.6"
+	}
+}
+</file>
+
+<file path="src/lib/server/auth.ts">
+import type { Cookies } from '@sveltejs/kit';
+import { dev } from '$app/environment';
+import type { AuthTokens, UserRole } from '$lib/api/types.js';
+
+const VALID_ROLES: UserRole[] = ['owner', 'admin', 'user'];
+
+/** Seconds before actual JWT expiry to treat the token as expired, ensuring it remains valid for the duration of the downstream API request */
+const EXPIRY_BUFFER_SECONDS = 60;
+
+/** Session user extracted from JWT claims */
+export interface SessionUser {
+	id: string;
+	email: string;
+	tenantId: string;
+	role: UserRole;
+	givenName: string;
+	familyName: string;
+}
+
+/** Authenticated session established by hooks.server.ts */
+export interface Session {
+	/** ID token (JWT) — contains custom claims needed by backend API (custom:tenant_id, etc.) */
+	idToken: string;
+	user: SessionUser;
+}
+
+/** Set httpOnly auth cookies after successful authentication */
+export function setAuthCookies(cookies: Cookies, tokens: AuthTokens): void {
+	const cookieOptions = {
+		path: '/',
+		httpOnly: true,
+		sameSite: 'strict' as const,
+		secure: !dev
+	};
+
+	cookies.set('accessToken', tokens.accessToken, {
+		...cookieOptions,
+		maxAge: tokens.expiresIn
+	});
+
+	cookies.set('idToken', tokens.idToken, {
+		...cookieOptions,
+		maxAge: tokens.expiresIn
+	});
+
+	cookies.set('refreshToken', tokens.refreshToken, {
+		...cookieOptions,
+		maxAge: 60 * 60 * 24 * 30 // 30 days — matches Cognito refresh token default lifetime
+	});
+}
+
+/** Remove all auth cookies */
+export function clearAuthCookies(cookies: Cookies): void {
+	const cookieOptions = { path: '/' };
+	cookies.delete('accessToken', cookieOptions);
+	cookies.delete('idToken', cookieOptions);
+	cookies.delete('refreshToken', cookieOptions);
+}
+
+/** Decode a JWT payload without verifying the signature. Safe here because the token was received directly from our API over HTTPS. */
+function parseJwtPayload(token: string): Record<string, unknown> {
+	const payload = token.split('.')[1];
+	return JSON.parse(Buffer.from(payload, 'base64url').toString('utf-8'));
+}
+
+/** Check if a JWT token is expired (with buffer) */
+export function isTokenExpired(token: string): boolean {
+	try {
+		const payload = parseJwtPayload(token);
+		const exp = payload.exp as number | undefined;
+		if (!exp) return true;
+
+		const nowSeconds = Math.floor(Date.now() / 1000);
+		return nowSeconds >= exp - EXPIRY_BUFFER_SECONDS;
+	} catch (error) {
+		console.error('[auth] Failed to parse token for expiry check:', error instanceof Error ? error.message : error);
+		return true;
+	}
+}
+
+/** Extract session data from access + id tokens. Returns null if claims are missing or malformed. */
+export function getSessionFromTokens(
+	accessToken: string,
+	idToken: string
+): Session | null {
+	try {
+		const claims = parseJwtPayload(idToken);
+
+		const id = claims['custom:user_id'];
+		const email = claims.email;
+		const tenantId = claims['custom:tenant_id'];
+		const role = claims['custom:tenant_role'];
+		const givenName = claims.given_name;
+		const familyName = claims.family_name;
+
+		if (
+			typeof id !== 'string' ||
+			typeof email !== 'string' ||
+			typeof tenantId !== 'string' ||
+			typeof role !== 'string' ||
+			typeof givenName !== 'string' ||
+			typeof familyName !== 'string' ||
+			!VALID_ROLES.includes(role as UserRole)
+		) {
+			console.error('[auth] idToken missing or invalid claims');
+			return null;
+		}
+
+		return {
+			idToken,
+			user: {
+				id,
+				email,
+				tenantId,
+				role: role as UserRole,
+				givenName,
+				familyName
+			}
+		};
+	} catch (error) {
+		console.error('[auth] Failed to extract session from tokens:', error instanceof Error ? error.message : error);
+		return null;
+	}
+}
+</file>
+
+<file path="src/app.d.ts">
+import type { Session } from '$lib/server/auth.js';
+
+declare global {
+	namespace App {
+		interface Locals {
+			session: Session | null;
+		}
+	}
+}
+
+export {};
+</file>
+
+</files>

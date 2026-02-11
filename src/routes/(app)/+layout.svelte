@@ -5,6 +5,8 @@
   import "@awesome.me/webawesome/dist/components/breadcrumb/breadcrumb.js";
   import "@awesome.me/webawesome/dist/components/breadcrumb-item/breadcrumb-item.js";
   import "@awesome.me/webawesome/dist/components/avatar/avatar.js";
+  import "@awesome.me/webawesome/dist/components/dropdown/dropdown.js";
+  import "@awesome.me/webawesome/dist/components/dropdown-item/dropdown-item.js";
   import "@awesome.me/webawesome/dist/components/badge/badge.js";
   import "@awesome.me/webawesome/dist/components/card/card.js";
   import "@awesome.me/webawesome/dist/components/progress-bar/progress-bar.js";
@@ -24,7 +26,10 @@
       }),
   });
 
-  let { children } = $props();
+  let { data, children } = $props();
+
+  let logoutForm: HTMLFormElement;
+  const userInitial = $derived(data.user.givenName.charAt(0).toUpperCase());
 </script>
 
 <div class="app-shell">
@@ -93,11 +98,6 @@
 
     <div class="sidebar-bottom wa-stack wa-gap-m">
       <wa-divider></wa-divider>
-      <wa-button href="#" appearance="plain" size="medium" style="width: 100%">
-        <wa-icon slot="start" library="heroicons" name="lifebuoy"></wa-icon>
-        Help Center
-      </wa-button>
-      <wa-divider></wa-divider>
       <!-- Audit Score -->
       <div class="audit-score wa-cluster wa-gap-xs wa-align-items-center">
         <span class="audit-dot"></span>
@@ -120,7 +120,31 @@
         <wa-breadcrumb-item>Overview</wa-breadcrumb-item>
       </wa-breadcrumb>
       <div class="header-end wa-cluster wa-gap-m wa-align-items-center">
-        <wa-avatar initials="U" shape="circle" style="--size: 32px"></wa-avatar>
+        <wa-dropdown placement="bottom-end" distance="4">
+          <wa-avatar
+            slot="trigger"
+            initials={userInitial}
+            shape="circle"
+            style="--size: 32px; cursor: pointer;"
+          ></wa-avatar>
+          <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
+          <wa-dropdown-item
+            onclick={() => (window.location.href = "/settings/profile")}
+          >
+            <wa-icon slot="icon" library="heroicons" name="user"></wa-icon>
+            Profile
+          </wa-dropdown-item>
+          <wa-divider></wa-divider>
+          <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
+          <wa-dropdown-item onclick={() => logoutForm.requestSubmit()}>
+            <wa-icon
+              slot="icon"
+              library="heroicons"
+              name="arrow-right-start-on-rectangle"
+            ></wa-icon>
+            Logout
+          </wa-dropdown-item>
+        </wa-dropdown>
         <wa-button appearance="plain" size="small">
           <wa-icon library="heroicons" name="bell" style="font-size: 20px"
           ></wa-icon>
@@ -147,6 +171,8 @@
     </footer>
   </div>
 </div>
+
+<form bind:this={logoutForm} method="POST" action="/logout" hidden></form>
 
 <style>
   .app-shell {
@@ -182,11 +208,6 @@
   .sidebar-logo :global(svg) {
     width: 32px;
     height: 32px;
-  }
-
-  /* Left-align sidebar nav buttons */
-  .sidebar wa-button::part(base) {
-    justify-content: flex-start;
   }
 
   /* Audit score */
@@ -277,11 +298,6 @@
   wa-breadcrumb-item:last-child::part(label) {
     color: var(--akriva-text-primary);
     font-weight: var(--akriva-weight-medium);
-  }
-
-  /* Nav button icon-to-text spacing */
-  .sidebar wa-button::part(label) {
-    padding-inline-start: var(--akriva-space-2);
   }
 
   nav a {

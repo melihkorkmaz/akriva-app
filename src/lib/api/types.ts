@@ -56,12 +56,15 @@ export interface AuthTokens {
 	expiresIn: number; // Seconds until accessToken expires (typically 3600)
 }
 
+/** Valid user roles */
+export type UserRole = 'owner' | 'admin' | 'user';
+
 /** User info returned by signup */
 export interface UserInfo {
 	id: string; // UUID
 	email: string;
 	tenantId: string; // UUID
-	role: 'owner' | 'admin' | 'user';
+	role: UserRole;
 }
 
 /** Signup response - 201 Created */
@@ -82,21 +85,11 @@ export type SigninResponse =
 	| { type: 'tokens'; tokens: AuthTokens }
 	| { type: 'mfa_challenge'; challenge: MfaChallenge };
 
-/** MFA verify response */
-export interface MfaVerifyResponse {
-	accessToken: string;
-	idToken: string;
-	refreshToken: string;
-	expiresIn: number;
-}
+/** MFA verify response — same shape as AuthTokens */
+export type MfaVerifyResponse = AuthTokens;
 
-/** Refresh token response */
-export interface RefreshResponse {
-	accessToken: string;
-	idToken: string;
-	refreshToken: string;
-	expiresIn: number;
-}
+/** Refresh token response — same shape as AuthTokens */
+export type RefreshResponse = AuthTokens;
 
 /** Standard success message response */
 export interface MessageResponse {
@@ -128,6 +121,49 @@ export type ErrorCode =
 	| 'MFA_CHALLENGE_REQUIRED'
 	| 'COGNITO_OPERATION_FAILED';
 
+/** Tenant status */
+export type TenantStatus = 'init' | 'active' | 'inactive' | 'removed';
+
+/** Consolidation approach (GHG Protocol) */
+export type ConsolidationApproach = 'operational_control' | 'financial_control' | 'equity_share';
+
+/** Tenant response DTO — returned by GET /v1/tenants/{id} and PATCH /v1/tenants/settings */
+export interface TenantResponseDto {
+	id: string;
+	name: string;
+	slug: string;
+	status: TenantStatus;
+	hqCountry: string | null;
+	stateProvince: string | null;
+	city: string | null;
+	reportingCurrency: string | null;
+	fiscalYearStartMonth: number | null;
+	fiscalYearStartDay: number | null;
+	baseYear: number | null;
+	sector: string | null;
+	subSector: string | null;
+	consolidationApproach: ConsolidationApproach | null;
+	createdAt: string;
+	updatedAt: string;
+	deletedAt: string | null;
+}
+
+/** Update tenant settings request — PATCH /v1/tenants/settings (all fields optional) */
+export interface UpdateTenantSettingsRequest {
+	name?: string;
+	slug?: string;
+	hqCountry?: string | null;
+	stateProvince?: string | null;
+	city?: string | null;
+	reportingCurrency?: string | null;
+	fiscalYearStartMonth?: number | null;
+	fiscalYearStartDay?: number | null;
+	baseYear?: number | null;
+	sector?: string | null;
+	subSector?: string | null;
+	consolidationApproach?: ConsolidationApproach | null;
+}
+
 /** JWT Claims (from idToken) */
 export interface JwtCustomClaims {
 	sub: string; // Cognito user sub (UUID)
@@ -136,5 +172,5 @@ export interface JwtCustomClaims {
 	family_name: string;
 	'custom:tenant_id': string; // UUID — snake_case, NOT camelCase
 	'custom:user_id': string; // UUID
-	'custom:tenant_role': string; // 'owner' | 'admin' | 'user'
+	'custom:tenant_role': UserRole;
 }

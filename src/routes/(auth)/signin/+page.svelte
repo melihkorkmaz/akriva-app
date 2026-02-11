@@ -20,6 +20,7 @@
     errors: signinErrors,
     enhance: signinEnhance,
     message: signinMessage,
+    submitting: signinSubmitting,
   } = superForm(data.signinForm, {
     validators: zod4Client(signinSchema),
     onResult({ result }) {
@@ -38,6 +39,7 @@
     errors: mfaErrors,
     enhance: mfaEnhance,
     message: mfaMessage,
+    submitting: mfaSubmitting,
   } = superForm(data.mfaForm, {
     validators: zod4Client(mfaVerifySchema),
   });
@@ -112,9 +114,15 @@
 
         <wa-checkbox name="rememberMe">Remember me for 30 days</wa-checkbox>
 
-        <wa-button type="submit" variant="brand" size="large" style="width:100%">
-          Sign In
-        </wa-button>
+        {#if $signinSubmitting}
+          <wa-button type="submit" variant="brand" size="large" style="width:100%" loading disabled>
+            Sign In
+          </wa-button>
+        {:else}
+          <wa-button type="submit" variant="brand" size="large" style="width:100%">
+            Sign In
+          </wa-button>
+        {/if}
       </form>
 
       <TextDivider />
@@ -166,14 +174,15 @@
           {/if}
         </div>
 
-        <wa-button
-          type="submit"
-          variant="brand"
-          size="large"
-          style="width:100%"
-        >
-          Verify
-        </wa-button>
+        {#if $mfaSubmitting}
+          <wa-button type="submit" variant="brand" size="large" style="width:100%" loading disabled>
+            Verify
+          </wa-button>
+        {:else}
+          <wa-button type="submit" variant="brand" size="large" style="width:100%">
+            Verify
+          </wa-button>
+        {/if}
       </form>
 
       <div class="wa-cluster wa-justify-content-center">

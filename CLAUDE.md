@@ -21,150 +21,169 @@ Never implement business logic, data transformation, or decision-making in the f
 - **Vite 7** — build tool
 - npm package manager
 
-## Path Aliases
+## Second Brain
 
-| Alias         | Path              |
-| ------------- | ----------------- |
-| `$lib`        | `src/lib/`        |
-| `$components` | `src/components/` |
+All project knowledge - architecture decisions, error patterns, dependency choices, discussions, and context - lives in the **NotebookLM notebook**. This file does NOT store knowledge.
+The notebook is the single source of truth. Always use nlm-cli-skill to interact with notebooklm.
 
-## Project Structure
+### Notebooks
 
+#### 1. Project Knowledge (Second Brain)
+
+- **Notebook Name**: Akriva Frontend - Second Brain
+- **Notebook ID**: `f0188b2a-2b42-4db1-9421-d5f4df9b17e6`
+- **Alias**: `fe-akriva`
+- **Contents**: Frontend project knowledge — architecture, codebase structure, coding patterns, API integration, authentication system, UI components, design system, company settings feature, and Product Requirement Document
+
+#### 2. Tech Documentation
+
+- **Notebook Name**: Akriva - Tech Documentation
+- **Notebook ID**: `07cbc727-79f2-48e5-be8e-d35144178637`
+- **Alias**: `techdocs`
+- **Contents**: Frontend tech stack documentation — Svelte 5 runes ($state, $derived, $effect, $props, $bindable, snippets), SvelteKit 2 (routing, load, form actions, hooks), Superforms (setup, validation, events, error handling), Zod 4 (types, refinements, coercion, transforms), Web Awesome 3.2 (input, select, radio, dialog, tabs, tokens), Vite 7 (config, proxy, env vars, plugins). Also includes backend references: Zod v3, Vitest, Drizzle ORM, AWS CDK/DynamoDB/Cognito, tsyringe, Stripe, Neon
+
+#### 3. Full Codebase (Repomix)
+
+- **Notebook Name**: Akriva - Repomix Codebase
+- **Notebook ID**: `905dbd90-acd9-4870-ae4d-c5aedebbe654`
+- **Alias**: `akriva-repomix`
+- **Contents**: Complete frontend and backend codebases packed as XML via Repomix (2 sources: Akriva Frontend, Akriva Backend)
+
+#### 4. GHG Domain Knowledge
+
+- **Notebook Name**: Akriva - GHG Domain Knowledge
+- **Notebook ID**: `03d2f415-5cb6-4922-a6d8-3dd7c34d2463`
+- **Alias**: `ghg-domain`
+- **Contents**: Deep research on GHG reporting business domain — GHG Protocol (Scope 1/2/3), ISO 14064, CSRD, SEC climate disclosure, emission factor management (DEFRA/EPA/IPCC), consolidation approaches, audit/verification standards, data quality frameworks, multi-entity reporting structures
+
+### Search-First Rule
+
+**When you need to search for anything related to this project — ALWAYS query the appropriate NotebookLM notebook FIRST before searching the codebase or web.**
+
+Use the nlm CLI:
+
+```bash
+# Project architecture, patterns, decisions, codebase knowledge
+nlm notebook query fe-akriva "your question here"
+
+# Library/framework API usage, syntax, examples
+nlm notebook query techdocs "your question here"
+
+# Full codebase context / cross-domain search
+nlm notebook query akriva-repomix "your question here"
+
+# GHG business domain knowledge (emissions, compliance, audit standards)
+nlm notebook query ghg-domain "your question here"
 ```
-src/
-  styles/
-    theme.css            ← orchestrator: imports WA base + token files
-    akriva-tokens.css    ← all --akriva-* design tokens (colors, typography, spacing, etc.)
-    wa-overrides.css     ← all --wa-* overrides mapped to akriva tokens
-    global.css           ← CSS reset + base element styles + ak-* utility classes
-  components/            ← reusable Svelte components
-  lib/
-    api/                 ← typed API client + DTOs
-    schemas/             ← Zod form schemas (shared server + client)
-    server/              ← server-only utilities (cookies, auth helpers)
-    stores/              ← Svelte stores
-  routes/
-    +layout.svelte       ← root layout (imports global.css)
-    (auth)/              ← auth layout group (no URL segment)
-      +layout.svelte     ← centered full-height auth layout
-      signup/+page.svelte
-      signin/+page.svelte
+
+The Second Brain notebook (`fe-akriva`) contains these source documents:
+
+1. **Product Requirement Document** — GHG reporting platform vision, product pillars, personas, functional requirements, compliance, success metrics, roadmap
+2. **Project Overview & Architecture** — Tech stack, project structure, package dependencies, architecture flow, backend API overview
+3. **API Layer — Client, Types & Domain APIs** — ApiError class, fetch wrappers, all TypeScript interfaces (auth, tenant, shared types), auth API functions, tenant API functions
+4. **Authentication System** — Server auth utilities, JWT handling, session types, hooks.server.ts middleware, route guards, auth store, signin/signup/logout flows
+5. **Company Settings Page** — Tenant settings feature: server load/action, Superforms configuration, form sections, sector cascade, Zod schema, error handling
+6. **UI Components, Layouts & Design System** — Reusable components (CountrySelect, DatePicker, TextDivider, AkrivaLogo), app shell layout, settings layout, waChange action, design token system
+7. **Coding Patterns & Conventions** — Svelte 5 runes usage, Superforms+Zod patterns, WA event handling, nullable field patterns, error handling, cascading select, file organization, CSS conventions
+
+### When to Search — Tool & Notebook Reference
+
+**Available tools:**
+
+- **`fe-akriva`** (nlm) — Project knowledge, architecture, patterns, PRD, prior plans
+- **`techdocs`** (nlm) — Tech stack docs (Svelte 5, SvelteKit 2, Superforms, Zod 4, Web Awesome 3.2, Vite 7)
+- **`ghg-domain`** (nlm) — GHG reporting domain (protocols, standards, methodologies)
+- **`akriva-repomix`** (nlm) — Full frontend + backend codebase snapshot (Repomix XML)
+- **Code** — Direct codebase search (Glob, Grep, Read tools)
+- **Context7** — Live library/framework documentation lookup (context7 MCP plugin)
+- **claude-mem** — Cross-session memory (past work, decisions, debugging insights)
+- **Web Search** — General web search for current information
+
+| Question Type                                           | Search First               | Fallback        |
+| ------------------------------------------------------- | -------------------------- | --------------- |
+| Product requirements and features                       | `fe-akriva`                | —               |
+| Business logic and domain rules                         | `fe-akriva`                | Code            |
+| User stories and acceptance criteria                    | `fe-akriva`                | —               |
+| Architecture decisions and patterns                     | `fe-akriva`                | Code            |
+| Prior plans and decisions                               | `fe-akriva`                | claude-mem      |
+| GHG/emissions/sustainability scope                      | `ghg-domain`               | `fe-akriva`     |
+| Emission factor databases / versioning                  | `ghg-domain`               | Web Search      |
+| GHG Protocol / ISO 14064 / CSRD / SEC rules             | `ghg-domain`               | Web Search      |
+| Audit/verification standards for GHG                    | `ghg-domain`               | Web Search      |
+| Scope 1/2/3 calculation methodologies                   | `ghg-domain`               | Web Search      |
+| Consolidation approaches (operational/financial/equity) | `ghg-domain`               | `fe-akriva`     |
+| Library/framework API usage (SvelteKit, Zod, etc.)      | `techdocs`                 | Context7        |
+| Web Awesome component usage                             | `techdocs`                 | Context7        |
+| Full codebase context / cross-domain search             | `akriva-repomix`           | Code            |
+| Specific implementation details                         | Code                       | `fe-akriva`     |
+| Runtime debugging                                       | Code                       | `fe-akriva`     |
+| Cross-session work history                              | claude-mem                 | `fe-akriva`     |
+
+### Planning Rules (STRICT)
+
+These rules are **mandatory** for every planning session. No exceptions.
+
+#### Before Planning: Search First
+
+Before creating ANY implementation plan, you MUST query NotebookLM to gather context:
+
+1. **Query `fe-akriva`** for architecture decisions, domain patterns, existing conventions, and related prior plans
+2. **Query `techdocs`** if the plan involves library/framework usage (SvelteKit, Superforms, Zod, Web Awesome, etc.)
+3. **Query `ghg-domain`** if the plan involves emissions, GHG calculations, compliance frameworks, emission factors, audit/verification, or any sustainability business logic
+4. **Query `akriva-repomix`** if you need to understand full codebase context or cross-file interactions
+
+```bash
+# Example: before planning a new "emissions" feature
+nlm notebook query fe-akriva "emissions module architecture plans existing decisions"
+nlm notebook query fe-akriva "what patterns are used for new page creation"
+nlm notebook query ghg-domain "scope 1 emission calculation methodology data requirements"
+nlm notebook query techdocs "superforms zod validation patterns"
 ```
 
-## Design System
+Do NOT skip this step. Do NOT rely solely on codebase search or your own knowledge. The notebooks contain decisions and context that may not be visible in the code.
 
-### Token Naming Convention
+#### After Plan Approval: Save to Second Brain
 
-| Prefix       | Scope                                            | Example                                       |
-| ------------ | ------------------------------------------------ | --------------------------------------------- |
-| `--akriva-*` | App design tokens (source of truth)              | `--akriva-action-primary`, `--akriva-space-4` |
-| `--wa-*`     | Web Awesome overrides (references akriva tokens) | `--wa-color-brand-50`, `--wa-space-m`         |
+When the user **accepts** an implementation plan, you MUST save it to the Second Brain notebook (`fe-akriva`) as a source:
 
-Akriva tokens are defined first in `akriva-tokens.css`. WA overrides in `wa-overrides.css` map `--wa-*` variables to `--akriva-*` values. Never hardcode colors or sizes — always use tokens.
+```bash
+nlm source add fe-akriva --text "PLAN CONTENT HERE" --title "Plan: [Feature/Task Name] - [Date]"
+```
 
-### CSS Class Naming
+The saved plan must include:
 
-| Prefix    | Scope                                          | Example                                       |
-| --------- | ---------------------------------------------- | --------------------------------------------- |
-| `wa-*`    | Web Awesome utility classes (from the library) | `wa-stack`, `wa-gap-m`, `wa-color-text-quiet` |
-| No prefix | Scoped component styles (Svelte `<style>`)     | `.text-divider`, `.akriva-logo-text`          |
+- **Goal**: What the plan aims to achieve
+- **Key decisions**: Architecture choices and trade-offs made
+- **Files to create/modify**: Full list of affected files
+- **Implementation steps**: The ordered steps from the plan
+- **Dependencies**: Any blockers or prerequisites
 
-Use `wa-*` utilities for layout and WA-provided styling. Use `ak-*` for app-specific utilities defined in `global.css`. Component-specific styles go in Svelte scoped `<style>` blocks with descriptive class names.
+This ensures all accepted plans are searchable for future planning sessions, preventing contradictory decisions and enabling plan continuity across sessions.
 
-### Style File Responsibilities
+### Updating the Notebooks
 
-- **`akriva-tokens.css`** — design token definitions only (no selectors, no rules)
-- **`wa-overrides.css`** — WA token mappings only (no selectors, no rules)
-- **`global.css`** — CSS reset, base element styles (`body`, `h1`-`h6`, `a`), WA element defaults (`wa-card`)
-- **`theme.css`** — import orchestrator only (no rules)
+When significant changes are made to the codebase (new domains, API changes, architectural decisions), update the notebook sources:
 
-### Web Awesome Components
+```bash
+# List current sources
+nlm source list fe-akriva
+nlm source list techdocs
+nlm source list akriva-repomix
 
-- Components use `<wa-*>` tag names (e.g., `<wa-button>`, `<wa-input>`, `<wa-card>`)
-- Cherry-pick JS imports per component: `import '@awesome.me/webawesome/dist/components/button/button.js'`
-- Import WA components in layout files so all child pages inherit them
-- WA layout utilities: `wa-stack` (vertical), `wa-cluster` (horizontal wrap), `wa-split` (side-by-side)
-- WA spacing utilities: `wa-gap-xs`, `wa-gap-s`, `wa-gap-m`, `wa-gap-l`, `wa-gap-xl`
+# Add a new source to Second Brain
+nlm source add fe-akriva --text "content" --title "Title"
 
-### Component Guidelines
+# Add a new tech doc URL
+nlm source add techdocs --url "https://docs.example.com/guide" --title "Library - Guide"
 
-- Props use Svelte 5 `$props()` with TypeScript `interface Props`
-- Keep components presentational — no API calls inside components
-- Use `--akriva-*` tokens in scoped styles, `wa-*` utilities in markup
-- Extract reusable UI into `src/components/` (e.g., `AkrivaLogo.svelte`, `TextDivider.svelte`)
+# Regenerate repomix codebase snapshot (run from project root)
+repomix --style xml --output repomix-output.xml
+# Then upsert via Python to bypass ARG_MAX (file > 1MB)
 
-## Forms — Superforms + Zod
+# Query to verify
+nlm notebook query fe-akriva "question about the change"
+nlm notebook query techdocs "how to use X in library Y"
+nlm notebook query akriva-repomix "cross-file question about codebase"
+```
 
-Every form uses [sveltekit-superforms](https://superforms.rocks/) with Zod 4 for client-side validation.
-
-### Pattern
-
-1. **Schema** — Define in `src/lib/schemas/<name>.ts` (shared between server and client):
-
-   ```ts
-   import { z } from 'zod';
-   export const mySchema = z.object({ ... });
-   ```
-
-2. **Server** (`+page.server.ts`) — Use `zod4` adapter:
-
-   ```ts
-   import { superValidate, message } from "sveltekit-superforms";
-   import { zod4 } from "sveltekit-superforms/adapters";
-   import { mySchema } from "$lib/schemas/my-schema.js";
-
-   export const load = async () => ({
-     form: await superValidate(zod4(mySchema)),
-   });
-
-   export const actions = {
-     default: async ({ request }) => {
-       const form = await superValidate(request, zod4(mySchema));
-       if (!form.valid) return fail(400, { form });
-       // ... API call ...
-       return message(form, "Success");
-     },
-   };
-   ```
-
-3. **Client** (`+page.svelte`) — Use `zod4Client` for client-side validation:
-
-   ```svelte
-   <script lang="ts">
-     import { superForm } from 'sveltekit-superforms';
-     import { zod4Client } from 'sveltekit-superforms/adapters';
-     import { mySchema } from '$lib/schemas/my-schema.js';
-
-     let { data } = $props();
-     const { form, errors, enhance, message } = superForm(data.form, {
-       validators: zod4Client(mySchema),
-     });
-   </script>
-   ```
-
-4. **WA input binding** — Since `<wa-input>` is a custom element, sync values manually:
-
-   ```svelte
-   <wa-input
-     name="fieldName"
-     value={$form.fieldName}
-     oninput={(e: Event) => { $form.fieldName = (e.target as HTMLInputElement).value }}
-   ></wa-input>
-   {#if $errors.fieldName}
-     <small class="error-message">{$errors.fieldName[0]}</small>
-   {/if}
-   ```
-
-5. **API errors** — Use `message(form, 'error text', { status })` on server, display via `$message` on client.
-
-## Code Style
-
-- TypeScript strict mode — no `any`, explicit types for props and API responses
-- Svelte 5 runes only (`$props`, `$state`, `$derived`, `$effect`) — no legacy `export let`
-- Prefer WA utility classes over custom CSS when a utility exists
-- Scoped `<style>` in components — avoid global styles leaking from page/component files
-
-## IMPORTANT
-
-- Always use context7 plugin/skill/mcp to get latest documentation for web development best practices, SvelteKit updates, and Web Awesome usage. This frontend is meant to be a thin layer — any logic or decision-making belongs in the backend API. If you find yourself needing to implement something that feels like business logic, it should be moved to the backend service instead.
-- USE ALWAYS CLEAN ARCHITECTURE PRINCIPLES, DO NOT DUPLICATE CODE OR LOGIC
+Reference documents are stored in `.claude/docs/ai/` for regeneration if needed.
