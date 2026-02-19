@@ -4,6 +4,7 @@
   import SectorSelect from "$components/SectorSelect.svelte";
   import SubSectorSelect from "$components/SubSectorSelect.svelte";
   import { getSubSectors } from "$lib/data/sectors.js";
+  import type { Writable } from "svelte/store";
   import type { SuperForm } from "sveltekit-superforms";
   import type { tenantSettingsSchema } from "$lib/schemas/tenant-settings";
   import type { z } from "zod";
@@ -15,7 +16,7 @@
     form,
   }: {
     superform: SuperForm<FormData>;
-    form: import("svelte/store").Writable<FormData>;
+    form: Writable<FormData>;
   } = $props();
 </script>
 

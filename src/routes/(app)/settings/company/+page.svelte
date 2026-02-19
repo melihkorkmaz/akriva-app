@@ -16,7 +16,7 @@
 
   let { data } = $props();
 
-  const sf = superForm(data.form, {
+  const superform = superForm(data.form, {
     validators: zod4Client(tenantSettingsSchema),
     dataType: "json",
     resetForm: false,
@@ -27,7 +27,7 @@
           : "An unexpected error occurred. Please try again.";
     },
   });
-  const { form, allErrors, enhance, message, submitting } = sf;
+  const { form, allErrors, enhance, message, submitting } = superform;
 </script>
 
 <svelte:head>
@@ -75,15 +75,15 @@
         </Card.Header>
         <Card.Content>
           <Field.Group>
-            <CompanyIdentificationSection superform={sf} {form} />
-            <LocalizationSection superform={sf} {form} />
-            <TemporalLogicSection superform={sf} {form} />
-            <SectorSection superform={sf} {form} />
+            <CompanyIdentificationSection {superform} {form} />
+            <LocalizationSection {superform} {form} />
+            <TemporalLogicSection {superform} {form} />
+            <SectorSection {superform} {form} />
           </Field.Group>
         </Card.Content>
       </Card.Root>
 
-      <BoundaryRulesSection superform={sf} {form} />
+      <BoundaryRulesSection {superform} {form} />
 
       <div class="flex gap-3 justify-end py-4">
         <Button variant="outline" type="button" href="/settings/company">

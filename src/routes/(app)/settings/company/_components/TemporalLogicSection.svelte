@@ -4,6 +4,7 @@
   import * as Select from "$lib/components/ui/select/index.js";
   import { Input } from "$lib/components/ui/input/index.js";
   import MonthSelect from "$components/MonthSelect.svelte";
+  import type { Writable } from "svelte/store";
   import type { SuperForm } from "sveltekit-superforms";
   import type { tenantSettingsSchema } from "$lib/schemas/tenant-settings";
   import type { z } from "zod";
@@ -15,7 +16,7 @@
     form,
   }: {
     superform: SuperForm<FormData>;
-    form: import("svelte/store").Writable<FormData>;
+    form: Writable<FormData>;
   } = $props();
 
   let fiscalDayLabel = $derived(

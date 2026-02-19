@@ -5,6 +5,7 @@
   import { Alert, AlertDescription } from "$lib/components/ui/alert/index.js";
   import Info from "@lucide/svelte/icons/info";
   import { cn } from "$lib/utils.js";
+  import type { Writable } from "svelte/store";
   import type { SuperForm } from "sveltekit-superforms";
   import type { tenantSettingsSchema } from "$lib/schemas/tenant-settings";
   import type { z } from "zod";
@@ -17,7 +18,7 @@
     form,
   }: {
     superform: SuperForm<FormData>;
-    form: import("svelte/store").Writable<FormData>;
+    form: Writable<FormData>;
   } = $props();
 
   let consolidationApproach = $derived(

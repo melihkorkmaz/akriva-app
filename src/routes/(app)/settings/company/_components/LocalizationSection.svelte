@@ -3,6 +3,7 @@
   import * as Field from "$lib/components/ui/field/index.js";
   import { Input } from "$lib/components/ui/input/index.js";
   import CountrySelect from "$components/CountrySelect.svelte";
+  import type { Writable } from "svelte/store";
   import type { SuperForm } from "sveltekit-superforms";
   import type { tenantSettingsSchema } from "$lib/schemas/tenant-settings";
   import type { z } from "zod";
@@ -14,7 +15,7 @@
     form,
   }: {
     superform: SuperForm<FormData>;
-    form: import("svelte/store").Writable<FormData>;
+    form: Writable<FormData>;
   } = $props();
 </script>
 
