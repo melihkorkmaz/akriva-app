@@ -1,0 +1,217 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ─────────────────────────────────────────────
+   Akriva × shadcn — Light tokens
+   Hex values from app.css, converted to oklch
+   ───────────────────────────────────────────── */
+:root {
+  /* Core surfaces */
+  --background: oklch(0.977 0.003 247);       /* #f7f8f9 */
+  --foreground: oklch(0.254 0.034 255);       /* #1e293b */
+  --card: oklch(1 0 0);                       /* #ffffff */
+  --card-foreground: oklch(0.254 0.034 255);  /* #1e293b */
+  --popover: oklch(1 0 0);                    /* #ffffff */
+  --popover-foreground: oklch(0.254 0.034 255);
+
+  /* Primary — Akriva action blue */
+  --primary: oklch(0.546 0.222 264);          /* #2563eb */
+  --primary-foreground: oklch(1 0 0);         /* #ffffff */
+
+  /* Secondary / Muted / Accent — light slate */
+  --secondary: oklch(0.967 0.007 247);        /* #f1f5f9 */
+  --secondary-foreground: oklch(0.254 0.034 255);
+  --muted: oklch(0.967 0.007 247);            /* #f1f5f9 */
+  --muted-foreground: oklch(0.544 0.027 256); /* #64748b */
+  --accent: oklch(0.967 0.007 247);           /* #f1f5f9 */
+  --accent-foreground: oklch(0.254 0.034 255);
+
+  /* Destructive — Akriva status-error */
+  --destructive: oklch(0.628 0.222 27);       /* #ef4444 */
+  --destructive-foreground: oklch(1 0 0);     /* #ffffff */
+
+  /* Borders & inputs */
+  --border: oklch(0.924 0.005 247);           /* #e5e7eb */
+  --input: oklch(0.924 0.005 247);            /* #e5e7eb */
+  --ring: oklch(0.546 0.222 264);             /* #2563eb — focus ring matches primary */
+
+  /* Sidebar — Akriva brand-primary dark navy */
+  --sidebar: oklch(0.254 0.034 255);          /* #1e293b */
+  --sidebar-foreground: oklch(1 0 0);         /* #ffffff */
+  --sidebar-primary: oklch(0.546 0.222 264);  /* #2563eb */
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.321 0.034 255);   /* lighter navy for hover */
+  --sidebar-accent-foreground: oklch(1 0 0);
+  --sidebar-border: oklch(0.321 0.034 255);
+  --sidebar-ring: oklch(0.546 0.222 264);
+
+  /* Chart — Akriva status palette + primary blue scale */
+  --chart-1: oklch(0.546 0.222 264);          /* primary blue     #2563eb */
+  --chart-2: oklch(0.579 0.151 190);          /* teal accent               */
+  --chart-3: oklch(0.695 0.149 154);          /* verified green   #10b981  */
+  --chart-4: oklch(0.714 0.168 58);           /* risk orange      #fb923c  */
+  --chart-5: oklch(0.628 0.222 27);           /* error red        #ef4444  */
+
+  /* Fonts */
+  --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo,
+    Consolas, "Liberation Mono", monospace;
+  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+
+  /* Radius
+     Base = 4px (akriva-radius-sm) → calc chain produces:
+       radius-sm  = 0px  (base - 4px)
+       radius-md  = 2px  (base - 2px)
+       radius-lg  = 4px  (base)
+       radius-xl  = 8px  (base + 4px)              */
+  --radius: 0.125rem;
+
+  /* Shadows — Akriva shadow scale */
+  --shadow-2xs: 0 1px 2px 0 rgba(30, 41, 59, 0.05);
+  --shadow-xs: 0 1px 2px 0 rgba(30, 41, 59, 0.05);
+  --shadow-sm: 0 2px 4px 0 rgba(30, 41, 59, 0.06);
+  --shadow: 0 2px 4px 0 rgba(30, 41, 59, 0.06),
+    0 1px 2px -1px rgba(30, 41, 59, 0.04);
+  --shadow-md: 0 4px 8px -1px rgba(30, 41, 59, 0.08);
+  --shadow-lg: 0 10px 20px -3px rgba(30, 41, 59, 0.1);
+  --shadow-xl: 0 20px 30px -5px rgba(30, 41, 59, 0.12);
+  --shadow-2xl: 0 25px 50px -12px rgba(30, 41, 59, 0.2);
+
+  /* Misc */
+  --tracking-normal: 0em;
+  --spacing: 0.25rem;
+}
+
+/* ─────────────────────────────────────────────
+   Dark mode — navy/slate inversion of Akriva palette
+   ───────────────────────────────────────────── */
+.dark {
+  --background: oklch(0.179 0.027 255);       /* deep navy    ~#111827 */
+  --foreground: oklch(0.967 0.007 247);       /* #f1f5f9 */
+  --card: oklch(0.218 0.030 255);             /* #1e293b surface */
+  --card-foreground: oklch(0.967 0.007 247);
+  --popover: oklch(0.254 0.034 255);          /* #1e293b */
+  --popover-foreground: oklch(0.967 0.007 247);
+
+  /* Primary stays blue, slightly lightened for dark bg */
+  --primary: oklch(0.623 0.213 264);          /* #3b82f6 */
+  --primary-foreground: oklch(1 0 0);
+
+  --secondary: oklch(0.293 0.030 255);        /* dark slate */
+  --secondary-foreground: oklch(0.967 0.007 247);
+  --muted: oklch(0.293 0.030 255);
+  --muted-foreground: oklch(0.704 0.020 252); /* #94a3b8 */
+  --accent: oklch(0.340 0.028 255);
+  --accent-foreground: oklch(0.967 0.007 247);
+
+  --destructive: oklch(0.685 0.191 22);       /* softer red on dark */
+  --destructive-foreground: oklch(0.967 0.007 247);
+
+  --border: oklch(0.293 0.030 255);
+  --input: oklch(0.340 0.028 255);
+  --ring: oklch(0.623 0.213 264);
+
+  --sidebar: oklch(0.218 0.030 255);
+  --sidebar-foreground: oklch(0.967 0.007 247);
+  --sidebar-primary: oklch(0.623 0.213 264);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.254 0.034 255);
+  --sidebar-accent-foreground: oklch(0.967 0.007 247);
+  --sidebar-border: oklch(0.293 0.030 255);
+  --sidebar-ring: oklch(0.623 0.213 264);
+
+  /* Chart colors stay the same — vivid enough on dark */
+  --chart-1: oklch(0.623 0.213 264);
+  --chart-2: oklch(0.579 0.151 190);
+  --chart-3: oklch(0.695 0.149 154);
+  --chart-4: oklch(0.714 0.168 58);
+  --chart-5: oklch(0.685 0.191 22);
+
+  /* Shadows are stronger on dark to stay visible */
+  --shadow-2xs: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+  --shadow-sm: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
+  --shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25), 0 1px 2px -1px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 8px -1px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 20px -3px rgba(0, 0, 0, 0.35);
+  --shadow-xl: 0 20px 30px -5px rgba(0, 0, 0, 0.4);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+}
+
+/* ─────────────────────────────────────────────
+   Tailwind @theme — maps CSS vars → utility classes
+   ───────────────────────────────────────────── */
+@theme inline {
+  /* Colors */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Fonts */
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --font-serif: var(--font-serif);
+
+  /* Radius — shadcn calc chain from base 0.25rem (4px) */
+  --radius-sm: calc(var(--radius) - 4px);   /* 0px   */
+  --radius-md: calc(var(--radius) - 2px);   /* 2px   */
+  --radius-lg: var(--radius);               /* 4px   */
+  --radius-xl: calc(var(--radius) + 4px);   /* 8px   */
+
+  /* Shadows */
+  --shadow-2xs: var(--shadow-2xs);
+  --shadow-xs: var(--shadow-xs);
+  --shadow-sm: var(--shadow-sm);
+  --shadow: var(--shadow);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-xl: var(--shadow-xl);
+  --shadow-2xl: var(--shadow-2xl);
+}
+
+/* ─────────────────────────────────────────────
+   Base layer
+   ───────────────────────────────────────────── */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans text-sm leading-normal antialiased;
+  }
+}

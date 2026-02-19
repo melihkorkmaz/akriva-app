@@ -1,11 +1,15 @@
 <script lang="ts">
   import { superForm } from "sveltekit-superforms";
   import { zod4Client } from "sveltekit-superforms/adapters";
-  import "@awesome.me/webawesome/dist/components/button/button.js";
-  import "@awesome.me/webawesome/dist/components/input/input.js";
-  import "@awesome.me/webawesome/dist/components/card/card.js";
-  import "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
-  import "@awesome.me/webawesome/dist/components/callout/callout.js";
+  import * as Card from "$lib/components/ui/card/index.js";
+  import * as Form from "$lib/components/ui/form/index.js";
+  import * as Field from "$lib/components/ui/field/index.js";
+  import { Input } from "$lib/components/ui/input/index.js";
+  import { Button } from "$lib/components/ui/button/index.js";
+  import { Checkbox } from "$lib/components/ui/checkbox/index.js";
+  import { Alert, AlertDescription } from "$lib/components/ui/alert/index.js";
+  import Eye from "@lucide/svelte/icons/eye";
+  import EyeOff from "@lucide/svelte/icons/eye-off";
 
   import TextDivider from "$components/TextDivider.svelte";
   import { signinSchema, mfaVerifySchema } from "$lib/schemas/signin.js";
@@ -14,14 +18,9 @@
 
   let showMfa = $state(false);
   let mfaSession = $state("");
+  let showPassword = $state(false);
 
-  const {
-    form: signinData,
-    errors: signinErrors,
-    enhance: signinEnhance,
-    message: signinMessage,
-    submitting: signinSubmitting,
-  } = superForm(data.signinForm, {
+  const signinSF = superForm(data.signinForm, {
     validators: zod4Client(signinSchema),
     onResult({ result }) {
       if (result.type === "success") {
@@ -33,211 +32,178 @@
       }
     },
   });
+  const {
+    form: signinData,
+    enhance: signinEnhance,
+    message: signinMessage,
+    submitting: signinSubmitting,
+  } = signinSF;
 
+  const mfaSF = superForm(data.mfaForm, {
+    validators: zod4Client(mfaVerifySchema),
+  });
   const {
     form: mfaData,
-    errors: mfaErrors,
     enhance: mfaEnhance,
     message: mfaMessage,
     submitting: mfaSubmitting,
-  } = superForm(data.mfaForm, {
-    validators: zod4Client(mfaVerifySchema),
-  });
+  } = mfaSF;
 </script>
 
 <svelte:head>
   <title>Sign In | Akriva</title>
 </svelte:head>
 
-<wa-card>
-  <div class="wa-stack wa-gap-l">
-    {#if !showMfa}
-      <!-- Signin form -->
-      <div class="wa-stack wa-gap-xs wa-align-items-center">
-        <h2>Welcome Back</h2>
-        <p class="wa-body-l wa-color-text-quiet">
-          Access your institutional ledger
-        </p>
-      </div>
-
-      {#if $signinMessage}
-        <wa-callout variant="danger">
-          {$signinMessage}
-        </wa-callout>
-      {/if}
-
-      <form
-        method="POST"
-        action="?/signin"
-        use:signinEnhance
-        class="wa-stack wa-gap-l"
-      >
-        <div class="field">
-          <wa-input
-            id="email"
-            name="email"
-            type="email"
-            placeholder="john.doe@company.com"
-            label="Email Address"
-            value={$signinData.email}
-            oninput={(e: Event) => {
-              $signinData.email = (e.target as HTMLInputElement).value;
-            }}
-            data-invalid={$signinErrors.email ? "" : undefined}
-          ></wa-input>
-          {#if $signinErrors.email}
-            <small class="error-message">{$signinErrors.email[0]}</small>
-          {/if}
+<Card.Root class="w-full max-w-[420px]">
+  <Card.Content class="pt-6">
+    <div class="flex flex-col gap-5">
+      {#if !showMfa}
+        <!-- Signin form -->
+        <div class="flex flex-col gap-2 items-center">
+          <h2 class="text-2xl font-semibold">Welcome Back</h2>
+          <p class="text-base text-muted-foreground">
+            Access your institutional ledger
+          </p>
         </div>
 
-        <div class="wa-stack wa-gap-xs">
-          <div class="password-label-row">
-            <label for="password">Password</label>
-            <a href="/forgot-password" class="forgot-link">Forgot password?</a>
-          </div>
-          <wa-input
-            id="password"
-            name="password"
-            type="password"
-            placeholder="••••••••"
-            password-toggle
-            value={$signinData.password}
-            oninput={(e: Event) => {
-              $signinData.password = (e.target as HTMLInputElement).value;
-            }}
-            data-invalid={$signinErrors.password ? "" : undefined}
-          ></wa-input>
-          {#if $signinErrors.password}
-            <small class="error-message">{$signinErrors.password[0]}</small>
-          {/if}
-        </div>
-
-        <wa-checkbox name="rememberMe">Remember me for 30 days</wa-checkbox>
-
-        {#if $signinSubmitting}
-          <wa-button type="submit" variant="brand" size="large" style="width:100%" loading disabled>
-            Sign In
-          </wa-button>
-        {:else}
-          <wa-button type="submit" variant="brand" size="large" style="width:100%">
-            Sign In
-          </wa-button>
+        {#if $signinMessage}
+          <Alert variant="destructive">
+            <AlertDescription>{$signinMessage}</AlertDescription>
+          </Alert>
         {/if}
-      </form>
 
-      <TextDivider />
-      <div class="wa-cluster wa-gap-xs wa-justify-content-center">
-        <span class="wa-body-s wa-color-text-quiet"
-          >Don't have an account?</span
+        <form
+          method="POST"
+          action="?/signin"
+          use:signinEnhance
+          class="flex flex-col gap-5"
         >
-        <a href="/signup" class="wa-link wa-font-size-s wa-font-weight-bold"
-          >Sign up</a
-        >
-      </div>
-    {:else}
-      <!-- MFA verification form -->
-      <div class="wa-stack wa-gap-xs wa-align-items-center">
-        <h2>Two-Factor Authentication</h2>
-        <p class="wa-body-l wa-color-text-quiet">
-          Enter the code from your authenticator app
-        </p>
-      </div>
+          <Form.Field form={signinSF} name="email">
+            <Form.Control>
+              {#snippet children({ props })}
+                <Form.Label>Email Address</Form.Label>
+                <Input
+                  {...props}
+                  type="email"
+                  placeholder="john.doe@company.com"
+                  bind:value={$signinData.email}
+                />
+              {/snippet}
+            </Form.Control>
+            <Form.FieldErrors />
+          </Form.Field>
 
-      {#if $mfaMessage}
-        <wa-callout variant="danger">
-          {$mfaMessage}
-        </wa-callout>
-      {/if}
+          <Form.Field form={signinSF} name="password">
+            <Form.Control>
+              {#snippet children({ props })}
+                <div class="flex justify-between items-center">
+                  <Form.Label>Password</Form.Label>
+                  <a
+                    href="/forgot-password"
+                    class="text-xs underline text-muted-foreground hover:text-foreground"
+                    >Forgot password?</a
+                  >
+                </div>
+                <div class="relative">
+                  <Input
+                    {...props}
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    bind:value={$signinData.password}
+                  />
+                  <button
+                    type="button"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    onclick={() => (showPassword = !showPassword)}
+                    tabindex={-1}
+                  >
+                    {#if showPassword}
+                      <EyeOff class="size-4" />
+                    {:else}
+                      <Eye class="size-4" />
+                    {/if}
+                  </button>
+                </div>
+              {/snippet}
+            </Form.Control>
+            <Form.FieldErrors />
+          </Form.Field>
 
-      <form
-        method="POST"
-        action="?/mfa"
-        use:mfaEnhance
-        class="wa-stack wa-gap-l"
-      >
-        <input type="hidden" name="session" value={mfaSession} />
+          <Field.Field orientation="horizontal">
+            <Checkbox id="rememberMe" name="rememberMe" />
+            <Field.Label for="rememberMe" class="font-normal"
+              >Remember me for 30 days</Field.Label
+            >
+          </Field.Field>
 
-        <div class="field">
-          <wa-input
-            id="code"
-            name="code"
-            placeholder="000000"
-            label="Verification Code"
-            value={$mfaData.code}
-            oninput={(e: Event) => {
-              $mfaData.code = (e.target as HTMLInputElement).value;
-            }}
-            data-invalid={$mfaErrors.code ? "" : undefined}
-          ></wa-input>
-          {#if $mfaErrors.code}
-            <small class="error-message">{$mfaErrors.code[0]}</small>
-          {/if}
+          <Form.Button class="w-full" disabled={$signinSubmitting}>
+            {$signinSubmitting ? "Signing in..." : "Sign In"}
+          </Form.Button>
+        </form>
+
+        <TextDivider />
+        <div class="flex flex-wrap gap-2 justify-center">
+          <span class="text-sm text-muted-foreground"
+            >Don't have an account?</span
+          >
+          <a href="/signup" class="text-sm font-bold text-primary hover:underline"
+            >Sign up</a
+          >
+        </div>
+      {:else}
+        <!-- MFA verification form -->
+        <div class="flex flex-col gap-2 items-center">
+          <h2 class="text-2xl font-semibold">Two-Factor Authentication</h2>
+          <p class="text-base text-muted-foreground">
+            Enter the code from your authenticator app
+          </p>
         </div>
 
-        {#if $mfaSubmitting}
-          <wa-button type="submit" variant="brand" size="large" style="width:100%" loading disabled>
-            Verify
-          </wa-button>
-        {:else}
-          <wa-button type="submit" variant="brand" size="large" style="width:100%">
-            Verify
-          </wa-button>
+        {#if $mfaMessage}
+          <Alert variant="destructive">
+            <AlertDescription>{$mfaMessage}</AlertDescription>
+          </Alert>
         {/if}
-      </form>
 
-      <div class="wa-cluster wa-justify-content-center">
-        <button
-          type="button"
-          class="back-link wa-body-s"
-          onclick={() => {
-            showMfa = false;
-          }}
+        <form
+          method="POST"
+          action="?/mfa"
+          use:mfaEnhance
+          class="flex flex-col gap-5"
         >
-          Back to sign in
-        </button>
-      </div>
-    {/if}
-  </div>
-</wa-card>
+          <input type="hidden" name="session" value={mfaSession} />
 
-<style>
-  wa-card {
-    width: 100%;
-    max-width: 420px;
-  }
+          <Form.Field form={mfaSF} name="code">
+            <Form.Control>
+              {#snippet children({ props })}
+                <Form.Label>Verification Code</Form.Label>
+                <Input
+                  {...props}
+                  placeholder="000000"
+                  bind:value={$mfaData.code}
+                />
+              {/snippet}
+            </Form.Control>
+            <Form.FieldErrors />
+          </Form.Field>
 
-  .field {
-    display: flex;
-    flex-direction: column;
-    gap: var(--wa-space-xs);
-  }
+          <Form.Button class="w-full" disabled={$mfaSubmitting}>
+            {$mfaSubmitting ? "Verifying..." : "Verify"}
+          </Form.Button>
+        </form>
 
-  .error-message {
-    color: var(--akriva-status-error);
-    font-size: var(--wa-font-size-s);
-  }
-
-  .password-label-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .forgot-link {
-    font-size: var(--akriva-size-caption);
-    text-decoration: underline;
-  }
-
-  .back-link {
-    background: none;
-    border: none;
-    color: var(--wa-color-text-quiet);
-    cursor: pointer;
-    text-decoration: underline;
-    padding: 0;
-  }
-
-  .back-link:hover {
-    color: var(--wa-color-text);
-  }
-</style>
+        <div class="flex justify-center">
+          <button
+            type="button"
+            class="text-sm text-muted-foreground underline hover:text-foreground bg-transparent border-none cursor-pointer p-0"
+            onclick={() => {
+              showMfa = false;
+            }}
+          >
+            Back to sign in
+          </button>
+        </div>
+      {/if}
+    </div>
+  </Card.Content>
+</Card.Root>

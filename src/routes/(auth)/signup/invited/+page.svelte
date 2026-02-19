@@ -1,107 +1,98 @@
 <script lang="ts">
-  import "@awesome.me/webawesome/dist/components/button/button.js";
-  import "@awesome.me/webawesome/dist/components/input/input.js";
-  import "@awesome.me/webawesome/dist/components/card/card.js";
-  import "@awesome.me/webawesome/dist/components/icon/icon.js";
-  import "@awesome.me/webawesome/dist/components/callout/callout.js";
+  import * as Card from "$lib/components/ui/card/index.js";
+  import * as Field from "$lib/components/ui/field/index.js";
+  import { Input } from "$lib/components/ui/input/index.js";
+  import { Button } from "$lib/components/ui/button/index.js";
+  import { Alert, AlertDescription } from "$lib/components/ui/alert/index.js";
+  import CircleCheck from "@lucide/svelte/icons/circle-check";
 
   import TextDivider from "$components/TextDivider.svelte";
   import { page } from "$app/state";
 
   const token = $derived(page.url.searchParams.get("token") ?? "");
-  const orgName = $derived(page.url.searchParams.get("org") ?? "Organization");
+  const orgName = $derived(
+    page.url.searchParams.get("org") ?? "Organization",
+  );
 </script>
 
 <svelte:head>
   <title>Join Organization | Akriva</title>
 </svelte:head>
 
-<wa-card>
-  <div class="wa-stack wa-gap-l">
-    <!-- Invitation Badge -->
-    <wa-callout variant="success">
-      <wa-icon slot="icon" name="circle-check" variant="regular"></wa-icon>
-      Valid Invitation
-    </wa-callout>
+<Card.Root class="w-full max-w-[490px]">
+  <Card.Content class="pt-6">
+    <div class="flex flex-col gap-5">
+      <!-- Invitation Badge -->
+      <Alert class="border-emerald-200 bg-emerald-50 text-emerald-800">
+        <CircleCheck class="size-4 text-emerald-600" />
+        <AlertDescription>Valid Invitation</AlertDescription>
+      </Alert>
 
-    <!-- Title Section -->
-    <div class="wa-stack wa-gap-xs wa-align-items-center">
-      <h2>Join Your Organization</h2>
-      <p class="wa-body-l wa-color-text-quiet">
-        Joining <strong class="org-name">{orgName}</strong>
-      </p>
-    </div>
-
-    <!-- Form -->
-    <form class="wa-stack wa-gap-l">
-      <div class="wa-grid">
-        <wa-input
-          id="firstName"
-          name="firstName"
-          placeholder="Jane"
-          label="First Name"
-        ></wa-input>
-        <wa-input
-          id="lastName"
-          name="lastName"
-          placeholder="Smith"
-          label="Last Name"
-        ></wa-input>
-      </div>
-      <wa-input
-        id="email"
-        name="email"
-        type="email"
-        placeholder="jane.smith@company.com"
-        label="Email Address"
-      ></wa-input>
-      <div class="wa-stack wa-gap-xs">
-        <wa-input
-          id="password"
-          name="password"
-          type="password"
-          placeholder="••••••••"
-          label="Password"
-          help-text="8-256 characters"
-          password-toggle
-        ></wa-input>
+      <!-- Title Section -->
+      <div class="flex flex-col gap-2 items-center">
+        <h2 class="text-2xl font-semibold">Join Your Organization</h2>
+        <p class="text-base text-muted-foreground">
+          Joining <strong class="text-foreground">{orgName}</strong>
+        </p>
       </div>
 
-      <!-- Invitation Token Display -->
-      <wa-input
-        id="token"
-        name="token"
-        label="Invitation Token"
-        value={token || "INV-XXXX-XXXX-XXXX"}
-        disabled
-      ></wa-input>
+      <!-- Form -->
+      <form class="flex flex-col gap-5">
+        <div class="grid grid-cols-2 gap-4">
+          <Field.Field>
+            <Field.Label for="firstName">First Name</Field.Label>
+            <Input id="firstName" name="firstName" placeholder="Jane" />
+          </Field.Field>
+          <Field.Field>
+            <Field.Label for="lastName">Last Name</Field.Label>
+            <Input id="lastName" name="lastName" placeholder="Smith" />
+          </Field.Field>
+        </div>
 
-      <wa-button type="submit">Join Organization</wa-button>
-    </form>
+        <Field.Field>
+          <Field.Label for="email">Email Address</Field.Label>
+          <Input
+            id="email"
+            name="email"
+            type="email"
+            placeholder="jane.smith@company.com"
+          />
+        </Field.Field>
 
-    <TextDivider />
+        <Field.Field>
+          <Field.Label for="password">Password</Field.Label>
+          <Input
+            id="password"
+            name="password"
+            type="password"
+            placeholder="••••••••"
+          />
+          <Field.Description>8-256 characters</Field.Description>
+        </Field.Field>
 
-    <div class="wa-cluster wa-gap-xs wa-justify-content-center">
-      <span class="wa-body-s wa-color-text-quiet">Already have an account?</span
-      >
-      <a href="/signin" class="wa-link wa-font-size-s wa-font-weight-bold"
-        >Sign in</a
-      >
+        <Field.Field>
+          <Field.Label for="token">Invitation Token</Field.Label>
+          <Input
+            id="token"
+            name="token"
+            value={token || "INV-XXXX-XXXX-XXXX"}
+            disabled
+          />
+        </Field.Field>
+
+        <Button type="submit" class="w-full">Join Organization</Button>
+      </form>
+
+      <TextDivider />
+
+      <div class="flex flex-wrap gap-2 justify-center">
+        <span class="text-sm text-muted-foreground"
+          >Already have an account?</span
+        >
+        <a href="/signin" class="text-sm font-bold text-primary hover:underline"
+          >Sign in</a
+        >
+      </div>
     </div>
-  </div>
-</wa-card>
-
-<style>
-  wa-card {
-    width: 100%;
-    max-width: 490px;
-  }
-
-  .org-name {
-    color: var(--akriva-text-primary);
-  }
-
-  wa-callout {
-    --wa-form-control-padding-inline: var(--akriva-space-5) !important;
-  }
-</style>
+  </Card.Content>
+</Card.Root>

@@ -3,10 +3,7 @@
   let { children } = $props();
 </script>
 
-<div
-  class="wa-stack wa-gap-m wa-align-items-center wa-justify-content-center"
-  style="height:100vh"
->
+<div class="flex flex-col gap-4 items-center justify-center h-screen">
   <AkrivaLogo />
   {@render children()}
 </div>

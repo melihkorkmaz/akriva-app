@@ -1,131 +1,81 @@
 <script lang="ts">
-  import "@awesome.me/webawesome/dist/components/callout/callout.js";
+  import * as Card from "$lib/components/ui/card/index.js";
+  import { Checkbox } from "$lib/components/ui/checkbox/index.js";
+  import { Progress } from "$lib/components/ui/progress/index.js";
+  import { Separator } from "$lib/components/ui/separator/index.js";
+  import BookOpen from "@lucide/svelte/icons/book-open";
+  import FileCheck from "@lucide/svelte/icons/file-check";
 </script>
 
 <svelte:head>
   <title>Dashboard | Akriva</title>
 </svelte:head>
 
-<div
-  class="onboarding wa-stack wa-gap-l wa-align-items-center wa-justify-content-center"
->
+<div class="flex flex-col gap-5 items-center justify-center p-12 h-full">
   <!-- Empty State Icon -->
-  <div class="state-icon">
-    <wa-icon
-      library="heroicons"
-      name="book-open"
-      style="font-size: 40px; color: var(--akriva-text-tertiary);"
-    ></wa-icon>
+  <div class="w-20 h-20 rounded-full bg-muted flex items-center justify-center">
+    <BookOpen class="size-10 text-muted-foreground" />
   </div>
 
   <!-- Welcome Text -->
-  <div class="wa-stack wa-gap-xs wa-align-items-center">
-    <h2>Welcome to Akriva</h2>
-    <p class="wa-body-l wa-color-text-quiet" style="text-align: center;">
+  <div class="flex flex-col gap-2 items-center">
+    <h2 class="text-2xl font-semibold">Welcome to Akriva</h2>
+    <p class="text-base text-muted-foreground text-center">
       Complete these steps to start your carbon accounting journey
     </p>
   </div>
 
   <!-- Success Checklist -->
-  <wa-card style="width: 100%; max-width: 600px;">
-    <div class="wa-stack wa-gap-l">
-      <!-- Header -->
-      <div class="wa-cluster wa-gap-s wa-align-items-center">
-        <wa-icon
-          library="heroicons"
-          name="document-check"
-          style="color: var(--akriva-action-primary); font-size: 24px;"
-        ></wa-icon>
-        <h3>Success Checklist</h3>
-      </div>
-
-      <!-- Progress -->
-      <div class="progress-section wa-stack wa-gap-xs">
-        <div
-          class="wa-cluster wa-align-items-center"
-          style="justify-content: space-between;"
-        >
-          <span class="wa-caption-xs wa-color-text-quiet">Setup Progress</span>
-          <span
-            class="wa-font-weight-semibold"
-            style="color: var(--akriva-action-primary); font-size: var(--akriva-size-body);"
-            >0/3 Completed</span
-          >
+  <Card.Root class="w-full max-w-[600px]">
+    <Card.Content class="pt-6">
+      <div class="flex flex-col gap-5">
+        <!-- Header -->
+        <div class="flex gap-3 items-center">
+          <FileCheck class="size-6 text-primary" />
+          <h3 class="text-xl font-semibold">Success Checklist</h3>
         </div>
-        <wa-progress-bar value="0" max="100"></wa-progress-bar>
+
+        <!-- Progress -->
+        <div class="flex flex-col gap-2 bg-muted p-3 px-4 rounded-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-muted-foreground">Setup Progress</span>
+            <span class="font-semibold text-primary text-sm">0/3 Completed</span>
+          </div>
+          <Progress value={0} max={100} class="h-1" />
+        </div>
+
+        <Separator />
+
+        <!-- Tasks -->
+        <div class="flex flex-col gap-4">
+          <div class="flex items-start gap-3 rounded-md border p-4">
+            <Checkbox class="mt-0.5" />
+            <div class="flex flex-col gap-1">
+              <strong>Task 1: Define Boundary</strong>
+              <span class="text-sm text-muted-foreground">Set up organizational boundaries and reporting scope</span>
+              <span class="text-xs text-muted-foreground">Status: Incomplete</span>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3 rounded-md border p-4">
+            <Checkbox class="mt-0.5" />
+            <div class="flex flex-col gap-1">
+              <strong>Task 2: Configure Company Master</strong>
+              <span class="text-sm text-muted-foreground">Add company details, locations, and operational units</span>
+              <span class="text-xs text-muted-foreground">Status: Incomplete</span>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3 rounded-md border p-4">
+            <Checkbox class="mt-0.5" />
+            <div class="flex flex-col gap-1">
+              <strong>Task 3: Set Calculation Engine</strong>
+              <span class="text-sm text-muted-foreground">Configure emission factors and calculation methodology</span>
+              <span class="text-xs text-muted-foreground">Status: Incomplete</span>
+            </div>
+          </div>
+        </div>
       </div>
-
-      <wa-divider></wa-divider>
-
-      <!-- Tasks -->
-      <div class="wa-stack wa-gap-m">
-        <wa-callout variant="neutral" appearance="filled-outlined">
-          <wa-checkbox slot="icon"></wa-checkbox>
-          <strong>Task 1: Define Boundary</strong><br />
-          <span class="wa-body-s wa-color-text-quiet"
-            >Set up organizational boundaries and reporting scope</span
-          ><br />
-          <span
-            class="wa-caption-xs"
-            style="color: var(--akriva-text-tertiary);">Status: Incomplete</span
-          >
-        </wa-callout>
-
-        <wa-callout variant="neutral" appearance="filled-outlined">
-          <wa-checkbox slot="icon"></wa-checkbox>
-          <strong>Task 2: Configure Company Master</strong><br />
-          <span class="wa-body-s wa-color-text-quiet"
-            >Add company details, locations, and operational units</span
-          ><br />
-          <span
-            class="wa-caption-xs"
-            style="color: var(--akriva-text-tertiary);">Status: Incomplete</span
-          >
-        </wa-callout>
-
-        <wa-callout variant="neutral" appearance="filled-outlined">
-          <wa-checkbox slot="icon"></wa-checkbox>
-          <strong>Task 3: Set Calculation Engine</strong><br />
-          <span class="wa-body-s wa-color-text-quiet"
-            >Configure emission factors and calculation methodology</span
-          ><br />
-          <span
-            class="wa-caption-xs"
-            style="color: var(--akriva-text-tertiary);">Status: Incomplete</span
-          >
-        </wa-callout>
-      </div>
-    </div>
-  </wa-card>
+    </Card.Content>
+  </Card.Root>
 </div>
-
-<style>
-  .onboarding {
-    padding: var(--akriva-space-12);
-    height: 100%;
-  }
-
-  .state-icon {
-    width: 80px;
-    height: 80px;
-    border-radius: var(--akriva-radius-full);
-    background: var(--akriva-surface-tertiary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .progress-section {
-    background: var(--akriva-surface-tertiary);
-    padding: var(--akriva-space-3) var(--akriva-space-4);
-    border-radius: var(--akriva-radius-xs);
-  }
-
-  wa-checkbox {
-    --wa-form-control-toggle-size: 24px;
-  }
-
-  wa-progress-bar {
-    --track-height: 4px;
-  }
-</style>

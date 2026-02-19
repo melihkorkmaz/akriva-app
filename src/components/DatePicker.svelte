@@ -64,22 +64,22 @@
   });
 </script>
 
-<div class="datepicker" class:disabled>
+<div class="flex flex-col gap-1" class:opacity-50={disabled}>
   {#if label}
     <!-- svelte-ignore a11y_label_has_associated_control -->
-    <label class="datepicker__label">{label}</label>
+    <label class="text-sm font-medium text-foreground">{label}</label>
   {/if}
-  <div class="datepicker__wrapper">
+  <div class="relative">
     <input
       bind:this={inputEl}
       type="text"
       readonly
       {placeholder}
       {disabled}
-      class="datepicker__input"
+      class="w-full h-10 px-3 pr-10 text-sm bg-card border border-input rounded-sm outline-none cursor-pointer placeholder:text-muted-foreground focus:border-ring focus:ring-1 focus:ring-ring disabled:cursor-not-allowed"
     />
     <svg
-      class="datepicker__icon"
+      class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 20 20"
       fill="currentColor"
@@ -95,65 +95,3 @@
     </svg>
   </div>
 </div>
-
-<style>
-  .datepicker {
-    display: flex;
-    flex-direction: column;
-    gap: var(--akriva-space-1);
-  }
-
-  .datepicker__label {
-    font-family: var(--akriva-font-primary);
-    font-size: var(--akriva-size-body);
-    font-weight: var(--akriva-weight-medium);
-    color: var(--akriva-text-primary);
-  }
-
-  .datepicker__wrapper {
-    position: relative;
-  }
-
-  .datepicker__input {
-    width: 100%;
-    height: var(--wa-form-control-height, 38px);
-    padding: 0 var(--akriva-space-10) 0 var(--akriva-space-3);
-    font-family: var(--akriva-font-primary);
-    font-size: var(--akriva-size-body);
-    font-weight: var(--akriva-weight-regular);
-    color: var(--akriva-text-primary);
-    background: var(--akriva-surface-primary);
-    border: var(--akriva-border-thin) solid var(--akriva-border-default);
-    border-radius: var(--akriva-radius-xs);
-    outline: none;
-    cursor: pointer;
-    box-sizing: border-box;
-  }
-
-  .datepicker__input::placeholder {
-    color: var(--akriva-text-tertiary);
-  }
-
-  .datepicker__input:focus {
-    border-color: var(--akriva-border-focus);
-    box-shadow: 0 0 0 1px var(--akriva-border-focus);
-  }
-
-  .datepicker__input:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  .datepicker__icon {
-    position: absolute;
-    right: var(--akriva-space-3);
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--akriva-text-tertiary);
-    pointer-events: none;
-  }
-
-  .disabled .datepicker__icon {
-    opacity: 0.5;
-  }
-</style>
