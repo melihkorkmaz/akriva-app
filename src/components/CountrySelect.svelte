@@ -1,28 +1,18 @@
 <script lang="ts">
-  import "@awesome.me/webawesome/dist/components/select/select.js";
-  import "@awesome.me/webawesome/dist/components/option/option.js";
-  import { waChange } from "$lib/actions/wa-events.js";
+  import * as Select from "$lib/components/ui/select/index.js";
 
   interface Props {
     value?: string | null;
-    label?: string;
     placeholder?: string;
-    clearable?: boolean;
-    name?: string;
     disabled?: boolean;
-    "data-invalid"?: string;
-    onchange?: (value: string | null) => void;
+    [key: string]: unknown;
   }
 
   let {
     value = $bindable(null),
-    label = "Country",
     placeholder = "Select country",
-    clearable = true,
-    name = "",
     disabled = false,
-    "data-invalid": dataInvalid = undefined,
-    onchange,
+    ...restProps
   }: Props = $props();
 
   const COUNTRIES = [
@@ -86,24 +76,32 @@
     { code: "VN", name: "Vietnam" },
     { code: "ZA", name: "South Africa" },
   ] as const;
+
+  let selectedLabel = $derived(
+    COUNTRIES.find((c) => c.code === value)?.name ?? "",
+  );
+
+  function handleValueChange(val: string | undefined) {
+    value = val || null;
+  }
 </script>
 
-{#if name}
-  <input type="hidden" {name} value={value ?? ""} />
-{/if}
-<wa-select
-  {label}
-  {placeholder}
-  {clearable}
+<Select.Root
+  type="single"
+  value={value ?? undefined}
+  onValueChange={handleValueChange}
   {disabled}
-  value={value ?? ""}
-  data-invalid={dataInvalid}
-  use:waChange={(val) => {
-    value = val || null;
-    onchange?.(value);
-  }}
 >
-  {#each COUNTRIES as country}
-    <wa-option value={country.code}>{country.name}</wa-option>
-  {/each}
-</wa-select>
+  <Select.Trigger class="w-full" {...restProps}>
+    {#if selectedLabel}
+      {selectedLabel}
+    {:else}
+      <span class="text-muted-foreground">{placeholder}</span>
+    {/if}
+  </Select.Trigger>
+  <Select.Content>
+    {#each COUNTRIES as country}
+      <Select.Item value={country.code}>{country.name}</Select.Item>
+    {/each}
+  </Select.Content>
+</Select.Root>

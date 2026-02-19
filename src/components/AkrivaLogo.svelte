@@ -1,6 +1,4 @@
-<div
-  class="wa-cluster wa-gap-3xs wa-align-items-end wa-justify-content-center"
->
+<div class="flex flex-wrap gap-0.5 items-end justify-center">
   <svg
     width="48"
     height="48"
@@ -10,14 +8,14 @@
   >
     <path
       d="M4 44L24 4L44 44L36 44L24 20L12 44Z"
-      fill="var(--akriva-action-primary)"
+      fill="var(--primary)"
     />
     <rect
       x="18"
       y="28"
       width="12"
       height="3"
-      fill="var(--akriva-brand-primary)"
+      fill="var(--foreground)"
     />
   </svg>
   <span class="akriva-logo-text">AKRIVA</span>
@@ -25,9 +23,9 @@
 
 <style>
   .akriva-logo-text {
-    font-size: var(--akriva-size-display);
-    font-weight: var(--akriva-weight-semibold);
-    color: var(--akriva-brand-primary);
+    font-size: 48px;
+    font-weight: 600;
+    color: var(--foreground);
     letter-spacing: -0.5px;
     line-height: 0.85;
   }

@@ -1,13 +1,13 @@
-/* Flatpickr base + Akriva token overrides */
+/* Flatpickr base + shadcn token overrides */
 @import "flatpickr/dist/flatpickr.css";
 
 /* Calendar popup container */
 .flatpickr-calendar {
-  font-family: var(--akriva-font-primary);
-  background: var(--akriva-surface-primary);
-  border: var(--akriva-border-thin) solid var(--akriva-border-default);
-  border-radius: var(--akriva-radius-md);
-  box-shadow: var(--akriva-shadow-md);
+  font-family: var(--font-sans);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
   width: 280px;
 }
 
@@ -18,47 +18,47 @@
 
 /* Month navigation header */
 .flatpickr-months {
-  padding: var(--akriva-space-2) var(--akriva-space-2) 0;
+  padding: 8px 8px 0;
 }
 
 .flatpickr-months .flatpickr-month {
-  color: var(--akriva-text-primary);
-  fill: var(--akriva-text-primary);
+  color: var(--foreground);
+  fill: var(--foreground);
   height: 36px;
 }
 
 .flatpickr-current-month {
-  font-size: var(--akriva-size-body);
-  font-weight: var(--akriva-weight-semibold);
-  color: var(--akriva-text-primary);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--foreground);
   padding-top: 6px;
 }
 
 .flatpickr-current-month .flatpickr-monthDropdown-months,
 .flatpickr-current-month input.cur-year {
-  font-weight: var(--akriva-weight-semibold);
-  color: var(--akriva-text-primary);
+  font-weight: 600;
+  color: var(--foreground);
 }
 
 .flatpickr-current-month .flatpickr-monthDropdown-months:hover,
 .flatpickr-current-month input.cur-year:hover {
-  background: var(--akriva-surface-tertiary);
+  background: var(--secondary);
 }
 
 /* Prev/next arrows */
 .flatpickr-months .flatpickr-prev-month,
 .flatpickr-months .flatpickr-next-month {
-  color: var(--akriva-text-secondary);
-  fill: var(--akriva-text-secondary);
-  padding: var(--akriva-space-2);
-  border-radius: var(--akriva-radius-sm);
+  color: var(--muted-foreground);
+  fill: var(--muted-foreground);
+  padding: 8px;
+  border-radius: 4px;
 }
 
 .flatpickr-months .flatpickr-prev-month:hover,
 .flatpickr-months .flatpickr-next-month:hover {
-  color: var(--akriva-text-primary);
-  fill: var(--akriva-text-primary);
-  background: var(--akriva-surface-tertiary);
+  color: var(--foreground);
+  fill: var(--foreground);
+  background: var(--secondary);
 }
 
 .flatpickr-months .flatpickr-prev-month svg,
@@ -68,18 +68,18 @@
 
 /* Weekday headers */
 .flatpickr-weekdays {
-  padding: 0 var(--akriva-space-2);
+  padding: 0 8px;
 }
 
 span.flatpickr-weekday {
-  color: var(--akriva-text-tertiary);
-  font-size: var(--akriva-size-body-sm);
-  font-weight: var(--akriva-weight-medium);
+  color: var(--muted-foreground);
+  font-size: 12px;
+  font-weight: 500;
 }
 
 /* Day grid */
 .flatpickr-innerContainer {
-  padding: 0 var(--akriva-space-2) var(--akriva-space-2);
+  padding: 0 8px 8px;
 }
 
 .flatpickr-days {
@@ -93,10 +93,10 @@ span.flatpickr-weekday {
 
 /* Individual day cells */
 .flatpickr-day {
-  color: var(--akriva-text-primary);
-  font-size: var(--akriva-size-body-sm);
-  font-weight: var(--akriva-weight-regular);
-  border-radius: var(--akriva-radius-sm);
+  color: var(--foreground);
+  font-size: 12px;
+  font-weight: 400;
+  border-radius: 4px;
   border: 2px solid transparent;
   max-width: 36px;
   height: 36px;
@@ -105,67 +105,68 @@ span.flatpickr-weekday {
 }
 
 .flatpickr-day:hover {
-  background: var(--akriva-surface-tertiary);
+  background: var(--secondary);
   border-color: transparent;
 }
 
 /* Today */
 .flatpickr-day.today {
-  border-color: var(--akriva-action-primary);
+  border-color: var(--primary);
 }
 
 .flatpickr-day.today:hover {
-  background: var(--akriva-surface-tertiary);
-  border-color: var(--akriva-action-primary);
-  color: var(--akriva-text-primary);
+  background: var(--secondary);
+  border-color: var(--primary);
+  color: var(--foreground);
 }
 
 /* Selected day */
 .flatpickr-day.selected,
 .flatpickr-day.startRange,
 .flatpickr-day.endRange {
-  background: var(--akriva-action-primary);
-  border-color: var(--akriva-action-primary);
-  color: var(--akriva-text-inverse);
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-foreground);
 }
 
 .flatpickr-day.selected:hover,
 .flatpickr-day.startRange:hover,
 .flatpickr-day.endRange:hover {
-  background: var(--akriva-action-hover);
-  border-color: var(--akriva-action-hover);
-  color: var(--akriva-text-inverse);
+  background: color-mix(in srgb, var(--primary) 85%, black);
+  border-color: color-mix(in srgb, var(--primary) 85%, black);
+  color: var(--primary-foreground);
 }
 
 /* Range in-between days */
 .flatpickr-day.inRange {
-  background: color-mix(in srgb, var(--akriva-action-primary) 10%, transparent);
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
   border-color: transparent;
   box-shadow: none;
 }
 
 .flatpickr-day.inRange:hover {
-  background: color-mix(in srgb, var(--akriva-action-primary) 20%, transparent);
+  background: color-mix(in srgb, var(--primary) 20%, transparent);
   border-color: transparent;
 }
 
 /* Range start/end rounding */
 .flatpickr-day.startRange {
-  border-radius: var(--akriva-radius-sm) 0 0 var(--akriva-radius-sm);
+  border-radius: 4px 0 0 4px;
 }
 
 .flatpickr-day.endRange {
-  border-radius: 0 var(--akriva-radius-sm) var(--akriva-radius-sm) 0;
+  border-radius: 0 4px 4px 0;
 }
 
 .flatpickr-day.startRange.endRange {
-  border-radius: var(--akriva-radius-sm);
+  border-radius: 4px;
 }
 
 /* Disabled / other-month days */
 .flatpickr-day.flatpickr-disabled,
 .flatpickr-day.flatpickr-disabled:hover {
-  color: var(--akriva-text-disabled);
+  color: var(--muted-foreground);
+  opacity: 0.5;
   background: transparent;
   border-color: transparent;
   cursor: not-allowed;
@@ -173,11 +174,12 @@ span.flatpickr-weekday {
 
 .flatpickr-day.prevMonthDay,
 .flatpickr-day.nextMonthDay {
-  color: var(--akriva-text-disabled);
+  color: var(--muted-foreground);
+  opacity: 0.5;
 }
 
 .flatpickr-day.prevMonthDay:hover,
 .flatpickr-day.nextMonthDay:hover {
-  background: var(--akriva-surface-tertiary);
+  background: var(--secondary);
   border-color: transparent;
 }

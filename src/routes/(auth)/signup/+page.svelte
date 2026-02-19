@@ -1,168 +1,156 @@
 <script lang="ts">
   import { superForm } from "sveltekit-superforms";
   import { zod4Client } from "sveltekit-superforms/adapters";
-  import "@awesome.me/webawesome/dist/components/button/button.js";
-  import "@awesome.me/webawesome/dist/components/input/input.js";
-  import "@awesome.me/webawesome/dist/components/card/card.js";
-  import "@awesome.me/webawesome/dist/components/callout/callout.js";
+  import * as Card from "$lib/components/ui/card/index.js";
+  import * as Form from "$lib/components/ui/form/index.js";
+  import { Input } from "$lib/components/ui/input/index.js";
+  import { Alert, AlertDescription } from "$lib/components/ui/alert/index.js";
+  import Eye from "@lucide/svelte/icons/eye";
+  import EyeOff from "@lucide/svelte/icons/eye-off";
 
   import TextDivider from "$components/TextDivider.svelte";
   import { signupSchema } from "$lib/schemas/signup.js";
 
   let { data } = $props();
 
-  const { form, errors, enhance, message, submitting } = superForm(data.form, {
+  let showPassword = $state(false);
+
+  const superform = superForm(data.form, {
     validators: zod4Client(signupSchema),
+    onError({ result }) {
+      $message =
+        typeof result.error === "string"
+          ? result.error
+          : "An unexpected error occurred. Please try again.";
+    },
   });
+  const { form, enhance, message, submitting } = superform;
 </script>
 
 <svelte:head>
   <title>Sign Up | Akriva</title>
 </svelte:head>
 
-<wa-card>
-  <div class="wa-stack wa-gap-l">
-    <div class="wa-stack wa-gap-xs wa-align-items-center">
-      <h2>Create Your Organization</h2>
-      <p class="wa-body-l wa-color-text-quiet">
-        Set up your institutional ledger environment
-      </p>
-    </div>
-
-    <!-- API error message -->
-    {#if $message}
-      <wa-callout variant="danger">
-        {$message}
-      </wa-callout>
-    {/if}
-
-    <form method="POST" use:enhance class="wa-stack wa-gap-l">
-      <div class="wa-grid wa-gap-m">
-        <div class="field">
-          <wa-input
-            id="firstName"
-            name="firstName"
-            placeholder="Jane"
-            label="First Name"
-            value={$form.firstName}
-            oninput={(e: Event) => {
-              $form.firstName = (e.target as HTMLInputElement).value;
-            }}
-            data-invalid={$errors.firstName ? "" : undefined}
-          ></wa-input>
-          {#if $errors.firstName}
-            <small class="error-message">{$errors.firstName[0]}</small>
-          {/if}
-        </div>
-
-        <div class="field">
-          <wa-input
-            id="lastName"
-            name="lastName"
-            placeholder="Doe"
-            label="Last Name"
-            value={$form.lastName}
-            oninput={(e: Event) => {
-              $form.lastName = (e.target as HTMLInputElement).value;
-            }}
-            data-invalid={$errors.lastName ? "" : undefined}
-          ></wa-input>
-          {#if $errors.lastName}
-            <small class="error-message">{$errors.lastName[0]}</small>
-          {/if}
-        </div>
+<Card.Root class="w-full max-w-[490px]">
+  <Card.Content class="pt-6">
+    <div class="flex flex-col gap-5">
+      <div class="flex flex-col gap-2 items-center">
+        <h2 class="text-2xl font-semibold">Create Your Organization</h2>
+        <p class="text-base text-muted-foreground">
+          Set up your institutional ledger environment
+        </p>
       </div>
 
-      <div class="field">
-        <wa-input
-          id="companyName"
-          name="companyName"
-          placeholder="Acme Corporation"
-          label="Company Name"
-          value={$form.companyName}
-          oninput={(e: Event) => {
-            $form.companyName = (e.target as HTMLInputElement).value;
-          }}
-          data-invalid={$errors.companyName ? "" : undefined}
-        ></wa-input>
-        {#if $errors.companyName}
-          <small class="error-message">{$errors.companyName[0]}</small>
-        {/if}
-      </div>
-
-      <div class="field">
-        <wa-input
-          id="email"
-          name="email"
-          placeholder="john.doe@company.com"
-          label="Email Address"
-          value={$form.email}
-          oninput={(e: Event) => {
-            $form.email = (e.target as HTMLInputElement).value;
-          }}
-          data-invalid={$errors.email ? "" : undefined}
-        ></wa-input>
-        {#if $errors.email}
-          <small class="error-message">{$errors.email[0]}</small>
-        {/if}
-      </div>
-
-      <div class="field">
-        <wa-input
-          id="password"
-          name="password"
-          type="password"
-          placeholder="••••••••"
-          label="Password"
-          password-toggle
-          value={$form.password}
-          oninput={(e: Event) => {
-            $form.password = (e.target as HTMLInputElement).value;
-          }}
-          data-invalid={$errors.password ? "" : undefined}
-        ></wa-input>
-        {#if $errors.password}
-          <small class="error-message">{$errors.password[0]}</small>
-        {/if}
-      </div>
-
-      {#if $submitting}
-        <wa-button type="submit" variant="brand" loading disabled>
-          Create Organization
-        </wa-button>
-      {:else}
-        <wa-button type="submit" variant="brand">
-          Create Organization
-        </wa-button>
+      {#if $message}
+        <Alert variant="destructive">
+          <AlertDescription>{$message}</AlertDescription>
+        </Alert>
       {/if}
-    </form>
 
-    <TextDivider />
+      <form method="POST" use:enhance class="flex flex-col gap-5">
+        <div class="grid grid-cols-2 gap-4">
+          <Form.Field form={superform} name="firstName">
+            <Form.Control>
+              {#snippet children({ props })}
+                <Form.Label>First Name</Form.Label>
+                <Input
+                  {...props}
+                  placeholder="Jane"
+                  bind:value={$form.firstName}
+                />
+              {/snippet}
+            </Form.Control>
+            <Form.FieldErrors />
+          </Form.Field>
 
-    <div class="wa-cluster wa-gap-xs wa-justify-content-center">
-      <span class="wa-body-s wa-color-text-quiet">Already have an account?</span
-      >
-      <a href="/signin" class="wa-link wa-font-size-s wa-font-weight-bold"
-        >Sign in</a
-      >
+          <Form.Field form={superform} name="lastName">
+            <Form.Control>
+              {#snippet children({ props })}
+                <Form.Label>Last Name</Form.Label>
+                <Input
+                  {...props}
+                  placeholder="Doe"
+                  bind:value={$form.lastName}
+                />
+              {/snippet}
+            </Form.Control>
+            <Form.FieldErrors />
+          </Form.Field>
+        </div>
+
+        <Form.Field form={superform} name="companyName">
+          <Form.Control>
+            {#snippet children({ props })}
+              <Form.Label>Company Name</Form.Label>
+              <Input
+                {...props}
+                placeholder="Acme Corporation"
+                bind:value={$form.companyName}
+              />
+            {/snippet}
+          </Form.Control>
+          <Form.FieldErrors />
+        </Form.Field>
+
+        <Form.Field form={superform} name="email">
+          <Form.Control>
+            {#snippet children({ props })}
+              <Form.Label>Email Address</Form.Label>
+              <Input
+                {...props}
+                type="email"
+                placeholder="john.doe@company.com"
+                bind:value={$form.email}
+              />
+            {/snippet}
+          </Form.Control>
+          <Form.FieldErrors />
+        </Form.Field>
+
+        <Form.Field form={superform} name="password">
+          <Form.Control>
+            {#snippet children({ props })}
+              <Form.Label>Password</Form.Label>
+              <div class="relative">
+                <Input
+                  {...props}
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  bind:value={$form.password}
+                />
+                <button
+                  type="button"
+                  class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  onclick={() => (showPassword = !showPassword)}
+                  tabindex={-1}
+                >
+                  {#if showPassword}
+                    <EyeOff class="size-4" />
+                  {:else}
+                    <Eye class="size-4" />
+                  {/if}
+                </button>
+              </div>
+            {/snippet}
+          </Form.Control>
+          <Form.FieldErrors />
+        </Form.Field>
+
+        <Form.Button class="w-full" disabled={$submitting}>
+          {$submitting ? "Creating..." : "Create Organization"}
+        </Form.Button>
+      </form>
+
+      <TextDivider />
+
+      <div class="flex flex-wrap gap-2 justify-center">
+        <span class="text-sm text-muted-foreground"
+          >Already have an account?</span
+        >
+        <a href="/signin" class="text-sm font-bold text-primary hover:underline"
+          >Sign in</a
+        >
+      </div>
     </div>
-  </div>
-</wa-card>
-
-<style>
-  wa-card {
-    width: 100%;
-    max-width: 490px;
-  }
-
-  .field {
-    display: flex;
-    flex-direction: column;
-    gap: var(--wa-space-xs);
-  }
-
-  .error-message {
-    color: var(--akriva-status-error);
-    font-size: var(--wa-font-size-s);
-  }
-</style>
+  </Card.Content>
+</Card.Root>

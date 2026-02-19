@@ -1,15 +1,80 @@
 <script lang="ts">
-  import "@awesome.me/webawesome/dist/components/tree/tree.js";
-  import "@awesome.me/webawesome/dist/components/tree-item/tree-item.js";
-  import "@awesome.me/webawesome/dist/components/input/input.js";
-  import "@awesome.me/webawesome/dist/components/select/select.js";
-  import "@awesome.me/webawesome/dist/components/option/option.js";
-  import "@awesome.me/webawesome/dist/components/switch/switch.js";
-  import "@awesome.me/webawesome/dist/components/callout/callout.js";
+  import * as Card from "$lib/components/ui/card/index.js";
+  import * as Select from "$lib/components/ui/select/index.js";
+  import { Input } from "$lib/components/ui/input/index.js";
+  import { Button } from "$lib/components/ui/button/index.js";
+  import { Checkbox } from "$lib/components/ui/checkbox/index.js";
+  import { Switch } from "$lib/components/ui/switch/index.js";
+  import { Separator } from "$lib/components/ui/separator/index.js";
+  import { Alert, AlertDescription } from "$lib/components/ui/alert/index.js";
+  import { Label } from "$lib/components/ui/label/index.js";
+  import Building2 from "@lucide/svelte/icons/building-2";
+  import Building from "@lucide/svelte/icons/building";
+  import Wrench from "@lucide/svelte/icons/wrench";
+  import Cpu from "@lucide/svelte/icons/cpu";
+  import Warehouse from "@lucide/svelte/icons/warehouse";
+  import Plus from "@lucide/svelte/icons/plus";
+  import ChevronRight from "@lucide/svelte/icons/chevron-right";
+  import ChevronDown from "@lucide/svelte/icons/chevron-down";
+  import Lock from "@lucide/svelte/icons/lock";
+  import Info from "@lucide/svelte/icons/info";
+  import AlertTriangle from "@lucide/svelte/icons/triangle-alert";
+  import Trash2 from "@lucide/svelte/icons/trash-2";
+  import type { Component } from "svelte";
 
   let nodeActive = $state(true);
   let overrideEquity = $state(true);
   let overrideMapping = $state(false);
+
+  // Tree state
+  interface TreeNode {
+    id: string;
+    name: string;
+    icon: Component;
+    expanded?: boolean;
+    selected?: boolean;
+    children?: TreeNode[];
+  }
+
+  let treeData = $state<TreeNode[]>([
+    {
+      id: "acme",
+      name: "Acme Corporation",
+      icon: Building2,
+      expanded: true,
+      children: [
+        { id: "chicago", name: "Chicago HQ", icon: Building },
+        {
+          id: "detroit",
+          name: "Detroit Factory",
+          icon: Wrench,
+          expanded: true,
+          selected: true,
+          children: [
+            { id: "line-a", name: "Production Line A", icon: Cpu },
+            { id: "line-b", name: "Production Line B", icon: Cpu },
+          ],
+        },
+        { id: "texas", name: "Texas Warehouse", icon: Warehouse },
+      ],
+    },
+  ]);
+
+  function toggleExpand(node: TreeNode) {
+    node.expanded = !node.expanded;
+  }
+
+  function selectNode(node: TreeNode) {
+    // Deselect all
+    function deselect(nodes: TreeNode[]) {
+      for (const n of nodes) {
+        n.selected = false;
+        if (n.children) deselect(n.children);
+      }
+    }
+    deselect(treeData);
+    node.selected = true;
+  }
 </script>
 
 <svelte:head>
@@ -18,290 +83,305 @@
 
 <div class="org-layout">
   <!-- Left: Tree Panel -->
-  <div class="tree-panel wa-stack wa-gap-s">
-    <div
-      class="wa-cluster"
-      style="justify-content: space-between; align-items: center"
-    >
-      <span class="wa-heading-s">Organization</span>
-      <wa-button size="small">
-        <wa-icon slot="start" library="heroicons" name="plus"></wa-icon>
+  <div class="tree-panel flex flex-col gap-3">
+    <div class="flex justify-between items-center">
+      <span class="text-lg font-semibold">Organization</span>
+      <Button size="sm">
+        <Plus class="size-4 mr-1" />
         Add
-      </wa-button>
+      </Button>
     </div>
 
-    <wa-divider></wa-divider>
+    <Separator />
 
-    <wa-tree selection="single">
-      <wa-tree-item expanded>
-        <wa-icon library="heroicons" name="building-office-2" slot="expand-icon"
-        ></wa-icon>
-        Acme Corporation
-
-        <wa-tree-item>
-          <wa-icon library="heroicons" name="building-office"></wa-icon>
-          Chicago HQ
-        </wa-tree-item>
-
-        <wa-tree-item selected expanded>
-          <wa-icon library="heroicons" name="wrench-screwdriver"></wa-icon>
-          Detroit Factory
-
-          <wa-tree-item>
-            <wa-icon library="heroicons" name="cpu-chip"></wa-icon>
-            Production Line A
-          </wa-tree-item>
-          <wa-tree-item>
-            <wa-icon library="heroicons" name="cpu-chip"></wa-icon>
-            Production Line B
-          </wa-tree-item>
-        </wa-tree-item>
-
-        <wa-tree-item>
-          <wa-icon library="heroicons" name="archive-box"></wa-icon>
-          Texas Warehouse
-        </wa-tree-item>
-      </wa-tree-item>
-    </wa-tree>
+    <!-- Custom Tree -->
+    <div class="flex flex-col">
+      {#snippet renderTree(nodes: TreeNode[], depth: number)}
+        {#each nodes as node}
+          <div>
+            <button
+              type="button"
+              class="tree-node"
+              class:selected={node.selected}
+              style:padding-left="{depth * 20 + 8}px"
+              onclick={() => {
+                selectNode(node);
+                if (node.children) toggleExpand(node);
+              }}
+            >
+              {#if node.children}
+                {#if node.expanded}
+                  <ChevronDown class="size-4 shrink-0 text-muted-foreground" />
+                {:else}
+                  <ChevronRight class="size-4 shrink-0 text-muted-foreground" />
+                {/if}
+              {:else}
+                <span class="w-4"></span>
+              {/if}
+              <node.icon class="size-4 shrink-0" />
+              <span class="truncate">{node.name}</span>
+            </button>
+            {#if node.children && node.expanded}
+              {@render renderTree(node.children, depth + 1)}
+            {/if}
+          </div>
+        {/each}
+      {/snippet}
+      {@render renderTree(treeData, 0)}
+    </div>
   </div>
 
   <!-- Right: Details Panel -->
-  <div class="details-panel wa-stack wa-gap-xl">
-    <h1 class="wa-heading-m">Facility Details</h1>
+  <div class="details-panel flex flex-col gap-6">
+    <h1 class="text-xl font-semibold">Facility Details</h1>
 
     <!-- Basic Information Card -->
-    <wa-card style="--spacing: var(--wa-space-xl)">
-      <div class="wa-stack wa-gap-l">
-        <h2 class="wa-heading-s">Basic Information</h2>
+    <Card.Root>
+      <Card.Content class="pt-6">
+        <div class="flex flex-col gap-5">
+          <h2 class="text-lg font-semibold">Basic Information</h2>
 
-        <div class="wa-stack wa-gap-m">
-          <!-- Name + Type -->
-          <div class="wa-cluster wa-gap-m" style="align-items: end">
-            <wa-input
-              label="Node Name"
-              placeholder="Detroit Factory"
-              style="flex: 1"
-            ></wa-input>
-            <wa-select label="Type" value="factory" style="width: 280px">
-              <wa-option value="factory">Factory</wa-option>
-              <wa-option value="office">Office</wa-option>
-              <wa-option value="warehouse">Warehouse</wa-option>
-              <wa-option value="production-line">Production Line</wa-option>
-            </wa-select>
-          </div>
-
-          <!-- Status -->
-          <div class="wa-stack wa-gap-xs">
-            <span class="wa-font-weight-semibold">Status</span>
-            <div class="wa-cluster wa-gap-s" style="align-items: center">
-              <span style="color: var(--akriva-text-tertiary)">Passive</span>
-              <wa-switch
-                checked={nodeActive}
-                onchange={(e: Event) => {
-                  nodeActive = (e.target as HTMLInputElement).checked;
-                }}
-              ></wa-switch>
-              <span class="wa-font-weight-bold">Active</span>
+          <div class="flex flex-col gap-4">
+            <!-- Name + Type -->
+            <div class="flex gap-4">
+              <div class="flex-1 flex flex-col gap-1.5">
+                <Label>Node Name</Label>
+                <Input placeholder="Detroit Factory" />
+              </div>
+              <div class="flex flex-col gap-1.5 w-[280px]">
+                <Label>Type</Label>
+                <Select.Root type="single" value="factory">
+                  <Select.Trigger class="w-full">Factory</Select.Trigger>
+                  <Select.Content>
+                    <Select.Item value="factory">Factory</Select.Item>
+                    <Select.Item value="office">Office</Select.Item>
+                    <Select.Item value="warehouse">Warehouse</Select.Item>
+                    <Select.Item value="production-line"
+                      >Production Line</Select.Item
+                    >
+                  </Select.Content>
+                </Select.Root>
+              </div>
             </div>
-            <span
-              style="font-size: var(--akriva-size-body-sm); color: var(--akriva-text-tertiary)"
-            >
-              Active nodes are included in calculations
-            </span>
-          </div>
 
-          <!-- Location -->
-          <div
-            style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--akriva-space-4); align-items: end"
-          >
-            <wa-select label="Country" value="us">
-              <wa-option value="us">United States</wa-option>
-              <wa-option value="gb">United Kingdom</wa-option>
-              <wa-option value="de">Germany</wa-option>
-            </wa-select>
-            <wa-select label="State" value="mi">
-              <wa-option value="mi">Michigan</wa-option>
-              <wa-option value="ca">California</wa-option>
-              <wa-option value="ny">New York</wa-option>
-            </wa-select>
-            <wa-input label="City" placeholder="Detroit"></wa-input>
-          </div>
-        </div>
-      </div>
-    </wa-card>
-
-    <!-- Boundary & Inheritance Card -->
-    <wa-card style="--spacing: var(--wa-space-xl)">
-      <div class="wa-stack wa-gap-l">
-        <div class="wa-stack wa-gap-2xs">
-          <h2 class="wa-heading-s">Boundary & Inheritance</h2>
-          <p class="wa-body-s wa-color-text-quiet">
-            Configure equity share and boundary rules for this node
-          </p>
-        </div>
-
-        <div class="wa-stack wa-gap-m">
-          <div class="wa-cluster wa-gap-xl" style="align-items: center">
-            <wa-checkbox
-              checked={overrideEquity}
-              onchange={(e: Event) => {
-                overrideEquity = (e.target as HTMLInputElement).checked;
-              }}
-            >
-              Override Equity Share
-            </wa-checkbox>
-            <div class="wa-cluster wa-gap-xs" style="align-items: center">
-              <wa-input type="number" value="40" style="width: 100px"
-              ></wa-input>
-              <span class="wa-font-weight-semibold">%</span>
-            </div>
-          </div>
-
-          <wa-callout variant="success">
-            <wa-icon slot="icon" library="heroicons" name="information-circle"
-            ></wa-icon>
-            This factory is 40% owned by Acme Corporation. Emissions will be calculated
-            based on this equity share.
-          </wa-callout>
-        </div>
-      </div>
-    </wa-card>
-
-    <!-- Scientific Authority Override Card -->
-    <wa-card style="--spacing: var(--wa-space-xl)">
-      <div class="wa-stack wa-gap-l">
-        <div class="wa-stack wa-gap-2xs">
-          <h2 class="wa-heading-s">Scientific Authority Override</h2>
-          <p class="wa-body-s wa-color-text-quiet">
-            Override standard mapping for this specific node. GWP Version is
-            inherited from global settings.
-          </p>
-        </div>
-
-        <div class="wa-stack wa-gap-l">
-          <!-- GWP Version (locked/inherited) -->
-          <div class="wa-stack wa-gap-xs">
-            <span class="wa-font-weight-semibold"
-              >GWP Version (Global Setting)</span
-            >
-            <div
-              class="wa-cluster wa-gap-s"
-              style="padding: var(--akriva-space-3); background: var(--akriva-surface-tertiary); border-radius: var(--akriva-radius-xs); opacity: 0.7"
-            >
-              <wa-icon
-                library="heroicons"
-                name="lock-closed"
-                style="font-size: 16px; color: var(--akriva-text-tertiary)"
-              ></wa-icon>
-              <span class="wa-color-text-quiet">IPCC AR6 (Latest)</span>
-            </div>
-            <div class="wa-cluster wa-gap-xs" style="align-items: start">
-              <wa-icon
-                library="heroicons"
-                name="information-circle"
-                style="font-size: 12px; color: var(--akriva-text-tertiary); flex-shrink: 0; margin-top: 2px"
-              ></wa-icon>
-              <span
-                style="font-size: var(--akriva-size-body-sm); color: var(--akriva-text-tertiary)"
-              >
-                GWP Version cannot be overridden at node level. Change in global
-                settings to apply organization-wide.
+            <!-- Status -->
+            <div class="flex flex-col gap-2">
+              <span class="font-semibold">Status</span>
+              <div class="flex gap-3 items-center">
+                <span class="text-muted-foreground">Passive</span>
+                <Switch
+                  checked={nodeActive}
+                  onCheckedChange={(checked) => {
+                    nodeActive = checked;
+                  }}
+                />
+                <span class="font-bold">Active</span>
+              </div>
+              <span class="text-xs text-muted-foreground">
+                Active nodes are included in calculations
               </span>
             </div>
-          </div>
 
-          <!-- Override Standard Mapping -->
-          <div class="wa-stack wa-gap-s">
-            <wa-checkbox
-              checked={overrideMapping}
-              onchange={(e: Event) => {
-                overrideMapping = (e.target as HTMLInputElement).checked;
-              }}
-            >
-              Override Standard Mapping for this node
-            </wa-checkbox>
-            <div
-              class="wa-cluster wa-gap-m"
-              style:opacity={overrideMapping ? "1" : "0.5"}
-              style:pointer-events={overrideMapping ? "auto" : "none"}
-            >
-              <div class="wa-stack wa-gap-2xs" style="flex: 1">
-                <wa-select label="Scope 1 - Direct Emissions" value="ipcc">
-                  <wa-option value="ipcc">IPCC Guidelines (Global)</wa-option>
-                  <wa-option value="epa">EPA</wa-option>
-                  <wa-option value="defra">DEFRA</wa-option>
-                </wa-select>
+            <!-- Location -->
+            <div class="grid grid-cols-3 gap-4">
+              <div class="flex flex-col gap-1.5">
+                <Label>Country</Label>
+                <Select.Root type="single" value="us">
+                  <Select.Trigger class="w-full">United States</Select.Trigger>
+                  <Select.Content>
+                    <Select.Item value="us">United States</Select.Item>
+                    <Select.Item value="gb">United Kingdom</Select.Item>
+                    <Select.Item value="de">Germany</Select.Item>
+                  </Select.Content>
+                </Select.Root>
               </div>
-              <div class="wa-stack wa-gap-2xs" style="flex: 1">
-                <wa-select label="Scope 2 - Energy Indirect" value="defra-iea">
-                  <wa-option value="defra-iea">DEFRA / IEA (Global)</wa-option>
-                  <wa-option value="epa">EPA eGRID</wa-option>
-                  <wa-option value="ipcc">IPCC Guidelines</wa-option>
-                </wa-select>
+              <div class="flex flex-col gap-1.5">
+                <Label>State</Label>
+                <Select.Root type="single" value="mi">
+                  <Select.Trigger class="w-full">Michigan</Select.Trigger>
+                  <Select.Content>
+                    <Select.Item value="mi">Michigan</Select.Item>
+                    <Select.Item value="ca">California</Select.Item>
+                    <Select.Item value="ny">New York</Select.Item>
+                  </Select.Content>
+                </Select.Root>
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <Label>City</Label>
+                <Input placeholder="Detroit" />
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </wa-card>
+      </Card.Content>
+    </Card.Root>
+
+    <!-- Boundary & Inheritance Card -->
+    <Card.Root>
+      <Card.Content class="pt-6">
+        <div class="flex flex-col gap-5">
+          <div class="flex flex-col gap-1">
+            <h2 class="text-lg font-semibold">Boundary & Inheritance</h2>
+            <p class="text-sm text-muted-foreground">
+              Configure equity share and boundary rules for this node
+            </p>
+          </div>
+
+          <div class="flex flex-col gap-4">
+            <div class="flex gap-6 items-center">
+              <div class="flex items-center gap-2">
+                <Checkbox
+                  checked={overrideEquity}
+                  onCheckedChange={(checked) => {
+                    overrideEquity = checked === true;
+                  }}
+                />
+                <Label>Override Equity Share</Label>
+              </div>
+              <div class="flex gap-2 items-center">
+                <Input type="number" value="40" class="w-[100px]" />
+                <span class="font-semibold">%</span>
+              </div>
+            </div>
+
+            <Alert class="border-emerald-200 bg-emerald-50 text-emerald-800">
+              <Info class="size-4 text-emerald-600" />
+              <AlertDescription>
+                This factory is 40% owned by Acme Corporation. Emissions will be
+                calculated based on this equity share.
+              </AlertDescription>
+            </Alert>
+          </div>
+        </div>
+      </Card.Content>
+    </Card.Root>
+
+    <!-- Scientific Authority Override Card -->
+    <Card.Root>
+      <Card.Content class="pt-6">
+        <div class="flex flex-col gap-5">
+          <div class="flex flex-col gap-1">
+            <h2 class="text-lg font-semibold">Scientific Authority Override</h2>
+            <p class="text-sm text-muted-foreground">
+              Override standard mapping for this specific node. GWP Version is
+              inherited from global settings.
+            </p>
+          </div>
+
+          <div class="flex flex-col gap-5">
+            <!-- GWP Version (locked/inherited) -->
+            <div class="flex flex-col gap-2">
+              <span class="font-semibold">GWP Version (Global Setting)</span>
+              <div class="flex gap-3 p-3 bg-muted rounded-sm opacity-70">
+                <Lock class="size-4 text-muted-foreground" />
+                <span class="text-muted-foreground">IPCC AR6 (Latest)</span>
+              </div>
+              <div class="flex gap-2 items-start">
+                <Info class="size-3 text-muted-foreground shrink-0 mt-0.5" />
+                <span class="text-xs text-muted-foreground">
+                  GWP Version cannot be overridden at node level. Change in
+                  global settings to apply organization-wide.
+                </span>
+              </div>
+            </div>
+
+            <!-- Override Standard Mapping -->
+            <div class="flex flex-col gap-3">
+              <div class="flex items-center gap-2">
+                <Checkbox
+                  checked={overrideMapping}
+                  onCheckedChange={(checked) => {
+                    overrideMapping = checked === true;
+                  }}
+                />
+                <Label>Override Standard Mapping for this node</Label>
+              </div>
+              <div
+                class="flex gap-4"
+                style:opacity={overrideMapping ? "1" : "0.5"}
+                style:pointer-events={overrideMapping ? "auto" : "none"}
+              >
+                <div class="flex-1 flex flex-col gap-1">
+                  <Label>Scope 1 - Direct Emissions</Label>
+                  <Select.Root type="single" value="ipcc">
+                    <Select.Trigger class="w-full"
+                      >IPCC Guidelines (Global)</Select.Trigger
+                    >
+                    <Select.Content>
+                      <Select.Item value="ipcc"
+                        >IPCC Guidelines (Global)</Select.Item
+                      >
+                      <Select.Item value="epa">EPA</Select.Item>
+                      <Select.Item value="defra">DEFRA</Select.Item>
+                    </Select.Content>
+                  </Select.Root>
+                </div>
+                <div class="flex-1 flex flex-col gap-1">
+                  <Label>Scope 2 - Energy Indirect</Label>
+                  <Select.Root type="single" value="defra-iea">
+                    <Select.Trigger class="w-full"
+                      >DEFRA / IEA (Global)</Select.Trigger
+                    >
+                    <Select.Content>
+                      <Select.Item value="defra-iea"
+                        >DEFRA / IEA (Global)</Select.Item
+                      >
+                      <Select.Item value="epa">EPA eGRID</Select.Item>
+                      <Select.Item value="ipcc">IPCC Guidelines</Select.Item>
+                    </Select.Content>
+                  </Select.Root>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Card.Content>
+    </Card.Root>
 
     <!-- Danger Zone Card -->
-    <wa-card class="danger-zone" style="--spacing: var(--wa-space-xl)">
-      <div class="wa-stack wa-gap-m">
-        <div class="wa-cluster wa-gap-xs" style="align-items: center">
-          <wa-icon
-            library="heroicons"
-            name="exclamation-triangle"
-            style="font-size: 20px; color: var(--akriva-status-error)"
-          ></wa-icon>
-          <span class="wa-heading-s" style="color: var(--akriva-status-error)">
-            Danger Zone
-          </span>
-        </div>
-
-        <wa-callout variant="danger">
-          <wa-icon slot="icon" library="heroicons" name="information-circle"
-          ></wa-icon>
-          <span class="wa-font-weight-bold">This action cannot be undone</span
-          ><br />
-          <span
-            class="wa-color-text-quiet"
-            style="font-size: var(--akriva-size-body-sm)"
-          >
-            Deleting this node will permanently remove it and all its child
-            nodes from the organizational tree. Historical data will be
-            preserved in the audit trail, but the node will no longer be
-            available for active calculations.
-          </span>
-        </wa-callout>
-
-        <div
-          class="wa-cluster"
-          style="justify-content: space-between; align-items: center"
-        >
-          <div class="wa-stack wa-gap-2xs">
-            <span class="wa-font-weight-semibold">Delete this node</span>
-            <span
-              style="font-size: var(--akriva-size-body-sm); color: var(--akriva-text-tertiary)"
+    <Card.Root class="border-destructive">
+      <Card.Content class="pt-6">
+        <div class="flex flex-col gap-4">
+          <div class="flex gap-2 items-center">
+            <AlertTriangle class="size-5 text-destructive" />
+            <span class="text-lg font-semibold text-destructive"
+              >Danger Zone</span
             >
-              Remove Detroit Factory and all associated data
-            </span>
           </div>
-          <wa-button variant="danger">
-            <wa-icon slot="start" library="heroicons" name="trash"></wa-icon>
-            Delete Node
-          </wa-button>
+
+          <Alert variant="destructive">
+            <Info class="size-4" />
+            <AlertDescription>
+              <span class="font-bold">This action cannot be undone</span><br />
+              <span class="text-xs">
+                Deleting this node will permanently remove it and all its child
+                nodes from the organizational tree. Historical data will be
+                preserved in the audit trail, but the node will no longer be
+                available for active calculations.
+              </span>
+            </AlertDescription>
+          </Alert>
+
+          <div class="flex justify-between items-center">
+            <div class="flex flex-col gap-1">
+              <span class="font-semibold">Delete this node</span>
+              <span class="text-xs text-muted-foreground">
+                Remove Detroit Factory and all associated data
+              </span>
+            </div>
+            <Button variant="destructive">
+              <Trash2 class="size-4 mr-1" />
+              Delete Node
+            </Button>
+          </div>
         </div>
-      </div>
-    </wa-card>
+      </Card.Content>
+    </Card.Root>
 
     <!-- Action Buttons -->
-    <div
-      class="wa-cluster wa-gap-s"
-      style="justify-content: flex-end; padding: var(--akriva-space-4) 0"
-    >
-      <wa-button appearance="outlined">Cancel</wa-button>
-      <wa-button>Save Changes</wa-button>
+    <div class="flex gap-3 justify-end py-4">
+      <Button variant="outline">Cancel</Button>
+      <Button>Save Changes</Button>
     </div>
   </div>
 </div>
@@ -315,43 +395,40 @@
   .tree-panel {
     width: 300px;
     flex-shrink: 0;
-    background: var(--akriva-surface-primary);
-    border-right: var(--akriva-border-thin) solid var(--akriva-border-default);
-    padding: var(--akriva-space-6);
+    background: var(--card);
+    border-right: 1px solid var(--border);
+    padding: 24px;
     overflow-y: auto;
   }
 
   .details-panel {
     flex: 1;
     overflow-y: auto;
-    padding: var(--akriva-space-6) var(--akriva-space-8);
+    padding: 24px 32px;
   }
 
-  .danger-zone {
-    border-color: var(--akriva-status-error);
+  .tree-node {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--muted-foreground);
+    text-align: left;
   }
 
-  /* Tree item spacing */
-  wa-tree-item::part(item) {
-    padding-block: 2px;
+  .tree-node:hover {
+    background: var(--secondary);
   }
 
-  wa-tree-item {
-    --wa-color-brand-fill-loud: transparent;
-    --wa-color-text-quiet: var(--akriva-text-tertiary);
-  }
-
-  /* Selected node: primary text, bold, left border accent, no background */
-  wa-tree-item[selected]::part(item) {
-    background-color: transparent;
-  }
-
-  wa-tree-item[selected]::part(label) {
-    color: var(--akriva-action-primary);
-    font-weight: var(--akriva-weight-semibold);
-  }
-
-  wa-tree-item[selected]::part(expand-button) {
-    color: var(--akriva-action-primary);
+  .tree-node.selected {
+    color: var(--primary);
+    font-weight: 600;
+    background: transparent;
   }
 </style>
