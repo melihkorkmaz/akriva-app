@@ -10,9 +10,13 @@
   let copied = $state(false);
 
   async function handleCopy() {
-    await navigator.clipboard.writeText(value);
-    copied = true;
-    setTimeout(() => (copied = false), 2000);
+    try {
+      await navigator.clipboard.writeText(value);
+      copied = true;
+      setTimeout(() => (copied = false), 2000);
+    } catch {
+      // Clipboard API unavailable or permission denied
+    }
   }
 </script>
 

@@ -165,7 +165,8 @@ span.flatpickr-weekday {
 /* Disabled / other-month days */
 .flatpickr-day.flatpickr-disabled,
 .flatpickr-day.flatpickr-disabled:hover {
-  color: #cbd5e1;
+  color: var(--muted-foreground);
+  opacity: 0.5;
   background: transparent;
   border-color: transparent;
   cursor: not-allowed;
@@ -173,7 +174,8 @@ span.flatpickr-weekday {
 
 .flatpickr-day.prevMonthDay,
 .flatpickr-day.nextMonthDay {
-  color: #cbd5e1;
+  color: var(--muted-foreground);
+  opacity: 0.5;
 }
 
 .flatpickr-day.prevMonthDay:hover,

@@ -17,6 +17,12 @@
 
   const superform = superForm(data.form, {
     validators: zod4Client(signupSchema),
+    onError({ result }) {
+      $message =
+        typeof result.error === "string"
+          ? result.error
+          : "An unexpected error occurred. Please try again.";
+    },
   });
   const { form, enhance, message, submitting } = superform;
 </script>

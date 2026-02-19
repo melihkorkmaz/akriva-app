@@ -1,15 +1,16 @@
 <script lang="ts">
   import { superForm } from "sveltekit-superforms";
   import { zod4Client } from "sveltekit-superforms/adapters";
-  import * as Card from "$lib/components/ui/card";
-  import * as Form from "$lib/components/ui/form";
-  import * as Field from "$lib/components/ui/field";
-  import * as Select from "$lib/components/ui/select";
-  import * as RadioGroup from "$lib/components/ui/radio-group";
-  import { Input } from "$lib/components/ui/input";
-  import { Button } from "$lib/components/ui/button";
-  import { Alert, AlertDescription } from "$lib/components/ui/alert";
+  import * as Card from "$lib/components/ui/card/index.js";
+  import * as Form from "$lib/components/ui/form/index.js";
+  import * as Field from "$lib/components/ui/field/index.js";
+  import * as Select from "$lib/components/ui/select/index.js";
+  import * as RadioGroup from "$lib/components/ui/radio-group/index.js";
+  import { Input } from "$lib/components/ui/input/index.js";
+  import { Button } from "$lib/components/ui/button/index.js";
+  import { Alert, AlertDescription } from "$lib/components/ui/alert/index.js";
   import Info from "@lucide/svelte/icons/info";
+  import { cn } from "$lib/utils.js";
   import CountrySelect from "$components/CountrySelect.svelte";
   import MonthSelect from "$components/MonthSelect.svelte";
   import SectorSelect from "$components/SectorSelect.svelte";
@@ -374,11 +375,11 @@
             >
               <div class="flex flex-col gap-3">
                 <label
-                  class="flex items-start gap-3 rounded-md border p-4 cursor-pointer transition-colors"
-                  class:border-primary={consolidationApproach ===
-                    "operational_control"}
-                  class:bg-blue-50={consolidationApproach ===
-                    "operational_control"}
+                  class={cn(
+                    "flex items-start gap-3 rounded-md border p-4 cursor-pointer transition-colors",
+                    consolidationApproach === "operational_control" &&
+                      "border-primary bg-primary/10",
+                  )}
                 >
                   <RadioGroup.Item value="operational_control" />
                   <div class="flex flex-col gap-1">
@@ -393,11 +394,11 @@
                 </label>
 
                 <label
-                  class="flex items-start gap-3 rounded-md border p-4 cursor-pointer transition-colors"
-                  class:border-primary={consolidationApproach ===
-                    "financial_control"}
-                  class:bg-blue-50={consolidationApproach ===
-                    "financial_control"}
+                  class={cn(
+                    "flex items-start gap-3 rounded-md border p-4 cursor-pointer transition-colors",
+                    consolidationApproach === "financial_control" &&
+                      "border-primary bg-primary/10",
+                  )}
                 >
                   <RadioGroup.Item value="financial_control" />
                   <div class="flex flex-col gap-1">
@@ -412,10 +413,11 @@
                 </label>
 
                 <label
-                  class="flex items-start gap-3 rounded-md border p-4 cursor-pointer transition-colors"
-                  class:border-primary={consolidationApproach ===
-                    "equity_share"}
-                  class:bg-blue-50={consolidationApproach === "equity_share"}
+                  class={cn(
+                    "flex items-start gap-3 rounded-md border p-4 cursor-pointer transition-colors",
+                    consolidationApproach === "equity_share" &&
+                      "border-primary bg-primary/10",
+                  )}
                 >
                   <RadioGroup.Item value="equity_share" />
                   <div class="flex flex-col gap-1">

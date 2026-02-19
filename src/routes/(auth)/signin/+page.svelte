@@ -31,6 +31,12 @@
         }
       }
     },
+    onError({ result }) {
+      $signinMessage =
+        typeof result.error === "string"
+          ? result.error
+          : "An unexpected error occurred. Please try again.";
+    },
   });
   const {
     form: signinData,
@@ -41,6 +47,12 @@
 
   const mfaSF = superForm(data.mfaForm, {
     validators: zod4Client(mfaVerifySchema),
+    onError({ result }) {
+      $mfaMessage =
+        typeof result.error === "string"
+          ? result.error
+          : "An unexpected error occurred. Please try again.";
+    },
   });
   const {
     form: mfaData,
