@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { untrack } from "svelte";
   import { superForm } from "sveltekit-superforms";
   import { zod4Client } from "sveltekit-superforms/adapters";
   import { toast } from "svelte-sonner";
@@ -83,10 +84,14 @@
     submitting: createSubmitting,
   } = createSuperform;
 
-  // Set parentId when entering create mode
+  // Set parentId when entering create mode.
+  // Wrap store write in untrack to avoid circular dependency.
   $effect(() => {
     if (mode === "create") {
-      $createForm.parentId = parentId;
+      const pid = parentId;
+      untrack(() => {
+        $createForm.parentId = pid;
+      });
     }
   });
 
@@ -120,13 +125,18 @@
     submitting: updateSubmitting,
   } = updateSuperform;
 
-  // Populate update form when node changes
+  // Populate update form when node changes.
+  // Wrap store writes in untrack to avoid infinite loop
+  // ($updateForm read+write in same effect causes effect_update_depth_exceeded).
   $effect(() => {
     if (mode === "edit" && node) {
-      $updateForm.name = node.name;
-      $updateForm.description = node.description;
-      $updateForm.equitySharePercentage = node.equitySharePercentage;
-      $updateForm.status = node.status;
+      const { name, description, equitySharePercentage, status } = node;
+      untrack(() => {
+        $updateForm.name = name;
+        $updateForm.description = description;
+        $updateForm.equitySharePercentage = equitySharePercentage;
+        $updateForm.status = status;
+      });
     }
   });
 

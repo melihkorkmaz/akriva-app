@@ -189,46 +189,46 @@
           {@const hasChildren = node.children.length > 0}
           {@const isSelected = node.id === selectedId}
           {@const isDropTarget = node.id === dropTargetId}
+          <!-- svelte-ignore a11y_interactive_supports_focus -->
           <div role="treeitem" aria-selected={isSelected} aria-expanded={hasChildren ? isExpanded : undefined}>
-            <div class="relative group">
-              <button
-                type="button"
-                class="tree-node"
-                class:selected={isSelected}
-                class:drop-target={isDropTarget}
-                style:padding-left="{depth * 20 + 8}px"
-                draggable="true"
-                ondragstart={(e) => handleDragStart(node.id, e)}
-                ondragover={(e) => handleDragOver(node.id, e)}
-                ondragleave={handleDragLeave}
-                ondragend={handleDragEnd}
-                ondrop={(e) => handleDrop(node.id, e)}
-                onclick={() => onSelect(node)}
-              >
-                {#if hasChildren}
-                  <span
-                    role="button"
-                    tabindex="-1"
-                    class="chevron-toggle shrink-0"
-                    onclick={(e) => toggleExpand(node.id, e)}
-                    onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggleExpand(node.id, e); }}
-                  >
-                    {#if isExpanded}
-                      <ChevronDown
-                        class="size-4 text-muted-foreground"
-                      />
-                    {:else}
-                      <ChevronRight
-                        class="size-4 text-muted-foreground"
-                      />
-                    {/if}
-                  </span>
-                {:else}
-                  <span class="w-4 shrink-0"></span>
-                {/if}
-                <Icon class="size-4 shrink-0" />
-                <span class="truncate">{node.name}</span>
-              </button>
+            <div
+              class="tree-node group"
+              class:selected={isSelected}
+              class:drop-target={isDropTarget}
+              style:padding-left="{depth * 20 + 8}px"
+              role="button"
+              tabindex="0"
+              draggable="true"
+              ondragstart={(e) => handleDragStart(node.id, e)}
+              ondragover={(e) => handleDragOver(node.id, e)}
+              ondragleave={handleDragLeave}
+              ondragend={handleDragEnd}
+              ondrop={(e) => handleDrop(node.id, e)}
+              onclick={() => onSelect(node)}
+              onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') onSelect(node); }}
+            >
+              {#if hasChildren}
+                <button
+                  type="button"
+                  class="chevron-toggle shrink-0"
+                  tabindex="-1"
+                  onclick={(e) => { e.stopPropagation(); toggleExpand(node.id, e); }}
+                >
+                  {#if isExpanded}
+                    <ChevronDown
+                      class="size-4 text-muted-foreground"
+                    />
+                  {:else}
+                    <ChevronRight
+                      class="size-4 text-muted-foreground"
+                    />
+                  {/if}
+                </button>
+              {:else}
+                <span class="w-4 shrink-0"></span>
+              {/if}
+              <Icon class="size-4 shrink-0" />
+              <span class="truncate">{node.name}</span>
               <!-- Hover add-child button -->
               <button
                 type="button"
@@ -264,6 +264,7 @@
   }
 
   .tree-node {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 6px;

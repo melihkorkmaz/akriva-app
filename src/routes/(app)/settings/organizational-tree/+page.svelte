@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { untrack } from "svelte";
   import OrgTree from "./_components/OrgTree.svelte";
   import OrgNodeForm from "./_components/OrgNodeForm.svelte";
   import EmptyState from "./_components/EmptyState.svelte";
@@ -41,10 +42,16 @@
     return null;
   }
 
-  // Re-sync selectedNode when tree data changes (after invalidateAll)
+  // Re-sync selectedNode when tree data changes (after invalidateAll).
+  // Use untrack for selectedNode/mode reads to avoid infinite loop
+  // (this effect writes selectedNode, which it also reads).
   $effect(() => {
-    if (selectedNode && mode === "edit") {
-      const updated = findNode(data.tree, selectedNode.id);
+    const tree = data.tree;
+    const currentNode = untrack(() => selectedNode);
+    const currentMode = untrack(() => mode);
+
+    if (currentNode && currentMode === "edit") {
+      const updated = findNode(tree, currentNode.id);
       if (updated) {
         selectedNode = updated;
       } else {
