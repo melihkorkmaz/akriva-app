@@ -1,6 +1,7 @@
 <script lang="ts">
   import { superForm } from "sveltekit-superforms";
   import { zod4Client } from "sveltekit-superforms/adapters";
+  import { toast } from "svelte-sonner";
   import * as Form from "$lib/components/ui/form/index.js";
   import { Button } from "$lib/components/ui/button/index.js";
   import { Alert, AlertDescription } from "$lib/components/ui/alert/index.js";
@@ -16,14 +17,24 @@
     validators: zod4Client(applicationSettingsSchema),
     dataType: "json",
     resetForm: false,
+    onUpdated({ form }) {
+      if (form.message) {
+        if (form.valid) {
+          toast.success(form.message);
+        } else {
+          toast.error(form.message);
+        }
+      }
+    },
     onError({ result }) {
-      $message =
+      const msg =
         typeof result.error === "string"
           ? result.error
           : "An unexpected error occurred. Please try again.";
+      toast.error(msg);
     },
   });
-  const { form, allErrors, enhance, message, submitting } = superform;
+  const { form, allErrors, enhance, submitting } = superform;
 </script>
 
 <svelte:head>
@@ -36,17 +47,6 @@
     Configure calculation methodology, localization settings, and scientific
     standards for emissions tracking
   </p>
-
-  {#if $message}
-    <Alert
-      variant={$message === "Settings saved successfully."
-        ? "default"
-        : "destructive"}
-      class="mt-4"
-    >
-      <AlertDescription>{$message}</AlertDescription>
-    </Alert>
-  {/if}
 
   {#if $allErrors.length > 0}
     <Alert variant="destructive" class="mt-4">

@@ -5,6 +5,7 @@
   import { Separator } from "$lib/components/ui/separator/index.js";
   import * as Breadcrumb from "$lib/components/ui/breadcrumb/index.js";
   import * as Sidebar from "$lib/components/ui/sidebar/index.js";
+  import { Toaster } from "$lib/components/ui/sonner/index.js";
 
   import AppSidebar from "$components/app-sidebar.svelte";
   import CopyButton from "$components/CopyButton.svelte";
@@ -60,3 +61,4 @@
     </footer>
   </Sidebar.Inset>
 </Sidebar.Provider>
+<Toaster richColors />
