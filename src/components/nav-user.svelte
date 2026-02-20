@@ -3,9 +3,9 @@
   import LogOut from "@lucide/svelte/icons/log-out";
   import User from "@lucide/svelte/icons/user";
 
-  import * as Avatar from "$lib/components/ui/avatar/index.js";
-  import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
-  import * as Sidebar from "$lib/components/ui/sidebar/index.js";
+  import * as Avatar from "$lib/components/ui/avatar";
+  import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
+  import * as Sidebar from "$lib/components/ui/sidebar";
 
   interface Props {
     user: {

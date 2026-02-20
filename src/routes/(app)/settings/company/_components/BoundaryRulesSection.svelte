@@ -1,10 +1,10 @@
 <script lang="ts">
-  import * as Card from "$lib/components/ui/card/index.js";
-  import * as Field from "$lib/components/ui/field/index.js";
-  import * as RadioGroup from "$lib/components/ui/radio-group/index.js";
-  import { Alert, AlertDescription } from "$lib/components/ui/alert/index.js";
+  import * as Card from "$lib/components/ui/card";
+  import * as Field from "$lib/components/ui/field";
+  import * as RadioGroup from "$lib/components/ui/radio-group";
+  import { Alert, AlertDescription } from "$lib/components/ui/alert";
   import Info from "@lucide/svelte/icons/info";
-  import { cn } from "$lib/utils.js";
+  import { cn } from "$lib/utils";
   import type { Writable } from "svelte/store";
   import type { SuperForm } from "sveltekit-superforms";
   import type { tenantSettingsSchema } from "$lib/schemas/tenant-settings";

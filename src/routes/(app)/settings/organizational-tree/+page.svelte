@@ -122,6 +122,7 @@
         parentId={createParentId}
         createFormData={data.createForm}
         updateFormData={data.updateForm}
+        tenantSettings={data.tenantSettings}
         {allNodes}
         onCreated={handleCreated}
         onDeleted={handleDeleted}
@@ -134,6 +135,7 @@
         parentId={null}
         createFormData={data.createForm}
         updateFormData={data.updateForm}
+        tenantSettings={data.tenantSettings}
         {allNodes}
         onCreated={handleCreated}
         onDeleted={handleDeleted}

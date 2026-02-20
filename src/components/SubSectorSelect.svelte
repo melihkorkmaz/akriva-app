@@ -1,6 +1,6 @@
 <script lang="ts">
-  import * as Select from "$lib/components/ui/select/index.js";
-  import { getSubSectors } from "$lib/data/sectors.js";
+  import * as Select from "$lib/components/ui/select";
+  import { getSubSectors } from "$lib/data/sectors";
 
   interface Props {
     value?: string | null;

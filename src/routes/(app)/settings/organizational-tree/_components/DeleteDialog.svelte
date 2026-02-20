@@ -1,6 +1,6 @@
 <script lang="ts">
-  import * as Dialog from "$lib/components/ui/dialog/index.js";
-  import { Button } from "$lib/components/ui/button/index.js";
+  import * as Dialog from "$lib/components/ui/dialog";
+  import { Button } from "$lib/components/ui/button";
   import { toast } from "svelte-sonner";
   import { invalidateAll } from "$app/navigation";
   import TriangleAlert from "@lucide/svelte/icons/triangle-alert";

@@ -1,10 +1,10 @@
 <script lang="ts">
-  import * as Card from "$lib/components/ui/card/index.js";
-  import * as Form from "$lib/components/ui/form/index.js";
-  import * as Field from "$lib/components/ui/field/index.js";
-  import * as Select from "$lib/components/ui/select/index.js";
-  import * as RadioGroup from "$lib/components/ui/radio-group/index.js";
-  import { cn } from "$lib/utils.js";
+  import * as Card from "$lib/components/ui/card";
+  import * as Form from "$lib/components/ui/form";
+  import * as Field from "$lib/components/ui/field";
+  import * as Select from "$lib/components/ui/select";
+  import * as RadioGroup from "$lib/components/ui/radio-group";
+  import { cn } from "$lib/utils";
   import type { Writable } from "svelte/store";
   import type { SuperForm } from "sveltekit-superforms";
   import type { applicationSettingsSchema } from "$lib/schemas/application-settings";

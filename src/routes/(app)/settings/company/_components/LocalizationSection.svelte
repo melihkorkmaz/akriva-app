@@ -1,7 +1,7 @@
 <script lang="ts">
-  import * as Form from "$lib/components/ui/form/index.js";
-  import * as Field from "$lib/components/ui/field/index.js";
-  import { Input } from "$lib/components/ui/input/index.js";
+  import * as Form from "$lib/components/ui/form";
+  import * as Field from "$lib/components/ui/field";
+  import { Input } from "$lib/components/ui/input";
   import CountrySelect from "$components/CountrySelect.svelte";
   import type { Writable } from "svelte/store";
   import type { SuperForm } from "sveltekit-superforms";

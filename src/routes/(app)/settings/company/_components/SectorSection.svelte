@@ -1,9 +1,9 @@
 <script lang="ts">
-  import * as Form from "$lib/components/ui/form/index.js";
-  import * as Field from "$lib/components/ui/field/index.js";
+  import * as Form from "$lib/components/ui/form";
+  import * as Field from "$lib/components/ui/field";
   import SectorSelect from "$components/SectorSelect.svelte";
   import SubSectorSelect from "$components/SubSectorSelect.svelte";
-  import { getSubSectors } from "$lib/data/sectors.js";
+  import { getSubSectors } from "$lib/data/sectors";
   import type { Writable } from "svelte/store";
   import type { SuperForm } from "sveltekit-superforms";
   import type { tenantSettingsSchema } from "$lib/schemas/tenant-settings";

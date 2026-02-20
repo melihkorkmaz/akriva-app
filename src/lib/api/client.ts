@@ -1,4 +1,4 @@
-import type { ApiErrorResponse } from "./types.js";
+import type { ApiErrorResponse } from "./types";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_URL || "https://api.akriva.com/v1";

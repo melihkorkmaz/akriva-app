@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from "$app/state";
-  import * as Sidebar from "$lib/components/ui/sidebar/index.js";
+  import * as Sidebar from "$lib/components/ui/sidebar";
   import SlidersHorizontal from "@lucide/svelte/icons/sliders-horizontal";
   import Calculator from "@lucide/svelte/icons/calculator";
   import Building2 from "@lucide/svelte/icons/building-2";

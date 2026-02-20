@@ -1,8 +1,8 @@
 <script lang="ts">
-  import * as Card from "$lib/components/ui/card/index.js";
-  import { Checkbox } from "$lib/components/ui/checkbox/index.js";
-  import { Progress } from "$lib/components/ui/progress/index.js";
-  import { Separator } from "$lib/components/ui/separator/index.js";
+  import * as Card from "$lib/components/ui/card";
+  import { Checkbox } from "$lib/components/ui/checkbox";
+  import { Progress } from "$lib/components/ui/progress";
+  import { Separator } from "$lib/components/ui/separator";
   import BookOpen from "@lucide/svelte/icons/book-open";
   import FileCheck from "@lucide/svelte/icons/file-check";
 </script>

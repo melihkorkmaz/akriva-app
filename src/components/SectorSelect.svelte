@@ -1,6 +1,6 @@
 <script lang="ts">
-  import * as Select from "$lib/components/ui/select/index.js";
-  import { SECTORS } from "$lib/data/sectors.js";
+  import * as Select from "$lib/components/ui/select";
+  import { SECTORS } from "$lib/data/sectors";
 
   interface Props {
     value?: string | null;

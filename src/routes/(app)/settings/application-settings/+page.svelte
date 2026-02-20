@@ -2,9 +2,9 @@
   import { superForm } from "sveltekit-superforms";
   import { zod4Client } from "sveltekit-superforms/adapters";
   import { toast } from "svelte-sonner";
-  import * as Form from "$lib/components/ui/form/index.js";
-  import { Button } from "$lib/components/ui/button/index.js";
-  import { Alert, AlertDescription } from "$lib/components/ui/alert/index.js";
+  import * as Form from "$lib/components/ui/form";
+  import { Button } from "$lib/components/ui/button";
+  import { Alert, AlertDescription } from "$lib/components/ui/alert";
   import { applicationSettingsSchema } from "$lib/schemas/application-settings";
 
   import LocalizationSection from "./_components/LocalizationSection.svelte";

@@ -1,11 +1,11 @@
 <script lang="ts">
   import Bell from "@lucide/svelte/icons/bell";
 
-  import { Button } from "$lib/components/ui/button/index.js";
-  import { Separator } from "$lib/components/ui/separator/index.js";
-  import * as Breadcrumb from "$lib/components/ui/breadcrumb/index.js";
-  import * as Sidebar from "$lib/components/ui/sidebar/index.js";
-  import { Toaster } from "$lib/components/ui/sonner/index.js";
+  import { Button } from "$lib/components/ui/button";
+  import { Separator } from "$lib/components/ui/separator";
+  import * as Breadcrumb from "$lib/components/ui/breadcrumb";
+  import * as Sidebar from "$lib/components/ui/sidebar";
+  import { Toaster } from "$lib/components/ui/sonner";
 
   import AppSidebar from "$components/app-sidebar.svelte";
   import CopyButton from "$components/CopyButton.svelte";

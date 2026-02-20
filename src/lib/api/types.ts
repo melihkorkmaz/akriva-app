@@ -251,6 +251,13 @@ export interface OrgUnitResponseDto {
 	equitySharePercentage: number | null;
 	orderIndex: number;
 	status: OrgUnitStatus;
+	country: string;
+	stateProvince: string | null;
+	city: string;
+	overrideScientificAuthority: boolean;
+	effectiveGwpVersion: GwpVersion;
+	effectiveScope1Authority: EmissionAuthority;
+	effectiveScope2Authority: EmissionAuthority;
 	createdAt: string;
 	updatedAt: string;
 }
@@ -275,6 +282,13 @@ export interface CreateOrgUnitRequest {
 	code: string;
 	description: string | null;
 	equitySharePercentage: number | null;
+	country: string;
+	stateProvince: string | null;
+	city: string;
+	overrideScientificAuthority?: boolean;
+	gwpVersion?: GwpVersion | null;
+	scope1Authority?: EmissionAuthority | null;
+	scope2Authority?: EmissionAuthority | null;
 }
 
 /** Update org unit request — PATCH /v1/org-units/{id} */
@@ -283,6 +297,13 @@ export interface UpdateOrgUnitRequest {
 	description?: string | null;
 	equitySharePercentage?: number | null;
 	status?: OrgUnitStatus;
+	country?: string;
+	stateProvince?: string | null;
+	city?: string;
+	overrideScientificAuthority?: boolean;
+	gwpVersion?: GwpVersion | null;
+	scope1Authority?: EmissionAuthority | null;
+	scope2Authority?: EmissionAuthority | null;
 }
 
 /** Move org unit request — PATCH /v1/org-units/{id}/move */

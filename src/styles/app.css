@@ -214,4 +214,8 @@
   body {
     @apply bg-background text-foreground font-sans text-sm leading-normal antialiased;
   }
+
+  a:not([class*="btn"]):not([role="menuitem"]):not([data-sidebar]) {
+    @apply text-primary underline hover:text-primary/80 transition-colors;
+  }
 }

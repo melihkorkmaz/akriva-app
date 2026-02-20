@@ -1,18 +1,17 @@
 <script lang="ts">
   import { superForm } from "sveltekit-superforms";
   import { zod4Client } from "sveltekit-superforms/adapters";
-  import * as Card from "$lib/components/ui/card/index.js";
-  import * as Form from "$lib/components/ui/form/index.js";
-  import * as Field from "$lib/components/ui/field/index.js";
-  import { Input } from "$lib/components/ui/input/index.js";
-  import { Button } from "$lib/components/ui/button/index.js";
-  import { Checkbox } from "$lib/components/ui/checkbox/index.js";
-  import { Alert, AlertDescription } from "$lib/components/ui/alert/index.js";
+  import * as Card from "$lib/components/ui/card";
+  import * as Form from "$lib/components/ui/form";
+  import * as Field from "$lib/components/ui/field";
+  import { Input } from "$lib/components/ui/input";
+  import { Checkbox } from "$lib/components/ui/checkbox";
+  import { Alert, AlertDescription } from "$lib/components/ui/alert";
   import Eye from "@lucide/svelte/icons/eye";
   import EyeOff from "@lucide/svelte/icons/eye-off";
 
   import TextDivider from "$components/TextDivider.svelte";
-  import { signinSchema, mfaVerifySchema } from "$lib/schemas/signin.js";
+  import { signinSchema, mfaVerifySchema } from "$lib/schemas/signin";
 
   let { data } = $props();
 
@@ -110,10 +109,7 @@
               {#snippet children({ props })}
                 <div class="flex justify-between items-center">
                   <Form.Label>Password</Form.Label>
-                  <a
-                    href="/forgot-password"
-                    class="text-xs underline text-muted-foreground hover:text-foreground"
-                    >Forgot password?</a
+                  <a href="/forgot-password" class="text-xs">Forgot password?</a
                   >
                 </div>
                 <div class="relative">
@@ -158,9 +154,7 @@
           <span class="text-sm text-muted-foreground"
             >Don't have an account?</span
           >
-          <a href="/signup" class="text-sm font-bold text-primary hover:underline"
-            >Sign up</a
-          >
+          <a href="/signup" class="text-sm font-bold">Sign up</a>
         </div>
       {:else}
         <!-- MFA verification form -->
@@ -207,7 +201,7 @@
         <div class="flex justify-center">
           <button
             type="button"
-            class="text-sm text-muted-foreground underline hover:text-foreground bg-transparent border-none cursor-pointer p-0"
+            class="text-sm bg-transparent border-none cursor-pointer p-0"
             onclick={() => {
               showMfa = false;
             }}

@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Button } from "$lib/components/ui/button/index.js";
-  import { Separator } from "$lib/components/ui/separator/index.js";
+  import { Button } from "$lib/components/ui/button";
+  import { Separator } from "$lib/components/ui/separator";
   import { toast } from "svelte-sonner";
   import { invalidateAll } from "$app/navigation";
   import Building2 from "@lucide/svelte/icons/building-2";
@@ -16,14 +16,16 @@
     tree,
     selectedId = null,
     onSelect,
-    onAddRoot,
-    onAddChild,
+    onAddRoot = () => {},
+    onAddChild = () => {},
+    showActions = true,
   }: {
     tree: OrgUnitTreeResponseDto[];
     selectedId: string | null;
     onSelect: (node: OrgUnitTreeResponseDto) => void;
-    onAddRoot: () => void;
-    onAddChild: (parentId: string) => void;
+    onAddRoot?: () => void;
+    onAddChild?: (parentId: string) => void;
+    showActions?: boolean;
   } = $props();
 
   // Type icon mapping
@@ -156,10 +158,12 @@
 <div class="tree-panel flex flex-col gap-3">
   <div class="flex justify-between items-center">
     <span class="text-lg font-semibold">Organization</span>
-    <Button size="sm" onclick={onAddRoot}>
-      <Plus class="size-4 mr-1" />
-      Add
-    </Button>
+    {#if showActions}
+      <Button size="sm" onclick={onAddRoot}>
+        <Plus class="size-4 mr-1" />
+        Add
+      </Button>
+    {/if}
   </div>
 
   <Separator />
@@ -167,20 +171,22 @@
   {#if tree.length === 0}
     <div class="flex flex-col items-center gap-2 py-8 text-center">
       <p class="text-sm text-muted-foreground">No organizational units yet.</p>
-      <Button size="sm" variant="outline" onclick={onAddRoot}>
-        Create your first unit
-      </Button>
+      {#if showActions}
+        <Button size="sm" variant="outline" onclick={onAddRoot}>
+          Create your first unit
+        </Button>
+      {/if}
     </div>
   {:else}
     <!-- svelte-ignore a11y_interactive_supports_focus -->
     <div
       class="flex flex-col"
       role="tree"
-      ondragover={(e) => {
+      ondragover={showActions ? (e) => {
         e.preventDefault();
         if (e.dataTransfer) e.dataTransfer.dropEffect = "move";
-      }}
-      ondrop={(e) => handleDrop(null, e)}
+      } : undefined}
+      ondrop={showActions ? (e) => handleDrop(null, e) : undefined}
     >
       {#snippet renderTree(nodes: OrgUnitTreeResponseDto[], depth: number)}
         {#each nodes as node}
@@ -198,12 +204,12 @@
               style:padding-left="{depth * 20 + 8}px"
               role="button"
               tabindex="0"
-              draggable="true"
-              ondragstart={(e) => handleDragStart(node.id, e)}
-              ondragover={(e) => handleDragOver(node.id, e)}
-              ondragleave={handleDragLeave}
-              ondragend={handleDragEnd}
-              ondrop={(e) => handleDrop(node.id, e)}
+              draggable={showActions ? "true" : "false"}
+              ondragstart={showActions ? (e) => handleDragStart(node.id, e) : undefined}
+              ondragover={showActions ? (e) => handleDragOver(node.id, e) : undefined}
+              ondragleave={showActions ? handleDragLeave : undefined}
+              ondragend={showActions ? handleDragEnd : undefined}
+              ondrop={showActions ? (e) => handleDrop(node.id, e) : undefined}
               onclick={() => onSelect(node)}
               onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') onSelect(node); }}
             >
@@ -229,18 +235,20 @@
               {/if}
               <Icon class="size-4 shrink-0" />
               <span class="truncate">{node.name}</span>
-              <!-- Hover add-child button -->
-              <button
-                type="button"
-                class="add-child-btn"
-                title="Add child"
-                onclick={(e) => {
-                  e.stopPropagation();
-                  onAddChild(node.id);
-                }}
-              >
-                <Plus class="size-3" />
-              </button>
+              {#if showActions}
+                <!-- Hover add-child button -->
+                <button
+                  type="button"
+                  class="add-child-btn"
+                  title="Add child"
+                  onclick={(e) => {
+                    e.stopPropagation();
+                    onAddChild(node.id);
+                  }}
+                >
+                  <Plus class="size-3" />
+                </button>
+              {/if}
             </div>
             {#if hasChildren && isExpanded}
               {@render renderTree(node.children, depth + 1)}

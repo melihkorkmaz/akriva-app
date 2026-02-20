@@ -2,11 +2,11 @@
   import { superForm } from "sveltekit-superforms";
   import { zod4Client } from "sveltekit-superforms/adapters";
   import { toast } from "svelte-sonner";
-  import * as Card from "$lib/components/ui/card/index.js";
-  import * as Form from "$lib/components/ui/form/index.js";
-  import * as Field from "$lib/components/ui/field/index.js";
-  import { Button } from "$lib/components/ui/button/index.js";
-  import { Alert, AlertDescription } from "$lib/components/ui/alert/index.js";
+  import * as Card from "$lib/components/ui/card";
+  import * as Form from "$lib/components/ui/form";
+  import * as Field from "$lib/components/ui/field";
+  import { Button } from "$lib/components/ui/button";
+  import { Alert, AlertDescription } from "$lib/components/ui/alert";
   import { tenantSettingsSchema } from "$lib/schemas/tenant-settings";
 
   import CompanyIdentificationSection from "./_components/CompanyIdentificationSection.svelte";

@@ -1,15 +1,15 @@
 <script lang="ts">
   import { superForm } from "sveltekit-superforms";
   import { zod4Client } from "sveltekit-superforms/adapters";
-  import * as Card from "$lib/components/ui/card/index.js";
-  import * as Form from "$lib/components/ui/form/index.js";
-  import { Input } from "$lib/components/ui/input/index.js";
-  import { Alert, AlertDescription } from "$lib/components/ui/alert/index.js";
+  import * as Card from "$lib/components/ui/card";
+  import * as Form from "$lib/components/ui/form";
+  import { Input } from "$lib/components/ui/input";
+  import { Alert, AlertDescription } from "$lib/components/ui/alert";
   import Eye from "@lucide/svelte/icons/eye";
   import EyeOff from "@lucide/svelte/icons/eye-off";
 
   import TextDivider from "$components/TextDivider.svelte";
-  import { signupSchema } from "$lib/schemas/signup.js";
+  import { signupSchema } from "$lib/schemas/signup";
 
   let { data } = $props();
 
@@ -147,7 +147,7 @@
         <span class="text-sm text-muted-foreground"
           >Already have an account?</span
         >
-        <a href="/signin" class="text-sm font-bold text-primary hover:underline"
+        <a href="/signin" class="text-sm font-bold"
           >Sign in</a
         >
       </div>

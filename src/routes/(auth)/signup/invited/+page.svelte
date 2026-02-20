@@ -1,9 +1,9 @@
 <script lang="ts">
-  import * as Card from "$lib/components/ui/card/index.js";
-  import * as Field from "$lib/components/ui/field/index.js";
-  import { Input } from "$lib/components/ui/input/index.js";
-  import { Button } from "$lib/components/ui/button/index.js";
-  import { Alert, AlertDescription } from "$lib/components/ui/alert/index.js";
+  import * as Card from "$lib/components/ui/card";
+  import * as Field from "$lib/components/ui/field";
+  import { Input } from "$lib/components/ui/input";
+  import { Button } from "$lib/components/ui/button";
+  import { Alert, AlertDescription } from "$lib/components/ui/alert";
   import CircleCheck from "@lucide/svelte/icons/circle-check";
 
   import TextDivider from "$components/TextDivider.svelte";
@@ -89,7 +89,7 @@
         <span class="text-sm text-muted-foreground"
           >Already have an account?</span
         >
-        <a href="/signin" class="text-sm font-bold text-primary hover:underline"
+        <a href="/signin" class="text-sm font-bold"
           >Sign in</a
         >
       </div>

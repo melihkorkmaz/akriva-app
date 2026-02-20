@@ -1,8 +1,8 @@
 <script lang="ts">
-  import * as Card from "$lib/components/ui/card/index.js";
-  import { Input } from "$lib/components/ui/input/index.js";
-  import { Button } from "$lib/components/ui/button/index.js";
-  import { Alert, AlertDescription } from "$lib/components/ui/alert/index.js";
+  import * as Card from "$lib/components/ui/card";
+  import { Input } from "$lib/components/ui/input";
+  import { Button } from "$lib/components/ui/button";
+  import { Alert, AlertDescription } from "$lib/components/ui/alert";
   import CircleCheck from "@lucide/svelte/icons/circle-check";
 
   import TextDivider from "$components/TextDivider.svelte";
@@ -46,7 +46,7 @@
       <!-- Resend -->
       <div class="flex flex-wrap gap-2 justify-center">
         <span class="text-sm text-muted-foreground">Didn't receive the code?</span>
-        <a href="/verify-email" class="text-sm font-bold text-primary hover:underline">Resend code</a>
+        <a href="/verify-email" class="text-sm font-bold">Resend code</a>
       </div>
 
       <TextDivider />
@@ -54,7 +54,7 @@
       <!-- Back to signup -->
       <div class="flex flex-wrap gap-2 justify-center">
         <span class="text-sm text-muted-foreground">Changed your mind?</span>
-        <a href="/signup" class="text-sm font-bold text-primary hover:underline">Go back to signup</a>
+        <a href="/signup" class="text-sm font-bold">Go back to signup</a>
       </div>
 
       <!-- Security Note -->

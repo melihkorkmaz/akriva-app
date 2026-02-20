@@ -1,11 +1,11 @@
-import { apiFetchAuth } from "./client.js";
+import { apiFetchAuth } from "./client";
 import type {
   OrgUnitResponseDto,
   OrgUnitTreeListResponseDto,
   CreateOrgUnitRequest,
   UpdateOrgUnitRequest,
   MoveOrgUnitRequest,
-} from "./types.js";
+} from "./types";
 
 /** GET /v1/org-units?view=tree */
 export async function getOrgUnitsTree(
