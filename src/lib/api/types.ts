@@ -164,6 +164,64 @@ export interface UpdateTenantSettingsRequest {
 	consolidationApproach?: ConsolidationApproach | null;
 }
 
+/** Decimal separator options */
+export type DecimalSeparator = 'point' | 'comma';
+
+/** Thousands separator options */
+export type ThousandsSeparator = 'comma' | 'point' | 'space' | 'none';
+
+/** Date format options */
+export type DateFormat = 'dd_mm_yyyy' | 'mm_dd_yyyy' | 'yyyy_mm_dd';
+
+/** Time format options */
+export type TimeFormat = '24h' | '12h';
+
+/** Unit system options */
+export type UnitSystem = 'metric' | 'imperial' | 'custom';
+
+/** Emission display unit options */
+export type EmissionDisplayUnit = 'tco2e' | 'kgco2e';
+
+/** GWP version options */
+export type GwpVersion = 'ar5' | 'ar6';
+
+/** Emission factor authority options */
+export type EmissionAuthority = 'ipcc' | 'defra' | 'epa' | 'iea' | 'egrid';
+
+/** Application settings response DTO — returned by GET/PATCH /v1/tenants/settings/application */
+export interface TenantSettingsResponseDto {
+	id: string;
+	tenantId: string;
+	decimalSeparator: DecimalSeparator;
+	thousandsSeparator: ThousandsSeparator;
+	decimalPrecision: number;
+	dateFormat: DateFormat;
+	timeFormat: TimeFormat;
+	timezone: string;
+	unitSystem: UnitSystem;
+	emissionDisplayUnit: EmissionDisplayUnit;
+	gwpVersion: GwpVersion;
+	scope1Authority: EmissionAuthority;
+	scope2Authority: EmissionAuthority;
+	createdAt: string;
+	updatedAt: string;
+}
+
+/** Update application settings request — PATCH /v1/tenants/settings/application (all fields optional) */
+export interface UpdateApplicationSettingsRequest {
+	decimalSeparator?: DecimalSeparator;
+	thousandsSeparator?: ThousandsSeparator;
+	decimalPrecision?: number;
+	dateFormat?: DateFormat;
+	timeFormat?: TimeFormat;
+	timezone?: string;
+	unitSystem?: UnitSystem;
+	emissionDisplayUnit?: EmissionDisplayUnit;
+	gwpVersion?: GwpVersion;
+	scope1Authority?: EmissionAuthority;
+	scope2Authority?: EmissionAuthority;
+}
+
 /** JWT Claims (from idToken) */
 export interface JwtCustomClaims {
 	sub: string; // Cognito user sub (UUID)
