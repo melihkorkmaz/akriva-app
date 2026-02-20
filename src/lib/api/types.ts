@@ -232,3 +232,61 @@ export interface JwtCustomClaims {
 	'custom:user_id': string; // UUID
 	'custom:tenant_role': UserRole;
 }
+
+/** Org unit type */
+export type OrgUnitType = 'subsidiary' | 'division' | 'facility';
+
+/** Org unit status */
+export type OrgUnitStatus = 'active' | 'inactive';
+
+/** Single org unit (flat) — returned by GET/POST/PATCH/DELETE /v1/org-units */
+export interface OrgUnitResponseDto {
+	id: string;
+	tenantId: string;
+	parentId: string | null;
+	name: string;
+	type: OrgUnitType;
+	code: string;
+	description: string | null;
+	equitySharePercentage: number | null;
+	orderIndex: number;
+	status: OrgUnitStatus;
+	createdAt: string;
+	updatedAt: string;
+}
+
+/** Tree node (recursive children) — returned by GET /v1/org-units?view=tree */
+export interface OrgUnitTreeResponseDto extends OrgUnitResponseDto {
+	children: OrgUnitTreeResponseDto[];
+}
+
+/** Tree list response — GET /v1/org-units?view=tree */
+export interface OrgUnitTreeListResponseDto {
+	view: 'tree';
+	data: OrgUnitTreeResponseDto[];
+	total: number;
+}
+
+/** Create org unit request — POST /v1/org-units */
+export interface CreateOrgUnitRequest {
+	parentId: string | null;
+	name: string;
+	type: OrgUnitType;
+	code: string;
+	description: string | null;
+	equitySharePercentage: number | null;
+}
+
+/** Update org unit request — PATCH /v1/org-units/{id} */
+export interface UpdateOrgUnitRequest {
+	name?: string;
+	description?: string | null;
+	equitySharePercentage?: number | null;
+	status?: OrgUnitStatus;
+}
+
+/** Move org unit request — PATCH /v1/org-units/{id}/move */
+export interface MoveOrgUnitRequest {
+	parentId: string | null;
+	orderIndex?: number;
+}
