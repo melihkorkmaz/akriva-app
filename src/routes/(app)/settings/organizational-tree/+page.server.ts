@@ -64,9 +64,13 @@ export const actions: Actions = {
 	update: async ({ request, locals }) => {
 		const session = locals.session!;
 		const formData = await request.formData();
-		const id = formData.get('id') as string;
+		const id = formData.get('id');
 
 		const form = await superValidate(formData, zod4(updateOrgUnitSchema));
+
+		if (!id || typeof id !== 'string') {
+			return message(form, 'Missing org unit ID.', { status: 400 });
+		}
 
 		if (!form.valid) {
 			return message(form, 'Please check your information and try again.', { status: 400 });
@@ -102,7 +106,11 @@ export const actions: Actions = {
 	delete: async ({ request, locals }) => {
 		const session = locals.session!;
 		const formData = await request.formData();
-		const id = formData.get('id') as string;
+		const id = formData.get('id');
+
+		if (!id || typeof id !== 'string') {
+			return { success: false, error: 'Missing org unit ID.' };
+		}
 
 		try {
 			await deleteOrgUnit(session.idToken, id);

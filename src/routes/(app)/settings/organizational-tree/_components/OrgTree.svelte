@@ -290,8 +290,8 @@
   }
 
   .tree-node.drop-target {
-    background: hsl(var(--primary) / 0.1);
-    outline: 2px dashed hsl(var(--primary) / 0.4);
+    background: color-mix(in oklch, var(--primary) 10%, transparent);
+    outline: 2px dashed color-mix(in oklch, var(--primary) 40%, transparent);
     outline-offset: -2px;
   }
 

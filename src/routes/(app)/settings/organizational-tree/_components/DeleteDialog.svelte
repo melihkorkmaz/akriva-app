@@ -1,6 +1,8 @@
 <script lang="ts">
   import * as Dialog from "$lib/components/ui/dialog/index.js";
   import { Button } from "$lib/components/ui/button/index.js";
+  import { toast } from "svelte-sonner";
+  import { invalidateAll } from "$app/navigation";
   import TriangleAlert from "@lucide/svelte/icons/triangle-alert";
 
   let {
@@ -36,9 +38,9 @@
 
     if (data?.success) {
       open = false;
+      await invalidateAll();
       onDeleted();
     } else {
-      const { toast } = await import("svelte-sonner");
       toast.error(data?.error || "Failed to delete org unit.");
       open = false;
     }

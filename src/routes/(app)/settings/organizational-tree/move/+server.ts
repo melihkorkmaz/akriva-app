@@ -7,6 +7,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	const session = locals.session!;
 	const { id, parentId, orderIndex } = await request.json();
 
+	if (!id || typeof id !== 'string') {
+		return json({ error: 'Missing required field: id' }, { status: 400 });
+	}
+
 	try {
 		const result = await moveOrgUnit(session.idToken, id, {
 			parentId: parentId ?? null,
