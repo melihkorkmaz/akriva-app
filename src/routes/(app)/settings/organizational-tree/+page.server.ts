@@ -2,13 +2,17 @@ import { message, superValidate } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import type { Actions, PageServerLoad } from './$types.js';
 import { getOrgUnitsTree, createOrgUnit, updateOrgUnit, deleteOrgUnit } from '$lib/api/org-units.js';
+import { getApplicationSettings } from '$lib/api/tenant.js';
 import { ApiError } from '$lib/api/client.js';
 import { createOrgUnitSchema, updateOrgUnitSchema } from '$lib/schemas/org-unit.js';
-import type { CreateOrgUnitRequest, UpdateOrgUnitRequest } from '$lib/api/types.js';
+import type { CreateOrgUnitRequest, UpdateOrgUnitRequest, GwpVersion } from '$lib/api/types.js';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const session = locals.session!;
-	const treeResponse = await getOrgUnitsTree(session.idToken);
+	const [treeResponse, tenantSettings] = await Promise.all([
+		getOrgUnitsTree(session.idToken),
+		getApplicationSettings(session.idToken)
+	]);
 
 	const createForm = await superValidate(zod4(createOrgUnitSchema));
 	const updateForm = await superValidate(zod4(updateOrgUnitSchema));
@@ -16,6 +20,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 	return {
 		tree: treeResponse.data,
 		total: treeResponse.total,
+		tenantSettings,
 		createForm,
 		updateForm
 	};
@@ -37,7 +42,10 @@ export const actions: Actions = {
 				type: form.data.type,
 				code: form.data.code,
 				description: form.data.description ?? null,
-				equitySharePercentage: form.data.equitySharePercentage ?? null
+				equitySharePercentage: form.data.equitySharePercentage ?? null,
+				country: form.data.country,
+				stateProvince: form.data.stateProvince ?? null,
+				city: form.data.city
 			};
 
 			const created = await createOrgUnit(session.idToken, payload);
@@ -77,11 +85,33 @@ export const actions: Actions = {
 		}
 
 		try {
+			// When overriding scientific authority, copy global GWP version since
+			// the UI locks GWP as global-only but the API requires all 3 fields
+			let gwpVersion: GwpVersion | null = null;
+			if (form.data.overrideScientificAuthority) {
+				const rawGwp = formData.get('effectiveGwpVersion');
+				if (rawGwp !== 'ar5' && rawGwp !== 'ar6') {
+					return message(form, 'GWP version is missing or invalid.', { status: 400 });
+				}
+				gwpVersion = rawGwp;
+			}
+
 			const payload: UpdateOrgUnitRequest = {
 				name: form.data.name,
 				description: form.data.description ?? null,
 				equitySharePercentage: form.data.equitySharePercentage ?? null,
-				status: form.data.status
+				status: form.data.status,
+				country: form.data.country,
+				stateProvince: form.data.stateProvince ?? null,
+				city: form.data.city,
+				overrideScientificAuthority: form.data.overrideScientificAuthority,
+				gwpVersion,
+				scope1Authority: form.data.overrideScientificAuthority
+					? form.data.scope1Authority
+					: null,
+				scope2Authority: form.data.overrideScientificAuthority
+					? form.data.scope2Authority
+					: null
 			};
 
 			await updateOrgUnit(session.idToken, id, payload);
@@ -94,7 +124,9 @@ export const actions: Actions = {
 					return message(form, 'Org unit not found.', { status: 404 });
 				}
 				if (err.status === 403) {
-					return message(form, "You don't have permission to perform this action.", { status: 403 });
+					return message(form, "You don't have permission to perform this action.", {
+						status: 403
+					});
 				}
 			}
 			return message(form, 'Something went wrong. Please try again.', { status: 500 });

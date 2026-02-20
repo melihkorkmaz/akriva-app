@@ -3,7 +3,7 @@
   import OrgTree from "./_components/OrgTree.svelte";
   import OrgNodeForm from "./_components/OrgNodeForm.svelte";
   import EmptyState from "./_components/EmptyState.svelte";
-  import type { OrgUnitTreeResponseDto } from "$lib/api/types";
+  import type { OrgUnitTreeResponseDto } from "$lib/api/types.js";
 
   let { data } = $props();
 
@@ -122,6 +122,7 @@
         parentId={createParentId}
         createFormData={data.createForm}
         updateFormData={data.updateForm}
+        tenantSettings={data.tenantSettings}
         {allNodes}
         onCreated={handleCreated}
         onDeleted={handleDeleted}
@@ -134,6 +135,7 @@
         parentId={null}
         createFormData={data.createForm}
         updateFormData={data.updateForm}
+        tenantSettings={data.tenantSettings}
         {allNodes}
         onCreated={handleCreated}
         onDeleted={handleDeleted}
