@@ -15,8 +15,8 @@
   const navItems: { href: string; label: string; icon: Component }[] = [
     { href: "/settings/company", label: "Company", icon: SlidersHorizontal },
     {
-      href: "/settings/methodology-calculation",
-      label: "Methodology & Calculation",
+      href: "/settings/application-settings",
+      label: "Application Settings",
       icon: Calculator,
     },
     {
