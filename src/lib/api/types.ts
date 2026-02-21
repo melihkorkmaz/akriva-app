@@ -56,15 +56,24 @@ export interface AuthTokens {
 	expiresIn: number; // Seconds until accessToken expires (typically 3600)
 }
 
-/** Valid user roles */
-export type UserRole = 'owner' | 'admin' | 'user';
+/** Valid tenant roles (lowest → highest privilege) */
+export type TenantRole = 'viewer' | 'data_entry' | 'data_approver' | 'tenant_admin' | 'super_admin';
+
+/** Display labels for tenant roles */
+export const TENANT_ROLE_LABELS: Record<TenantRole, string> = {
+	viewer: 'Viewer',
+	data_entry: 'Data Entry',
+	data_approver: 'Data Approver',
+	tenant_admin: 'Admin',
+	super_admin: 'Super Admin'
+};
 
 /** User info returned by signup */
 export interface UserInfo {
 	id: string; // UUID
 	email: string;
 	tenantId: string; // UUID
-	role: UserRole;
+	role: TenantRole;
 }
 
 /** Signup response - 201 Created */
@@ -230,7 +239,7 @@ export interface JwtCustomClaims {
 	family_name: string;
 	'custom:tenant_id': string; // UUID — snake_case, NOT camelCase
 	'custom:user_id': string; // UUID
-	'custom:tenant_role': UserRole;
+	'custom:tenant_role': TenantRole;
 }
 
 /** Org unit type */
@@ -310,4 +319,40 @@ export interface UpdateOrgUnitRequest {
 export interface MoveOrgUnitRequest {
 	parentId: string | null;
 	orderIndex?: number;
+}
+
+/** Returned by GET /v1/users/me */
+export interface UserMeResponseDto {
+	id: string;
+	email: string;
+	displayName: string | null;
+	role: TenantRole;
+	isActive: boolean;
+	cognitoSub: string | null;
+	createdAt: string;
+	updatedAt: string;
+}
+
+/** Returned by all other user endpoints (list, update, delete) */
+export interface UserResponseDto {
+	id: string;
+	email: string;
+	displayName: string | null;
+	role: TenantRole;
+	isActive: boolean;
+	createdAt: string;
+	updatedAt: string;
+}
+
+/** Returned by GET /v1/users */
+export interface UserListResponse {
+	users: UserResponseDto[];
+}
+
+/** Returned by assignment endpoints */
+export interface AssignmentResponseDto {
+	id: string;
+	orgUnitId: string;
+	assignedBy: string;
+	createdAt: string;
 }

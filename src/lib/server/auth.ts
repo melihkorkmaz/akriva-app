@@ -1,8 +1,8 @@
 import type { Cookies } from '@sveltejs/kit';
 import { dev } from '$app/environment';
-import type { AuthTokens, UserRole } from '$lib/api/types.js';
+import type { AuthTokens, TenantRole } from '$lib/api/types.js';
 
-const VALID_ROLES: UserRole[] = ['owner', 'admin', 'user'];
+const VALID_ROLES: TenantRole[] = ['viewer', 'data_entry', 'data_approver', 'tenant_admin', 'super_admin'];
 
 /** Seconds before actual JWT expiry to treat the token as expired, ensuring it remains valid for the duration of the downstream API request */
 const EXPIRY_BUFFER_SECONDS = 60;
@@ -12,7 +12,7 @@ export interface SessionUser {
 	id: string;
 	email: string;
 	tenantId: string;
-	role: UserRole;
+	role: TenantRole;
 	givenName: string;
 	familyName: string;
 }
@@ -100,7 +100,7 @@ export function getSessionFromTokens(
 			typeof role !== 'string' ||
 			typeof givenName !== 'string' ||
 			typeof familyName !== 'string' ||
-			!VALID_ROLES.includes(role as UserRole)
+			!VALID_ROLES.includes(role as TenantRole)
 		) {
 			console.error('[auth] idToken missing or invalid claims');
 			return null;
@@ -112,7 +112,7 @@ export function getSessionFromTokens(
 				id,
 				email,
 				tenantId,
-				role: role as UserRole,
+				role: role as TenantRole,
 				givenName,
 				familyName
 			}
