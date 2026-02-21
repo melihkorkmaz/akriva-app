@@ -3,9 +3,11 @@ import { message, superValidate } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import type { Actions, PageServerLoad } from './$types.js';
 import { fetchUsers, updateUserRole, deactivateUser, fetchAssignments, replaceAssignments } from '$lib/api/users.js';
+import { fetchInvites, createInvite, revokeInvite } from '$lib/api/invites.js';
 import { getOrgUnitsTree } from '$lib/api/org-units.js';
 import { ApiError } from '$lib/api/client.js';
 import { changeRoleSchema, updateAssignmentsSchema, deactivateUserSchema } from '$lib/schemas/user-management.js';
+import { createInviteSchema, revokeInviteSchema } from '$lib/schemas/invite.js';
 import type { TenantRole } from '$lib/api/types.js';
 
 const VALID_ROLES: TenantRole[] = ['viewer', 'data_entry', 'data_approver', 'tenant_admin', 'super_admin'];
@@ -28,29 +30,36 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	const role = roleParam && VALID_ROLES.includes(roleParam as TenantRole) ? (roleParam as TenantRole) : undefined;
 	const includeInactive = url.searchParams.get('includeInactive') === 'true';
 
-	const [usersResponse, orgTree] = await Promise.all([
+	const [usersResponse, invitesResponse, orgTree] = await Promise.all([
 		fetchUsers(session.idToken, {
 			search,
 			role,
 			includeInactive,
 			limit: 200
 		}),
+		fetchInvites(session.idToken, { limit: 200 }),
 		getOrgUnitsTree(session.idToken)
 	]);
 
-	const [changeRoleForm, deactivateForm, assignmentsForm] = await Promise.all([
+	const [changeRoleForm, deactivateForm, assignmentsForm, createInviteForm, revokeInviteForm] = await Promise.all([
 		superValidate(zod4(changeRoleSchema)),
 		superValidate(zod4(deactivateUserSchema)),
-		superValidate(zod4(updateAssignmentsSchema))
+		superValidate(zod4(updateAssignmentsSchema)),
+		superValidate(zod4(createInviteSchema)),
+		superValidate(zod4(revokeInviteSchema))
 	]);
 
 	return {
 		users: usersResponse.users,
+		invites: invitesResponse.invites,
 		orgTree: orgTree.data,
 		currentUserId: session.user.id,
+		currentUserRole: session.user.role,
 		changeRoleForm,
 		deactivateForm,
 		assignmentsForm,
+		createInviteForm,
+		revokeInviteForm,
 		filters: { search: search || '', role: roleParam || '', includeInactive }
 	};
 };
@@ -144,6 +153,66 @@ export const actions: Actions = {
 
 		const form = await superValidate(zod4(updateAssignmentsSchema));
 		return message(form, 'Assignments updated successfully.');
+	},
+
+	createInvite: async ({ request, locals }) => {
+		const session = requireAdmin(locals);
+		const form = await superValidate(request, zod4(createInviteSchema));
+
+		if (!form.valid) {
+			return message(form, 'Please check the invite details.', { status: 400 });
+		}
+
+		try {
+			await createInvite(session.idToken, {
+				email: form.data.email,
+				role: form.data.role,
+				expiresInDays: form.data.expiresInDays
+			});
+		} catch (err) {
+			if (err instanceof ApiError) {
+				if (err.status === 403) {
+					return message(form, 'Cannot invite a user with a role equal to or above your own.', { status: 403 });
+				}
+				if (err.status === 409) {
+					return message(form, 'A pending invitation already exists for this email.', { status: 409 });
+				}
+				if (err.status === 422) {
+					return message(form, 'This user already exists in your organization.', { status: 422 });
+				}
+				if (err.status === 502) {
+					return message(form, 'Invite created but the email could not be sent. You can revoke and re-create the invite, or ask the recipient to check their spam folder.', { status: 502 });
+				}
+			}
+			return message(form, 'Something went wrong. Please try again.', { status: 500 });
+		}
+
+		return message(form, 'Invitation sent successfully.');
+	},
+
+	revokeInvite: async ({ request, locals }) => {
+		const session = requireAdmin(locals);
+		const form = await superValidate(request, zod4(revokeInviteSchema));
+
+		if (!form.valid) {
+			return message(form, 'Invalid request.', { status: 400 });
+		}
+
+		try {
+			await revokeInvite(session.idToken, form.data.inviteId);
+		} catch (err) {
+			if (err instanceof ApiError) {
+				if (err.status === 404) {
+					return message(form, 'Invitation not found.', { status: 404 });
+				}
+				if (err.status === 409) {
+					return message(form, err.body.error || 'This invitation can no longer be revoked.', { status: 409 });
+				}
+			}
+			return message(form, 'Something went wrong. Please try again.', { status: 500 });
+		}
+
+		return message(form, 'Invitation revoked successfully.');
 	},
 
 	fetchAssignments: async ({ request, locals }) => {
