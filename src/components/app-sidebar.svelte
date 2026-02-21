@@ -25,6 +25,10 @@
 
   let { user }: Props = $props();
 
+  let isAdmin = $derived(
+    user.role === 'tenant_admin' || user.role === 'super_admin'
+  );
+
   const dataItems = [
     { title: "Dashboard", url: "/dashboard", icon: LayoutGrid },
     { title: "Scope 1-3", url: "/scope-1/emission-entries", icon: Globe },
@@ -38,7 +42,7 @@
 
   const adminItems = [
     { title: "Settings", url: "/settings", icon: Settings },
-    { title: "Team Members", url: "/#", icon: UsersRound },
+    { title: "Team Members", url: "/settings/team-members", icon: UsersRound },
   ];
 </script>
 
@@ -89,28 +93,30 @@
     </Sidebar.Group>
 
     <!-- Admin Group -->
-    <Sidebar.Group>
-      <Sidebar.GroupLabel>Admin</Sidebar.GroupLabel>
-      <Sidebar.GroupContent>
-        <Sidebar.Menu>
-          {#each adminItems as item}
-            <Sidebar.MenuItem>
-              <Sidebar.MenuButton
-                tooltipContent={item.title}
-                isActive={page.url.pathname === item.url || page.url.pathname.startsWith(item.url + "/")}
-              >
-                {#snippet child({ props })}
-                  <a href={item.url} {...props}>
-                    <item.icon />
-                    <span>{item.title}</span>
-                  </a>
-                {/snippet}
-              </Sidebar.MenuButton>
-            </Sidebar.MenuItem>
-          {/each}
-        </Sidebar.Menu>
-      </Sidebar.GroupContent>
-    </Sidebar.Group>
+    {#if isAdmin}
+      <Sidebar.Group>
+        <Sidebar.GroupLabel>Admin</Sidebar.GroupLabel>
+        <Sidebar.GroupContent>
+          <Sidebar.Menu>
+            {#each adminItems as item}
+              <Sidebar.MenuItem>
+                <Sidebar.MenuButton
+                  tooltipContent={item.title}
+                  isActive={page.url.pathname === item.url || page.url.pathname.startsWith(item.url + "/")}
+                >
+                  {#snippet child({ props })}
+                    <a href={item.url} {...props}>
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </a>
+                  {/snippet}
+                </Sidebar.MenuButton>
+              </Sidebar.MenuItem>
+            {/each}
+          </Sidebar.Menu>
+        </Sidebar.GroupContent>
+      </Sidebar.Group>
+    {/if}
   </Sidebar.Content>
 
   <Sidebar.Footer>

@@ -4,6 +4,7 @@
   import SlidersHorizontal from "@lucide/svelte/icons/sliders-horizontal";
   import Calculator from "@lucide/svelte/icons/calculator";
   import Building2 from "@lucide/svelte/icons/building-2";
+  import UsersRound from "@lucide/svelte/icons/users-round";
   import ShieldCheck from "@lucide/svelte/icons/shield-check";
   import Puzzle from "@lucide/svelte/icons/puzzle";
   import BellIcon from "@lucide/svelte/icons/bell";
@@ -24,11 +25,27 @@
       label: "Organizational Tree",
       icon: Building2,
     },
+    {
+      href: "/settings/team-members",
+      label: "Team Members",
+      icon: UsersRound,
+    },
     { href: "/settings/security", label: "Security", icon: ShieldCheck },
     { href: "/settings/integrations", label: "Integrations", icon: Puzzle },
     { href: "/settings/notifications", label: "Notifications", icon: BellIcon },
     { href: "/settings/api", label: "API & Webhooks", icon: Terminal },
   ];
+
+  let isAdmin = $derived(
+    page.data?.user?.role === 'tenant_admin' || page.data?.user?.role === 'super_admin'
+  );
+
+  let visibleNavItems = $derived(
+    navItems.filter((item) => {
+      if (item.href === '/settings/team-members') return isAdmin;
+      return true;
+    })
+  );
 
   let currentPath = $derived(page.url.pathname);
 </script>
@@ -40,7 +57,7 @@
         <Sidebar.GroupLabel>Settings</Sidebar.GroupLabel>
         <Sidebar.GroupContent>
           <Sidebar.Menu>
-            {#each navItems as item}
+            {#each visibleNavItems as item}
               <Sidebar.MenuItem>
                 <Sidebar.MenuButton
                   isActive={currentPath.startsWith(item.href)}
