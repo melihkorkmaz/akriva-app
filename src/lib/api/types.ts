@@ -356,3 +356,40 @@ export interface AssignmentResponseDto {
 	assignedBy: string;
 	createdAt: string;
 }
+
+/** Invite statuses */
+export type InviteStatus = 'pending' | 'accepted' | 'expired' | 'revoked';
+
+/** Display labels for invite statuses */
+export const INVITE_STATUS_LABELS: Record<InviteStatus, string> = {
+	pending: 'Pending',
+	accepted: 'Accepted',
+	expired: 'Expired',
+	revoked: 'Revoked'
+};
+
+/** Returned by invite endpoints (POST/GET/DELETE /v1/users/invites) */
+export interface InviteResponseDto {
+	id: string;
+	email: string;
+	role: TenantRole;
+	status: InviteStatus;
+	invitedBy: string | null;
+	expiresAt: string | null;
+	createdAt: string;
+}
+
+/** Returned by GET /v1/users/invites */
+export interface InviteListResponse {
+	invites: InviteResponseDto[];
+}
+
+/** Returned by GET /v1/auth/invites/{token}/validate (public) */
+export interface ValidateInviteTokenResponseDto {
+	valid: boolean;
+	email?: string;
+	role?: string;
+	tenantName?: string;
+	expiresAt?: string;
+	reason?: string;
+}
