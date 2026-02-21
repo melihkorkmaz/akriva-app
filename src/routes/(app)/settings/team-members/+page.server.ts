@@ -1,4 +1,4 @@
-import { redirect } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import { message, superValidate } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import type { Actions, PageServerLoad } from './$types.js';
@@ -6,24 +6,32 @@ import { fetchUsers, updateUserRole, deactivateUser, fetchAssignments, replaceAs
 import { getOrgUnitsTree } from '$lib/api/org-units.js';
 import { ApiError } from '$lib/api/client.js';
 import { changeRoleSchema, updateAssignmentsSchema, deactivateUserSchema } from '$lib/schemas/user-management.js';
+import type { TenantRole } from '$lib/api/types.js';
+
+const VALID_ROLES: TenantRole[] = ['viewer', 'data_entry', 'data_approver', 'tenant_admin', 'super_admin'];
+const ADMIN_ROLES: TenantRole[] = ['tenant_admin', 'super_admin'];
+
+function requireAdmin(locals: App.Locals) {
+	const session = locals.session!;
+	if (!ADMIN_ROLES.includes(session.user.role)) {
+		error(403, 'Forbidden');
+	}
+	return session;
+}
 
 export const load: PageServerLoad = async ({ locals, url }) => {
-	const session = locals.session!;
-
-	// Route guard: admin-only
-	if (session.user.role !== 'tenant_admin' && session.user.role !== 'super_admin') {
-		redirect(302, '/settings/company');
-	}
+	const session = requireAdmin(locals);
 
 	// Parse query params for search/filter
 	const search = url.searchParams.get('search') || undefined;
-	const role = url.searchParams.get('role') || undefined;
+	const roleParam = url.searchParams.get('role') || undefined;
+	const role = roleParam && VALID_ROLES.includes(roleParam as TenantRole) ? (roleParam as TenantRole) : undefined;
 	const includeInactive = url.searchParams.get('includeInactive') === 'true';
 
 	const [usersResponse, orgTree] = await Promise.all([
 		fetchUsers(session.idToken, {
 			search,
-			role: role as any,
+			role,
 			includeInactive,
 			limit: 200
 		}),
@@ -43,13 +51,13 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 		changeRoleForm,
 		deactivateForm,
 		assignmentsForm,
-		filters: { search: search || '', role: role || '', includeInactive }
+		filters: { search: search || '', role: roleParam || '', includeInactive }
 	};
 };
 
 export const actions: Actions = {
 	changeRole: async ({ request, locals }) => {
-		const session = locals.session!;
+		const session = requireAdmin(locals);
 		const form = await superValidate(request, zod4(changeRoleSchema));
 
 		if (!form.valid) {
@@ -77,7 +85,7 @@ export const actions: Actions = {
 	},
 
 	deactivate: async ({ request, locals }) => {
-		const session = locals.session!;
+		const session = requireAdmin(locals);
 		const form = await superValidate(request, zod4(deactivateUserSchema));
 
 		if (!form.valid) {
@@ -105,7 +113,7 @@ export const actions: Actions = {
 	},
 
 	updateAssignments: async ({ request, locals }) => {
-		const session = locals.session!;
+		const session = requireAdmin(locals);
 		const formData = await request.formData();
 		const userId = formData.get('userId') as string;
 		const orgUnitIdsRaw = formData.get('orgUnitIds') as string;
@@ -139,7 +147,7 @@ export const actions: Actions = {
 	},
 
 	fetchAssignments: async ({ request, locals }) => {
-		const session = locals.session!;
+		const session = requireAdmin(locals);
 		const formData = await request.formData();
 		const userId = formData.get('userId') as string;
 

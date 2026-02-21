@@ -46,7 +46,7 @@
 	}
 
 	function handleRoleFilter(value: string | undefined) {
-		roleFilter = value ?? '';
+		roleFilter = value === '__all__' ? '' : (value ?? '');
 		applyFilters();
 	}
 
@@ -121,13 +121,14 @@
 
 				<Select.Root
 					type="single"
-					value={roleFilter || undefined}
+					value={roleFilter || '__all__'}
 					onValueChange={handleRoleFilter}
 				>
 					<Select.Trigger class="w-48">
 						{roleFilterLabel}
 					</Select.Trigger>
 					<Select.Content>
+						<Select.Item value="__all__">All roles</Select.Item>
 						{#each roles as role}
 							<Select.Item value={role}>{TENANT_ROLE_LABELS[role]}</Select.Item>
 						{/each}

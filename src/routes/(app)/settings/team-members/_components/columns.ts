@@ -4,6 +4,15 @@ import { renderSnippet } from '$lib/components/ui/data-table';
 import type { UserResponseDto, TenantRole } from '$lib/api/types.js';
 import { TENANT_ROLE_LABELS } from '$lib/api/types.js';
 
+function escapeHtml(str: string): string {
+	return str
+		.replace(/&/g, '&amp;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;')
+		.replace(/"/g, '&quot;')
+		.replace(/'/g, '&#39;');
+}
+
 const roleBadgeConfig: Record<TenantRole, { cls: string }> = {
 	super_admin: {
 		cls: 'inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium bg-violet-50 text-violet-700 ring-1 ring-violet-500/20'
@@ -28,8 +37,8 @@ export function createColumns(currentUserId: string): ColumnDef<UserResponseDto>
 			accessorKey: 'displayName',
 			header: 'Name',
 			cell: ({ row }) => {
-				const name = row.original.displayName || 'No name set';
-				const email = row.original.email;
+				const name = escapeHtml(row.original.displayName || 'No name set');
+				const email = escapeHtml(row.original.email);
 				const isCurrentUser = row.original.id === currentUserId;
 				const snippet = createRawSnippet<
 					[{ name: string; email: string; isCurrentUser: boolean }]
