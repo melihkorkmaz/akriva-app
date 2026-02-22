@@ -9,11 +9,15 @@
 		CalculationMethod,
 		EmissionSourceResponseDto
 	} from '$lib/api/types.js';
-	import type { SuperForm } from 'sveltekit-superforms';
+	import type { SuperForm, Infer } from 'sveltekit-superforms';
+	import type { Writable } from 'svelte/store';
+	import type { emissionEntrySchema } from '$lib/schemas/emission-entry.js';
+
+	type EmissionEntryForm = Infer<typeof emissionEntrySchema>;
 
 	interface Props {
-		superform: SuperForm<any>;
-		form: any;
+		superform: SuperForm<EmissionEntryForm>;
+		form: Writable<EmissionEntryForm>;
 		category: EmissionCategory;
 		calculationMethod: CalculationMethod;
 		sources: EmissionSourceResponseDto[];

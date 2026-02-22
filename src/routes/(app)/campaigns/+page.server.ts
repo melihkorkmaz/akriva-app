@@ -3,21 +3,14 @@ import type { Actions, PageServerLoad } from './$types.js';
 import { listCampaigns, deleteCampaign } from '$lib/api/campaigns.js';
 import { listIndicators } from '$lib/api/indicators.js';
 import { ApiError } from '$lib/api/client.js';
-import type { TenantRole, CampaignStatus } from '$lib/api/types.js';
+import { requireAdmin } from '$lib/server/auth.js';
+import type { CampaignStatus } from '$lib/api/types.js';
 
-const ADMIN_ROLES: TenantRole[] = ['tenant_admin', 'super_admin'];
 const VALID_STATUSES: CampaignStatus[] = ['draft', 'active', 'closed'];
 
-function requireAdmin(locals: App.Locals) {
-	const session = locals.session!;
-	if (!ADMIN_ROLES.includes(session.user.role)) {
-		error(403, 'Forbidden');
-	}
-	return session;
-}
-
 export const load: PageServerLoad = async ({ locals, url }) => {
-	const session = requireAdmin(locals);
+	requireAdmin(locals);
+	const session = locals.session!;
 
 	// Parse filter params
 	const statusParam = url.searchParams.get('status') || undefined;
@@ -53,7 +46,8 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 
 export const actions: Actions = {
 	delete: async ({ request, locals }) => {
-		const session = requireAdmin(locals);
+		requireAdmin(locals);
+		const session = locals.session!;
 		const formData = await request.formData();
 		const id = formData.get('id') as string;
 

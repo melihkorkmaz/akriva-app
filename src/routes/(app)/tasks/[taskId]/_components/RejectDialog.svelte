@@ -1,8 +1,10 @@
 <script lang="ts">
+	import { invalidateAll } from '$app/navigation';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
+	import { toast } from 'svelte-sonner';
 
 	interface Props {
 		open: boolean;
@@ -37,11 +39,6 @@
 				body: formData
 			});
 
-			if (response.redirected) {
-				window.location.href = response.url;
-				return;
-			}
-
 			const result = await response.json();
 			if (result?.type === 'error') {
 				error = result.error?.message || 'Failed to send back for revision.';
@@ -49,10 +46,14 @@
 				return;
 			}
 
-			// Success - reload the page
-			window.location.reload();
+			// Success - close dialog and refresh data via SvelteKit
+			notes = '';
+			open = false;
+			toast.success('Task sent back for revision.');
+			await invalidateAll();
 		} catch {
 			error = 'Something went wrong. Please try again.';
+		} finally {
 			submitting = false;
 		}
 	}

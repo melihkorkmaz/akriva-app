@@ -4,8 +4,8 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import Eye from '@lucide/svelte/icons/eye';
 	import ClipboardList from '@lucide/svelte/icons/clipboard-list';
-	import type { CampaignTask, CampaignTaskStatus } from '$lib/api/types.js';
-	import { CAMPAIGN_TASK_STATUS_LABELS } from '$lib/api/types.js';
+	import type { CampaignTask } from '$lib/api/types.js';
+	import { CAMPAIGN_TASK_STATUS_LABELS, CAMPAIGN_TASK_STATUS_BADGE_CLASSES } from '$lib/api/types.js';
 
 	interface Props {
 		tasks: CampaignTask[];
@@ -14,15 +14,6 @@
 
 	let { tasks, orgUnitNames }: Props = $props();
 
-	const STATUS_STYLES: Record<CampaignTaskStatus, string> = {
-		pending: 'bg-secondary text-secondary-foreground hover:bg-secondary',
-		draft: 'bg-blue-100 text-blue-800 hover:bg-blue-100',
-		submitted: 'bg-sky-100 text-sky-800 hover:bg-sky-100',
-		in_review: 'bg-amber-100 text-amber-800 hover:bg-amber-100',
-		revision_requested: 'bg-red-100 text-red-800 hover:bg-red-100',
-		approved: 'bg-emerald-100 text-emerald-800 hover:bg-emerald-100',
-		locked: 'bg-green-100 text-green-800 hover:bg-green-100'
-	};
 
 	function formatDate(dateString: string | null): string {
 		if (!dateString) return '\u2014';
@@ -53,7 +44,7 @@
 						{orgUnitNames[task.orgUnitId] ?? task.orgUnitId}
 					</Table.Cell>
 					<Table.Cell>
-						<Badge class={STATUS_STYLES[task.status]}>
+						<Badge class={CAMPAIGN_TASK_STATUS_BADGE_CLASSES[task.status]}>
 							{CAMPAIGN_TASK_STATUS_LABELS[task.status]}
 						</Badge>
 					</Table.Cell>

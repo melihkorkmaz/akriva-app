@@ -4,18 +4,8 @@ import { zod4 } from 'sveltekit-superforms/adapters';
 import type { Actions, PageServerLoad } from './$types.js';
 import { createWorkflowTemplate } from '$lib/api/workflow-templates.js';
 import { ApiError } from '$lib/api/client.js';
+import { requireAdmin } from '$lib/server/auth.js';
 import { createWorkflowTemplateSchema } from '$lib/schemas/workflow-template.js';
-import type { TenantRole } from '$lib/api/types.js';
-
-const ADMIN_ROLES: TenantRole[] = ['tenant_admin', 'super_admin'];
-
-function requireAdmin(locals: App.Locals) {
-	const session = locals.session!;
-	if (!ADMIN_ROLES.includes(session.user.role)) {
-		error(403, 'Forbidden');
-	}
-	return session;
-}
 
 /**
  * Auto-generate workflow steps based on the number of approval tiers.
@@ -128,7 +118,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 export const actions: Actions = {
 	default: async ({ request, locals }) => {
-		const session = requireAdmin(locals);
+		requireAdmin(locals);
+		const session = locals.session!;
 		const form = await superValidate(request, zod4(createWorkflowTemplateSchema));
 
 		if (!form.valid) {

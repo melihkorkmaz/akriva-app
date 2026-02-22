@@ -8,26 +8,17 @@ import {
 	updateWorkflowTemplate
 } from '$lib/api/workflow-templates.js';
 import { ApiError } from '$lib/api/client.js';
+import { requireAdmin } from '$lib/server/auth.js';
 import { z } from 'zod';
-import type { TenantRole } from '$lib/api/types.js';
 
 /** Minimal schema just to carry the template id for actions */
 const templateActionSchema = z.object({
 	id: z.string().min(1)
 });
 
-const ADMIN_ROLES: TenantRole[] = ['tenant_admin', 'super_admin'];
-
-function requireAdmin(locals: App.Locals) {
-	const session = locals.session!;
-	if (!ADMIN_ROLES.includes(session.user.role)) {
-		error(403, 'Forbidden');
-	}
-	return session;
-}
-
 export const load: PageServerLoad = async ({ locals }) => {
-	const session = requireAdmin(locals);
+	requireAdmin(locals);
+	const session = locals.session!;
 
 	try {
 		const response = await listWorkflowTemplates(session.idToken);
@@ -50,7 +41,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 export const actions: Actions = {
 	delete: async ({ request, locals }) => {
-		const session = requireAdmin(locals);
+		requireAdmin(locals);
+		const session = locals.session!;
 		const form = await superValidate(request, zod4(templateActionSchema));
 
 		if (!form.valid) {
@@ -79,7 +71,8 @@ export const actions: Actions = {
 	},
 
 	activate: async ({ request, locals }) => {
-		const session = requireAdmin(locals);
+		requireAdmin(locals);
+		const session = locals.session!;
 		const form = await superValidate(request, zod4(templateActionSchema));
 
 		if (!form.valid) {
@@ -108,7 +101,8 @@ export const actions: Actions = {
 	},
 
 	archive: async ({ request, locals }) => {
-		const session = requireAdmin(locals);
+		requireAdmin(locals);
+		const session = locals.session!;
 		const form = await superValidate(request, zod4(templateActionSchema));
 
 		if (!form.valid) {

@@ -8,21 +8,12 @@ import {
 	deleteWorkflowTemplate
 } from '$lib/api/workflow-templates.js';
 import { ApiError } from '$lib/api/client.js';
+import { requireAdmin } from '$lib/server/auth.js';
 import { updateWorkflowTemplateSchema } from '$lib/schemas/workflow-template.js';
-import type { TenantRole } from '$lib/api/types.js';
-
-const ADMIN_ROLES: TenantRole[] = ['tenant_admin', 'super_admin'];
-
-function requireAdmin(locals: App.Locals) {
-	const session = locals.session!;
-	if (!ADMIN_ROLES.includes(session.user.role)) {
-		error(403, 'Forbidden');
-	}
-	return session;
-}
 
 export const load: PageServerLoad = async ({ locals, params }) => {
-	const session = requireAdmin(locals);
+	requireAdmin(locals);
+	const session = locals.session!;
 
 	try {
 		const template = await getWorkflowTemplate(session.idToken, params.id);
@@ -51,7 +42,8 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 
 export const actions: Actions = {
 	update: async ({ request, locals, params }) => {
-		const session = requireAdmin(locals);
+		requireAdmin(locals);
+		const session = locals.session!;
 		const form = await superValidate(request, zod4(updateWorkflowTemplateSchema));
 
 		if (!form.valid) {
@@ -90,7 +82,8 @@ export const actions: Actions = {
 	},
 
 	activate: async ({ request, locals, params }) => {
-		const session = requireAdmin(locals);
+		requireAdmin(locals);
+		const session = locals.session!;
 		const form = await superValidate(request, zod4(updateWorkflowTemplateSchema));
 
 		try {
@@ -115,7 +108,8 @@ export const actions: Actions = {
 	},
 
 	archive: async ({ request, locals, params }) => {
-		const session = requireAdmin(locals);
+		requireAdmin(locals);
+		const session = locals.session!;
 		const form = await superValidate(request, zod4(updateWorkflowTemplateSchema));
 
 		try {
@@ -140,7 +134,8 @@ export const actions: Actions = {
 	},
 
 	delete: async ({ locals, params }) => {
-		const session = requireAdmin(locals);
+		requireAdmin(locals);
+		const session = locals.session!;
 
 		try {
 			await deleteWorkflowTemplate(session.idToken, params.id);

@@ -7,8 +7,8 @@
 	import Pencil from '@lucide/svelte/icons/pencil';
 	import Eye from '@lucide/svelte/icons/eye';
 	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
-	import type { CampaignTask, CampaignTaskStatus } from '$lib/api/types.js';
-	import { CAMPAIGN_TASK_STATUS_LABELS } from '$lib/api/types.js';
+	import type { CampaignTask } from '$lib/api/types.js';
+	import { CAMPAIGN_TASK_STATUS_LABELS, CAMPAIGN_TASK_STATUS_BADGE_CLASSES } from '$lib/api/types.js';
 
 	interface Props {
 		task: CampaignTask;
@@ -21,15 +21,6 @@
 
 	let { task, campaignName, indicatorName, orgUnitName, periodStart, periodEnd }: Props = $props();
 
-	const STATUS_BADGE_CLASSES: Record<CampaignTaskStatus, string> = {
-		pending: '',
-		draft: 'bg-blue-100 text-blue-800 hover:bg-blue-100',
-		submitted: 'bg-sky-100 text-sky-800 hover:bg-sky-100',
-		in_review: 'bg-amber-100 text-amber-800 hover:bg-amber-100',
-		revision_requested: '',
-		approved: 'bg-emerald-100 text-emerald-800 hover:bg-emerald-100',
-		locked: 'bg-green-100 text-green-800 hover:bg-green-100'
-	};
 
 	let badgeVariant = $derived(
 		task.status === 'pending'
@@ -39,7 +30,7 @@
 				: ('default' as const)
 	);
 
-	let badgeClass = $derived(STATUS_BADGE_CLASSES[task.status]);
+	let badgeClass = $derived(CAMPAIGN_TASK_STATUS_BADGE_CLASSES[task.status]);
 
 	interface ActionConfig {
 		label: string;

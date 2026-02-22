@@ -12,6 +12,7 @@ import {
 import { fetchInvites, createInvite, revokeInvite } from "$lib/api/invites.js";
 import { getOrgUnitsTree } from "$lib/api/org-units.js";
 import { ApiError } from "$lib/api/client.js";
+import { requireAdmin } from "$lib/server/auth.js";
 import {
   changeRoleSchema,
   updateAssignmentsSchema,
@@ -27,18 +28,9 @@ const VALID_ROLES: TenantRole[] = [
   "tenant_admin",
   "super_admin",
 ];
-const ADMIN_ROLES: TenantRole[] = ["tenant_admin", "super_admin"];
-
-function requireAdmin(locals: App.Locals) {
-  const session = locals.session!;
-  if (!ADMIN_ROLES.includes(session.user.role)) {
-    error(403, "Forbidden");
-  }
-  return session;
-}
-
 export const load: PageServerLoad = async ({ locals, url }) => {
-  const session = requireAdmin(locals);
+  requireAdmin(locals);
+  const session = locals.session!;
 
   // Parse query params for search/filter
   const search = url.searchParams.get("search") || undefined;
@@ -96,7 +88,8 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 
 export const actions: Actions = {
   changeRole: async ({ request, locals }) => {
-    const session = requireAdmin(locals);
+    requireAdmin(locals);
+    const session = locals.session!;
     const form = await superValidate(request, zod4(changeRoleSchema));
 
     if (!form.valid) {
@@ -134,7 +127,8 @@ export const actions: Actions = {
   },
 
   deactivate: async ({ request, locals }) => {
-    const session = requireAdmin(locals);
+    requireAdmin(locals);
+    const session = locals.session!;
     const form = await superValidate(request, zod4(deactivateUserSchema));
 
     if (!form.valid) {
@@ -172,7 +166,8 @@ export const actions: Actions = {
   },
 
   updateAssignments: async ({ request, locals }) => {
-    const session = requireAdmin(locals);
+    requireAdmin(locals);
+    const session = locals.session!;
     const formData = await request.formData();
     const userId = formData.get("userId") as string;
     const orgUnitIdsRaw = formData.get("orgUnitIds") as string;
@@ -212,7 +207,8 @@ export const actions: Actions = {
   },
 
   createInvite: async ({ request, locals }) => {
-    const session = requireAdmin(locals);
+    requireAdmin(locals);
+    const session = locals.session!;
     const form = await superValidate(request, zod4(createInviteSchema));
 
     if (!form.valid) {
@@ -265,7 +261,8 @@ export const actions: Actions = {
   },
 
   revokeInvite: async ({ request, locals }) => {
-    const session = requireAdmin(locals);
+    requireAdmin(locals);
+    const session = locals.session!;
     const form = await superValidate(request, zod4(revokeInviteSchema));
 
     if (!form.valid) {
@@ -296,7 +293,8 @@ export const actions: Actions = {
   },
 
   fetchAssignments: async ({ request, locals }) => {
-    const session = requireAdmin(locals);
+    requireAdmin(locals);
+    const session = locals.session!;
     const formData = await request.formData();
     const userId = formData.get("userId") as string;
 

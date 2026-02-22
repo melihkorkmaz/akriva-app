@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { superForm } from 'sveltekit-superforms';
+	import { superForm, type SuperValidated, type Infer } from 'sveltekit-superforms';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import * as Form from '$lib/components/ui/form/index.js';
@@ -25,6 +25,8 @@
 	} from '$lib/api/types.js';
 	import OrgUnitSelector from './OrgUnitSelector.svelte';
 
+	type CampaignFormData = Infer<typeof createCampaignSchema>;
+
 	let {
 		formData,
 		indicators,
@@ -34,7 +36,7 @@
 		mode,
 		campaignStatus
 	}: {
-		formData: any;
+		formData: SuperValidated<CampaignFormData>;
 		indicators: IndicatorResponseDto[];
 		workflowTemplates: WorkflowTemplateResponseDto[];
 		orgTree: OrgUnitTreeResponseDto[];

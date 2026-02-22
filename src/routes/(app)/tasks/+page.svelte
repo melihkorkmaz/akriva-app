@@ -2,24 +2,30 @@
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
 	import TaskCard from './_components/TaskCard.svelte';
 	import ListChecks from '@lucide/svelte/icons/list-checks';
-	import type { CampaignTask, CampaignTaskStatus } from '$lib/api/types.js';
+	import type {
+		CampaignTask,
+		CampaignTaskStatus,
+		CampaignResponseDto,
+		IndicatorResponseDto,
+		OrgUnitTreeResponseDto
+	} from '$lib/api/types.js';
 	import { CAMPAIGN_TASK_STATUS_LABELS } from '$lib/api/types.js';
 
 	let { data } = $props();
 
 	// Build lookup maps
 	let campaignMap = $derived(
-		new Map(data.campaigns.map((c: any) => [c.id, c]))
+		new Map(data.campaigns.map((c: CampaignResponseDto) => [c.id, c]))
 	);
 
 	let indicatorMap = $derived(
-		new Map(data.indicators.map((ind: any) => [ind.id, ind]))
+		new Map(data.indicators.map((ind: IndicatorResponseDto) => [ind.id, ind]))
 	);
 
 	// Flatten org tree for name lookup
-	function flattenOrgTree(nodes: any[]): Map<string, string> {
+	function flattenOrgTree(nodes: OrgUnitTreeResponseDto[]): Map<string, string> {
 		const map = new Map<string, string>();
-		function walk(nodes: any[]) {
+		function walk(nodes: OrgUnitTreeResponseDto[]) {
 			for (const node of nodes) {
 				map.set(node.id, node.name);
 				if (node.children?.length) walk(node.children);

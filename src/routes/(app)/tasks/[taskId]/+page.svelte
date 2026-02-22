@@ -16,8 +16,7 @@
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
 	import Calendar from '@lucide/svelte/icons/calendar';
 	import { toast } from 'svelte-sonner';
-	import type { CampaignTaskStatus } from '$lib/api/types.js';
-	import { CAMPAIGN_TASK_STATUS_LABELS } from '$lib/api/types.js';
+	import { CAMPAIGN_TASK_STATUS_LABELS, CAMPAIGN_TASK_STATUS_BADGE_CLASSES } from '$lib/api/types.js';
 	import { emissionEntrySchema } from '$lib/schemas/emission-entry.js';
 	import ActivityDataSection from './_components/ActivityDataSection.svelte';
 	import EvidenceSection from './_components/EvidenceSection.svelte';
@@ -51,15 +50,6 @@
 		}
 	});
 
-	const STATUS_BADGE_CLASSES: Record<CampaignTaskStatus, string> = {
-		pending: '',
-		draft: 'bg-blue-100 text-blue-800 hover:bg-blue-100',
-		submitted: 'bg-sky-100 text-sky-800 hover:bg-sky-100',
-		in_review: 'bg-amber-100 text-amber-800 hover:bg-amber-100',
-		revision_requested: '',
-		approved: 'bg-emerald-100 text-emerald-800 hover:bg-emerald-100',
-		locked: 'bg-green-100 text-green-800 hover:bg-green-100'
-	};
 
 	let badgeVariant = $derived(
 		data.task.status === 'pending'
@@ -104,7 +94,7 @@
 				<h1 class="text-2xl font-semibold">{data.orgUnitName}</h1>
 				<p class="text-sm text-muted-foreground">{data.campaign.name}</p>
 			</div>
-			<Badge variant={badgeVariant} class={STATUS_BADGE_CLASSES[data.task.status]}>
+			<Badge variant={badgeVariant} class={CAMPAIGN_TASK_STATUS_BADGE_CLASSES[data.task.status]}>
 				{CAMPAIGN_TASK_STATUS_LABELS[data.task.status]}
 			</Badge>
 		</div>
@@ -190,7 +180,7 @@
 			/>
 		{/if}
 
-		<EvidenceSection taskId={data.task.id} existingEvidence={[]} readonly={true} />
+		<EvidenceSection taskId={data.task.id} existingEvidence={data.evidenceFiles} readonly={true} />
 
 		<CalculationPreview
 			trace={data.emissionEntry?.trace ?? null}
@@ -219,7 +209,7 @@
 			/>
 		{/if}
 
-		<EvidenceSection taskId={data.task.id} existingEvidence={[]} readonly={true} />
+		<EvidenceSection taskId={data.task.id} existingEvidence={data.evidenceFiles} readonly={true} />
 
 		<CalculationPreview
 			trace={data.emissionEntry?.trace ?? null}
@@ -254,7 +244,7 @@
 				/>
 			{/if}
 
-			<EvidenceSection taskId={data.task.id} existingEvidence={[]} />
+			<EvidenceSection taskId={data.task.id} existingEvidence={data.evidenceFiles} />
 
 			<CalculationPreview
 				trace={data.emissionEntry?.trace ?? null}

@@ -12,12 +12,13 @@ import { emissionEntrySchema } from '$lib/schemas/emission-entry.js';
 import { taskRejectSchema } from '$lib/schemas/task-reject.js';
 import { ApiError } from '$lib/api/client.js';
 import {
+	listEvidenceByEntry as apiListEvidence,
 	requestUploadUrl as apiRequestUploadUrl,
 	confirmUpload as apiConfirmUpload,
 	getDownloadUrl as apiGetDownloadUrl,
 	deleteEvidence as apiDeleteEvidence
 } from '$lib/api/evidence.js';
-import type { OrgUnitTreeResponseDto } from '$lib/api/types.js';
+import type { OrgUnitTreeResponseDto, EvidenceFileResponseDto } from '$lib/api/types.js';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	const session = locals.session!;
@@ -55,6 +56,16 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 			}
 		}
 
+		// Load evidence files for the emission entry
+		let evidenceFiles: EvidenceFileResponseDto[] = [];
+		if (task.emissionEntryId) {
+			try {
+				evidenceFiles = await apiListEvidence(session.idToken, task.emissionEntryId);
+			} catch {
+				// Endpoint may not exist yet — graceful fallback
+			}
+		}
+
 		// Load emission sources for this org unit
 		let emissionSources: Awaited<ReturnType<typeof listEmissionSources>> = [];
 		try {
@@ -65,34 +76,31 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 			// Not critical
 		}
 
-		// Initialize forms
-		const [entryForm, rejectForm] = await Promise.all([
-			superValidate(
-				emissionEntry
-					? {
-							sourceId: emissionEntry.sourceId,
-							fuelType: emissionEntry.fuelType,
-							activityAmount: emissionEntry.activityAmount,
-							activityUnit: emissionEntry.activityUnit,
-							distance: emissionEntry.distance,
-							distanceUnit: emissionEntry.distanceUnit,
-							vehicleType: emissionEntry.vehicleType,
-							technology: emissionEntry.technology,
-							gasType: emissionEntry.gasType,
-							refrigerantInventoryStart: emissionEntry.refrigerantInventoryStart,
-							refrigerantInventoryEnd: emissionEntry.refrigerantInventoryEnd,
-							refrigerantPurchased: emissionEntry.refrigerantPurchased,
-							refrigerantRecovered: emissionEntry.refrigerantRecovered,
-							productionVolume: emissionEntry.productionVolume,
-							productionUnit: emissionEntry.productionUnit,
-							abatementEfficiency: emissionEntry.abatementEfficiency,
-							notes: emissionEntry.notes
-						}
-					: {},
-				zod4(emissionEntrySchema)
-			),
-			superValidate(zod4(taskRejectSchema))
-		]);
+		// Initialize entry form
+		const entryForm = await superValidate(
+			emissionEntry
+				? {
+						sourceId: emissionEntry.sourceId,
+						fuelType: emissionEntry.fuelType,
+						activityAmount: emissionEntry.activityAmount,
+						activityUnit: emissionEntry.activityUnit,
+						distance: emissionEntry.distance,
+						distanceUnit: emissionEntry.distanceUnit,
+						vehicleType: emissionEntry.vehicleType,
+						technology: emissionEntry.technology,
+						gasType: emissionEntry.gasType,
+						refrigerantInventoryStart: emissionEntry.refrigerantInventoryStart,
+						refrigerantInventoryEnd: emissionEntry.refrigerantInventoryEnd,
+						refrigerantPurchased: emissionEntry.refrigerantPurchased,
+						refrigerantRecovered: emissionEntry.refrigerantRecovered,
+						productionVolume: emissionEntry.productionVolume,
+						productionUnit: emissionEntry.productionUnit,
+						abatementEfficiency: emissionEntry.abatementEfficiency,
+						notes: emissionEntry.notes
+					}
+				: {},
+			zod4(emissionEntrySchema)
+		);
 
 		return {
 			task,
@@ -100,9 +108,9 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 			indicator,
 			orgUnitName,
 			emissionEntry,
+			evidenceFiles,
 			emissionSources,
-			entryForm,
-			rejectForm
+			entryForm
 		};
 	} catch (err) {
 		if (err instanceof ApiError && err.status === 404) {

@@ -8,21 +8,12 @@ import { listWorkflowTemplates } from '$lib/api/workflow-templates.js';
 import { getOrgUnitsTree } from '$lib/api/org-units.js';
 import { fetchUsers } from '$lib/api/users.js';
 import { ApiError } from '$lib/api/client.js';
+import { requireAdmin } from '$lib/server/auth.js';
 import { createCampaignSchema } from '$lib/schemas/campaign.js';
-import type { TenantRole } from '$lib/api/types.js';
-
-const ADMIN_ROLES: TenantRole[] = ['tenant_admin', 'super_admin'];
-
-function requireAdmin(locals: App.Locals) {
-	const session = locals.session!;
-	if (!ADMIN_ROLES.includes(session.user.role)) {
-		error(403, 'Forbidden');
-	}
-	return session;
-}
 
 export const load: PageServerLoad = async ({ locals, params }) => {
-	const session = requireAdmin(locals);
+	requireAdmin(locals);
+	const session = locals.session!;
 
 	const [campaign, indicators, templates, orgTree, userList] = await Promise.all([
 		getCampaign(session.idToken, params.id),
@@ -65,7 +56,8 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 
 export const actions: Actions = {
 	default: async ({ request, locals, params }) => {
-		const session = requireAdmin(locals);
+		requireAdmin(locals);
+		const session = locals.session!;
 		const form = await superValidate(request, zod4(createCampaignSchema));
 
 		if (!form.valid) {
@@ -124,7 +116,8 @@ export const actions: Actions = {
 	},
 
 	activate: async ({ locals, params }) => {
-		const session = requireAdmin(locals);
+		requireAdmin(locals);
+		const session = locals.session!;
 
 		try {
 			await activateCampaign(session.idToken, params.id);

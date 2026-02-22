@@ -4,17 +4,8 @@ import { getCampaign, activateCampaign, deleteCampaign, listCampaignTasks } from
 import { listIndicators } from '$lib/api/indicators.js';
 import { getOrgUnitsTree } from '$lib/api/org-units.js';
 import { ApiError } from '$lib/api/client.js';
-import type { TenantRole, OrgUnitTreeResponseDto, IndicatorResponseDto } from '$lib/api/types.js';
-
-const ADMIN_ROLES: TenantRole[] = ['tenant_admin', 'super_admin'];
-
-function requireAdmin(locals: App.Locals) {
-	const session = locals.session!;
-	if (!ADMIN_ROLES.includes(session.user.role)) {
-		error(403, 'Forbidden');
-	}
-	return session;
-}
+import { requireAdmin } from '$lib/server/auth.js';
+import type { OrgUnitTreeResponseDto, IndicatorResponseDto } from '$lib/api/types.js';
 
 /** Recursively flatten org tree into a name lookup map */
 function flattenOrgTree(
@@ -31,7 +22,8 @@ function flattenOrgTree(
 }
 
 export const load: PageServerLoad = async ({ locals, params }) => {
-	const session = requireAdmin(locals);
+	requireAdmin(locals);
+	const session = locals.session!;
 
 	let campaign;
 	try {
@@ -71,7 +63,8 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 
 export const actions: Actions = {
 	activate: async ({ locals, params }) => {
-		const session = requireAdmin(locals);
+		requireAdmin(locals);
+		const session = locals.session!;
 
 		try {
 			const result = await activateCampaign(session.idToken, params.id);
@@ -105,7 +98,8 @@ export const actions: Actions = {
 	},
 
 	delete: async ({ locals, params }) => {
-		const session = requireAdmin(locals);
+		requireAdmin(locals);
+		const session = locals.session!;
 
 		try {
 			await deleteCampaign(session.idToken, params.id);

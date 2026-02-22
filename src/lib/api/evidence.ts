@@ -1,6 +1,16 @@
 import { apiFetchAuth } from './client.js';
 import type { EvidenceFileResponseDto, EvidenceUploadUrlResponse } from './types.js';
 
+export async function listEvidenceByEntry(
+	accessToken: string,
+	entryId: string
+): Promise<EvidenceFileResponseDto[]> {
+	return apiFetchAuth<EvidenceFileResponseDto[]>(
+		`/emission/evidence?entryId=${entryId}`,
+		accessToken
+	);
+}
+
 export async function requestUploadUrl(
 	accessToken: string,
 	data: { originalFilename: string; contentType: string }

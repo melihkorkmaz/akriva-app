@@ -1,6 +1,16 @@
-import type { Cookies } from '@sveltejs/kit';
+import { error, type Cookies } from '@sveltejs/kit';
 import { dev } from '$app/environment';
 import type { AuthTokens, TenantRole } from '$lib/api/types.js';
+
+const ADMIN_ROLES: TenantRole[] = ['tenant_admin', 'super_admin'];
+
+/** Throw 403 if the user is not a tenant or super admin */
+export function requireAdmin(locals: App.Locals): void {
+	const session = locals.session!;
+	if (!ADMIN_ROLES.includes(session.user.role)) {
+		error(403, 'Forbidden');
+	}
+}
 
 const VALID_ROLES: TenantRole[] = ['viewer', 'data_entry', 'data_approver', 'tenant_admin', 'super_admin'];
 
