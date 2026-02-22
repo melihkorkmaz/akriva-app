@@ -7,6 +7,7 @@
 	import { Switch } from '$lib/components/ui/switch/index.js';
 	import { Alert, AlertDescription } from '$lib/components/ui/alert/index.js';
 	import { toast } from 'svelte-sonner';
+	import { deserialize } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
 	import type {
@@ -120,22 +121,24 @@
 			body: formData
 		});
 
-		const result = await response.json();
+		const result = deserialize(await response.text());
 		submitting = false;
 
-		// SvelteKit form action responses are wrapped in a data array
-		const data = result?.data?.[0] ?? result;
-
-		if (data?.status && data.status >= 400) {
-			errorMessage = data.message || `Failed to ${mode} indicator.`;
+		if (result.type === 'success') {
+			open = false;
+			toast.success(
+				mode === 'create' ? 'Indicator created successfully.' : 'Indicator updated successfully.'
+			);
+			await invalidateAll();
 			return;
 		}
 
-		open = false;
-		toast.success(
-			mode === 'create' ? 'Indicator created successfully.' : 'Indicator updated successfully.'
-		);
-		await invalidateAll();
+		// Extract error message from superforms response
+		const msg =
+			result.type === 'failure'
+				? (result.data as Record<string, any> | undefined)?.form?.message
+				: undefined;
+		errorMessage = typeof msg === 'string' ? msg : `Failed to ${mode} indicator. Please try again.`;
 	}
 
 	let isCreateDisabled = $derived(

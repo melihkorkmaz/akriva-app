@@ -6,6 +6,7 @@
 	import { Badge } from '$lib/components/ui/badge/index.js';
 	import { Alert, AlertDescription } from '$lib/components/ui/alert/index.js';
 	import { toast } from 'svelte-sonner';
+	import { deserialize } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
 	import Plus from '@lucide/svelte/icons/plus';
 	import Gauge from '@lucide/svelte/icons/gauge';
@@ -65,19 +66,21 @@
 			body: formData
 		});
 
-		const result = await response.json();
+		const result = deserialize(await response.text());
 		deleteSubmitting = false;
 
-		const responseData = result?.data?.[0] ?? result;
-
-		if (responseData?.status && responseData.status >= 400) {
-			deleteError = responseData.message || 'Failed to delete indicator.';
+		if (result.type === 'success') {
+			deleteDialogOpen = false;
+			toast.success('Indicator deleted successfully.');
+			await invalidateAll();
 			return;
 		}
 
-		deleteDialogOpen = false;
-		toast.success('Indicator deleted successfully.');
-		await invalidateAll();
+		const msg =
+			result.type === 'failure'
+				? (result.data as Record<string, any> | undefined)?.form?.message
+				: undefined;
+		deleteError = typeof msg === 'string' ? msg : 'Failed to delete indicator.';
 	}
 </script>
 
