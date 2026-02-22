@@ -11,6 +11,12 @@ import { getOrgUnitsTree } from '$lib/api/org-units.js';
 import { emissionEntrySchema } from '$lib/schemas/emission-entry.js';
 import { taskRejectSchema } from '$lib/schemas/task-reject.js';
 import { ApiError } from '$lib/api/client.js';
+import {
+	requestUploadUrl as apiRequestUploadUrl,
+	confirmUpload as apiConfirmUpload,
+	getDownloadUrl as apiGetDownloadUrl,
+	deleteEvidence as apiDeleteEvidence
+} from '$lib/api/evidence.js';
 import type { OrgUnitTreeResponseDto } from '$lib/api/types.js';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
@@ -196,5 +202,73 @@ export const actions: Actions = {
 		}
 
 		redirect(303, `/tasks/${params.taskId}`);
+	},
+
+	requestUploadUrl: async ({ request, locals }) => {
+		const session = locals.session!;
+		const formData = await request.formData();
+		const originalFilename = formData.get('originalFilename') as string;
+		const contentType = formData.get('contentType') as string;
+
+		try {
+			const result = await apiRequestUploadUrl(session.idToken, {
+				originalFilename,
+				contentType
+			});
+			return { uploadUrl: result.uploadUrl, evidenceId: result.evidenceId };
+		} catch (err) {
+			if (err instanceof ApiError) {
+				return { error: err.body.error || 'Failed to get upload URL.' };
+			}
+			return { error: 'Something went wrong.' };
+		}
+	},
+
+	confirmUpload: async ({ request, locals }) => {
+		const session = locals.session!;
+		const formData = await request.formData();
+		const evidenceId = formData.get('evidenceId') as string;
+
+		try {
+			const evidence = await apiConfirmUpload(session.idToken, evidenceId);
+			return { evidence };
+		} catch (err) {
+			if (err instanceof ApiError) {
+				return { error: err.body.error || 'Failed to confirm upload.' };
+			}
+			return { error: 'Something went wrong.' };
+		}
+	},
+
+	downloadEvidence: async ({ request, locals }) => {
+		const session = locals.session!;
+		const formData = await request.formData();
+		const evidenceId = formData.get('evidenceId') as string;
+
+		try {
+			const downloadUrl = await apiGetDownloadUrl(session.idToken, evidenceId);
+			return { downloadUrl };
+		} catch (err) {
+			if (err instanceof ApiError) {
+				return { error: err.body.error || 'Failed to get download URL.' };
+			}
+			return { error: 'Something went wrong.' };
+		}
+	},
+
+	deleteEvidence: async ({ request, locals }) => {
+		const session = locals.session!;
+		const formData = await request.formData();
+		const evidenceId = formData.get('evidenceId') as string;
+
+		try {
+			await apiDeleteEvidence(session.idToken, evidenceId);
+			return { success: true };
+		} catch (err) {
+			if (err instanceof ApiError) {
+				return { error: err.body.error || 'Failed to delete evidence.' };
+			}
+			return { error: 'Something went wrong.' };
+		}
 	}
 };

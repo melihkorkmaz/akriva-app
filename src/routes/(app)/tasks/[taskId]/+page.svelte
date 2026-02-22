@@ -16,6 +16,7 @@
 	import { CAMPAIGN_TASK_STATUS_LABELS } from '$lib/api/types.js';
 	import { emissionEntrySchema } from '$lib/schemas/emission-entry.js';
 	import ActivityDataSection from './_components/ActivityDataSection.svelte';
+	import EvidenceSection from './_components/EvidenceSection.svelte';
 
 	let { data } = $props();
 
@@ -165,6 +166,8 @@
 				readonly={true}
 			/>
 		{/if}
+
+		<EvidenceSection taskId={data.task.id} existingEvidence={[]} readonly={true} />
 	{:else if data.task.status === 'in_review' || data.task.status === 'submitted' || data.task.status === 'approved'}
 		<!-- In Review: read-only data + approval -->
 		<Alert>
@@ -187,6 +190,8 @@
 				readonly={true}
 			/>
 		{/if}
+
+		<EvidenceSection taskId={data.task.id} existingEvidence={[]} readonly={true} />
 
 		<!-- Placeholder for approval section (Task 16) -->
 	{:else if isEditable}
@@ -211,17 +216,7 @@
 			/>
 		{/if}
 
-		<!-- Placeholder for EvidenceSection (Task 14) -->
-		<Card.Root>
-			<Card.Header>
-				<Card.Title>Evidence</Card.Title>
-			</Card.Header>
-			<Card.Content>
-				<p class="text-sm text-muted-foreground">
-					Evidence upload section will be displayed here.
-				</p>
-			</Card.Content>
-		</Card.Root>
+		<EvidenceSection taskId={data.task.id} existingEvidence={[]} />
 
 		<!-- Placeholder for CalculationPreview (Task 15) -->
 		<Card.Root>
