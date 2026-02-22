@@ -9,6 +9,8 @@
   import Users from "@lucide/svelte/icons/users";
   import ClipboardList from "@lucide/svelte/icons/clipboard-list";
   import FileCheck from "@lucide/svelte/icons/file-check";
+  import ListChecks from "@lucide/svelte/icons/list-checks";
+  import Megaphone from "@lucide/svelte/icons/megaphone";
   import Settings from "@lucide/svelte/icons/settings";
   import UsersRound from "@lucide/svelte/icons/users-round";
 
@@ -38,9 +40,11 @@
     { title: "Team", url: "/#", icon: Users },
     { title: "Inventory", url: "/#", icon: ClipboardList },
     { title: "Evidence", url: "/#", icon: FileCheck },
+    { title: "My Tasks", url: "/tasks", icon: ListChecks },
   ];
 
   const adminItems = [
+    { title: "Campaigns", url: "/campaigns", icon: Megaphone },
     { title: "Settings", url: "/settings", icon: Settings },
     { title: "Team Members", url: "/settings/team-members", icon: UsersRound },
   ];

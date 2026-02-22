@@ -4,6 +4,8 @@
   import SlidersHorizontal from "@lucide/svelte/icons/sliders-horizontal";
   import Calculator from "@lucide/svelte/icons/calculator";
   import Building2 from "@lucide/svelte/icons/building-2";
+  import GitBranch from "@lucide/svelte/icons/git-branch";
+  import Gauge from "@lucide/svelte/icons/gauge";
   import UsersRound from "@lucide/svelte/icons/users-round";
   import ShieldCheck from "@lucide/svelte/icons/shield-check";
   import Puzzle from "@lucide/svelte/icons/puzzle";
@@ -26,6 +28,16 @@
       icon: Building2,
     },
     {
+      href: "/settings/workflow-templates",
+      label: "Workflow Templates",
+      icon: GitBranch,
+    },
+    {
+      href: "/settings/indicators",
+      label: "Indicators",
+      icon: Gauge,
+    },
+    {
       href: "/settings/team-members",
       label: "Team Members",
       icon: UsersRound,
@@ -43,6 +55,8 @@
   let visibleNavItems = $derived(
     navItems.filter((item) => {
       if (item.href === '/settings/team-members') return isAdmin;
+      if (item.href === '/settings/workflow-templates') return isAdmin;
+      if (item.href === '/settings/indicators') return isAdmin;
       return true;
     })
   );
