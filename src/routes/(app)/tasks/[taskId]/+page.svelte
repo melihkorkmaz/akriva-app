@@ -17,6 +17,8 @@
 	import { emissionEntrySchema } from '$lib/schemas/emission-entry.js';
 	import ActivityDataSection from './_components/ActivityDataSection.svelte';
 	import EvidenceSection from './_components/EvidenceSection.svelte';
+	import CalculationPreview from './_components/CalculationPreview.svelte';
+	import ApprovalSection from './_components/ApprovalSection.svelte';
 
 	let { data } = $props();
 
@@ -168,6 +170,11 @@
 		{/if}
 
 		<EvidenceSection taskId={data.task.id} existingEvidence={[]} readonly={true} />
+
+		<CalculationPreview
+			trace={data.emissionEntry?.trace ?? null}
+			co2eTonnes={null}
+		/>
 	{:else if data.task.status === 'in_review' || data.task.status === 'submitted' || data.task.status === 'approved'}
 		<!-- In Review: read-only data + approval -->
 		<Alert>
@@ -193,7 +200,16 @@
 
 		<EvidenceSection taskId={data.task.id} existingEvidence={[]} readonly={true} />
 
-		<!-- Placeholder for approval section (Task 16) -->
+		<CalculationPreview
+			trace={data.emissionEntry?.trace ?? null}
+			co2eTonnes={null}
+		/>
+
+		<ApprovalSection
+			taskId={data.task.id}
+			currentTier={data.task.currentTier}
+			totalTiers={data.campaign.approvalTiers}
+		/>
 	{:else if isEditable}
 		<!-- Draft / Revision Requested: editable -->
 		{#if data.task.status === 'revision_requested'}
@@ -218,17 +234,10 @@
 
 		<EvidenceSection taskId={data.task.id} existingEvidence={[]} />
 
-		<!-- Placeholder for CalculationPreview (Task 15) -->
-		<Card.Root>
-			<Card.Header>
-				<Card.Title>Calculation Preview</Card.Title>
-			</Card.Header>
-			<Card.Content>
-				<p class="text-sm text-muted-foreground">
-					Calculation results will be displayed here.
-				</p>
-			</Card.Content>
-		</Card.Root>
+		<CalculationPreview
+			trace={data.emissionEntry?.trace ?? null}
+			co2eTonnes={null}
+		/>
 
 		<!-- Placeholder for sticky footer (Task 17) -->
 	{/if}
