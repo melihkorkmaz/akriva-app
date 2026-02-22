@@ -31,7 +31,7 @@ export async function listCampaigns(
   if (params?.reportingYear) qs.set("reportingYear", params.reportingYear);
   const query = qs.toString();
   return apiFetchAuth<CampaignListItem[]>(
-    `/campaigns/${query ? `?${query}` : ""}`,
+    `/campaign/campaigns${query ? `?${query}` : ""}`,
     accessToken
   );
 }
@@ -40,7 +40,7 @@ export async function getCampaign(
   accessToken: string,
   id: string
 ): Promise<CampaignWithDetails> {
-  return apiFetchAuth<CampaignWithDetails>(`/campaigns/${id}`, accessToken);
+  return apiFetchAuth<CampaignWithDetails>(`/campaign/campaigns/${id}`, accessToken);
 }
 
 export async function createCampaign(
@@ -61,7 +61,7 @@ export async function createCampaign(
     }>;
   }
 ): Promise<CampaignResponseDto> {
-  return apiFetchAuth<CampaignResponseDto>("/campaigns/", accessToken, {
+  return apiFetchAuth<CampaignResponseDto>("/campaign/campaigns", accessToken, {
     method: "POST",
     body: JSON.stringify(data),
   });
@@ -72,17 +72,21 @@ export async function updateCampaign(
   id: string,
   data: Record<string, unknown>
 ): Promise<CampaignWithDetails> {
-  return apiFetchAuth<CampaignWithDetails>(`/campaigns/${id}`, accessToken, {
-    method: "PATCH",
-    body: JSON.stringify(data),
-  });
+  return apiFetchAuth<CampaignWithDetails>(
+    `/campaign/campaigns/${id}`,
+    accessToken,
+    {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }
+  );
 }
 
 export async function deleteCampaign(
   accessToken: string,
   id: string
 ): Promise<void> {
-  await apiFetchAuth<void>(`/campaigns/${id}`, accessToken, {
+  await apiFetchAuth<void>(`/campaign/campaigns/${id}`, accessToken, {
     method: "DELETE",
   });
 }
@@ -92,7 +96,7 @@ export async function activateCampaign(
   id: string
 ): Promise<CampaignActivationResponse> {
   return apiFetchAuth<CampaignActivationResponse>(
-    `/campaigns/${id}/activate`,
+    `/campaign/campaigns/${id}/activate`,
     accessToken,
     {
       method: "POST",
@@ -110,7 +114,7 @@ export async function listCampaignTasks(
   if (params?.orgUnitId) qs.set("orgUnitId", params.orgUnitId);
   const query = qs.toString();
   return apiFetchAuth<CampaignTask[]>(
-    `/campaigns/${campaignId}/tasks${query ? `?${query}` : ""}`,
+    `/campaign/campaigns/${campaignId}/tasks${query ? `?${query}` : ""}`,
     accessToken
   );
 }
