@@ -85,7 +85,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 						activityAmount: emissionEntry.activityAmount,
 						activityUnit: emissionEntry.activityUnit,
 						distance: emissionEntry.distance,
-						distanceUnit: emissionEntry.distanceUnit,
+						distanceUnit: emissionEntry.distanceUnit as 'km' | 'miles' | null,
 						vehicleType: emissionEntry.vehicleType,
 						technology: emissionEntry.technology,
 						gasType: emissionEntry.gasType,

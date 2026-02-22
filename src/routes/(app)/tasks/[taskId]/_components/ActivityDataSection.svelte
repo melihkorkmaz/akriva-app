@@ -193,7 +193,7 @@
 								type="single"
 								value={$form.distanceUnit ?? undefined}
 								onValueChange={(v) => {
-									$form.distanceUnit = v ?? null;
+									$form.distanceUnit = (v as 'km' | 'miles') ?? null;
 								}}
 								disabled={readonly}
 							>

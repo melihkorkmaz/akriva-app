@@ -5,8 +5,6 @@
 	import type {
 		CampaignTask,
 		CampaignTaskStatus,
-		CampaignResponseDto,
-		IndicatorResponseDto,
 		OrgUnitTreeResponseDto
 	} from '$lib/api/types.js';
 	import { CAMPAIGN_TASK_STATUS_LABELS } from '$lib/api/types.js';
@@ -15,11 +13,11 @@
 
 	// Build lookup maps
 	let campaignMap = $derived(
-		new Map(data.campaigns.map((c: CampaignResponseDto) => [c.id, c]))
+		new Map(data.campaigns.map((c) => [c.id, c]))
 	);
 
 	let indicatorMap = $derived(
-		new Map(data.indicators.map((ind: IndicatorResponseDto) => [ind.id, ind]))
+		new Map(data.indicators.map((ind) => [ind.id, ind]))
 	);
 
 	// Flatten org tree for name lookup
