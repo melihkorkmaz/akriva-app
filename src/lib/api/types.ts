@@ -393,3 +393,353 @@ export interface ValidateInviteTokenResponseDto {
 	expiresAt?: string;
 	reason?: string;
 }
+
+// ── Emission Domain ──
+
+/** Emission source categories */
+export type EmissionCategory = 'stationary' | 'mobile' | 'fugitive' | 'process';
+
+export const EMISSION_CATEGORY_LABELS: Record<EmissionCategory, string> = {
+	stationary: 'Stationary Combustion',
+	mobile: 'Mobile Combustion',
+	fugitive: 'Fugitive Emissions',
+	process: 'Process Emissions'
+};
+
+/** Calculation methods */
+export type CalculationMethod =
+	| 'ipcc_energy_based'
+	| 'defra_direct'
+	| 'ipcc_mobile_fuel'
+	| 'ipcc_mobile_distance'
+	| 'material_balance'
+	| 'process_production'
+	| 'process_gas_abatement';
+
+export const CALCULATION_METHOD_LABELS: Record<CalculationMethod, string> = {
+	ipcc_energy_based: 'IPCC Energy Based',
+	defra_direct: 'DEFRA Direct',
+	ipcc_mobile_fuel: 'IPCC Mobile (Fuel)',
+	ipcc_mobile_distance: 'IPCC Mobile (Distance)',
+	material_balance: 'Material Balance',
+	process_production: 'Process Production',
+	process_gas_abatement: 'Process Gas Abatement'
+};
+
+/** Category-method compatibility */
+export const CATEGORY_METHOD_MAP: Record<EmissionCategory, CalculationMethod[]> = {
+	stationary: ['ipcc_energy_based', 'defra_direct'],
+	mobile: ['ipcc_mobile_fuel', 'ipcc_mobile_distance'],
+	fugitive: ['material_balance'],
+	process: ['process_production', 'process_gas_abatement']
+};
+
+/** Evidence file status */
+export type EvidenceStatus = 'pending_upload' | 'uploaded' | 'linked';
+
+/** Emission source — GET/POST/PATCH /v1/emission/emission-sources */
+export interface EmissionSourceResponseDto {
+	id: string;
+	tenantId: string;
+	orgUnitId: string;
+	category: EmissionCategory;
+	name: string;
+	meterNumber: string | null;
+	vehicleType: string | null;
+	technology: string | null;
+	defaultFuelType: string | null;
+	defaultGasType: string | null;
+	isActive: boolean;
+	createdBy: string;
+	createdAt: string;
+	updatedAt: string;
+}
+
+/** Calculation trace — nested in emission entry */
+export interface CalculationTraceResponseDto {
+	calculationMethod: string;
+	authority: string;
+	gwpBasis: string | null;
+	gwpCh4: number | null;
+	gwpN2o: number | null;
+	factorLibraryId: string | null;
+	factorLibraryVersion: string | null;
+	factorResolutionTier: string | null;
+	basisAmount: number | null;
+	basisUnit: string | null;
+	energyTj: number | null;
+	massKg: number | null;
+	massGg: number | null;
+	co2Kg: number | null;
+	ch4Kg: number | null;
+	n2oKg: number | null;
+	biogenicCo2Kg: number | null;
+	co2Co2eKg: number | null;
+	ch4Co2eKg: number | null;
+	n2oCo2eKg: number | null;
+	totalCo2eKg: number;
+	totalCo2eTonnes: number;
+	formulaText: string | null;
+}
+
+/** Emission entry — GET/POST/PATCH /v1/emission/emission-entries */
+export interface EmissionEntryResponseDto {
+	id: string;
+	tenantId: string;
+	orgUnitId: string;
+	sourceId: string | null;
+	category: EmissionCategory;
+	calculationMethod: CalculationMethod;
+	reportingYear: number;
+	startDate: string;
+	endDate: string;
+	fuelType: string | null;
+	gasType: string | null;
+	activityAmount: number | null;
+	activityUnit: string | null;
+	distance: number | null;
+	distanceUnit: string | null;
+	vehicleType: string | null;
+	technology: string | null;
+	productionVolume: number | null;
+	productionUnit: string | null;
+	abatementEfficiency: number | null;
+	refrigerantInventoryStart: number | null;
+	refrigerantInventoryEnd: number | null;
+	refrigerantPurchased: number | null;
+	refrigerantRecovered: number | null;
+	notes: string | null;
+	createdBy: string;
+	createdAt: string;
+	updatedAt: string;
+	trace: CalculationTraceResponseDto | null;
+}
+
+/** Paginated emission entry list */
+export interface EmissionEntryListResponse {
+	data: EmissionEntryResponseDto[];
+	total: number;
+	page: number;
+	pageSize: number;
+}
+
+/** Evidence file — returned by evidence endpoints */
+export interface EvidenceFileResponseDto {
+	id: string;
+	tenantId: string;
+	entryId: string | null;
+	s3Key: string;
+	originalFilename: string;
+	contentType: string;
+	sizeBytes: number | null;
+	status: EvidenceStatus;
+	uploadedAt: string | null;
+	createdBy: string;
+	createdAt: string;
+	updatedAt: string;
+}
+
+/** Upload URL response */
+export interface EvidenceUploadUrlResponse {
+	evidenceId: string;
+	uploadUrl: string;
+	s3Key: string;
+	expiresAt: string;
+}
+
+/** Emission factor library */
+export interface EmissionFactorLibraryResponseDto {
+	id: string;
+	name: string;
+	authority: string;
+	version: string;
+	releaseYear: number;
+	isDefault: boolean;
+	createdAt: string;
+}
+
+// ── Workflow Domain ──
+
+/** Workflow template status */
+export type WorkflowTemplateStatus = 'draft' | 'active' | 'archived';
+
+export const WORKFLOW_STATUS_LABELS: Record<WorkflowTemplateStatus, string> = {
+	draft: 'Draft',
+	active: 'Active',
+	archived: 'Archived'
+};
+
+/** Workflow step type */
+export type WorkflowStepType = 'submit' | 'review' | 'approve';
+
+/** Workflow gate type */
+export type WorkflowGateType = 'serial' | 'parallel_all' | 'parallel_any';
+
+/** Workflow transition trigger */
+export type WorkflowTransitionTrigger = 'complete' | 'reject' | 'timeout';
+
+/** Workflow step response */
+export interface WorkflowStepResponseDto {
+	id: string;
+	name: string;
+	type: WorkflowStepType;
+	assignedRole: TenantRole;
+	gateType: WorkflowGateType;
+	stepOrder: number;
+}
+
+/** Workflow transition response */
+export interface WorkflowTransitionResponseDto {
+	id: string;
+	fromStepId: string;
+	toStepId: string;
+	trigger: WorkflowTransitionTrigger;
+	rejectionTargetStepId: string | null;
+}
+
+/** Workflow template — GET/POST/PATCH /v1/workflow-templates */
+export interface WorkflowTemplateResponseDto {
+	id: string;
+	tenantId: string;
+	name: string;
+	description: string | null;
+	version: number;
+	status: WorkflowTemplateStatus;
+	steps: WorkflowStepResponseDto[];
+	transitions: WorkflowTransitionResponseDto[];
+	createdBy: string;
+	createdAt: string;
+	updatedAt: string;
+}
+
+/** Workflow template list response */
+export interface WorkflowTemplateListResponse {
+	data: WorkflowTemplateResponseDto[];
+	total: number;
+}
+
+// ── Campaign Domain ──
+
+/** Campaign status */
+export type CampaignStatus = 'draft' | 'active' | 'closed';
+
+export const CAMPAIGN_STATUS_LABELS: Record<CampaignStatus, string> = {
+	draft: 'Draft',
+	active: 'Active',
+	closed: 'Closed'
+};
+
+/** Campaign task status */
+export type CampaignTaskStatus =
+	| 'pending'
+	| 'draft'
+	| 'submitted'
+	| 'in_review'
+	| 'revision_requested'
+	| 'approved'
+	| 'locked';
+
+export const CAMPAIGN_TASK_STATUS_LABELS: Record<CampaignTaskStatus, string> = {
+	pending: 'Pending',
+	draft: 'Draft',
+	submitted: 'Submitted',
+	in_review: 'In Review',
+	revision_requested: 'Revision Requested',
+	approved: 'Approved',
+	locked: 'Locked'
+};
+
+/** Indicator — GET/POST/PATCH /v1/indicators */
+export interface IndicatorResponseDto {
+	id: string;
+	tenantId: string | null;
+	name: string;
+	emissionCategory: EmissionCategory;
+	calculationMethod: CalculationMethod;
+	defaultFuelType: string | null;
+	defaultGasType: string | null;
+	isGlobal: boolean;
+	isActive: boolean;
+	createdAt: string;
+	updatedAt: string;
+}
+
+/** Campaign org unit (nested in campaign response) */
+export interface CampaignOrgUnit {
+	orgUnitId: string;
+	orgUnitName: string;
+}
+
+/** Campaign approver override (nested in campaign response) */
+export interface CampaignApproverOverride {
+	orgUnitId: string;
+	tier: number;
+	userId: string;
+}
+
+/** Campaign response — POST/GET /v1/campaigns */
+export interface CampaignResponseDto {
+	id: string;
+	name: string;
+	indicatorId: string;
+	indicator: { name: string; emissionCategory: string } | null;
+	workflowTemplateId: string;
+	approvalTiers: number;
+	reportingYear: number;
+	periodStart: string;
+	periodEnd: string;
+	status: CampaignStatus;
+	orgUnits: CampaignOrgUnit[];
+	approverOverrides: CampaignApproverOverride[];
+	createdBy: string;
+	createdAt: string;
+	updatedAt: string;
+}
+
+/** Campaign detail (with raw org units + overrides) — GET /v1/campaigns/{id} */
+export interface CampaignWithDetails {
+	id: string;
+	tenantId: string;
+	name: string;
+	indicatorId: string;
+	workflowTemplateId: string;
+	approvalTiers: number;
+	reportingYear: number;
+	periodStart: string;
+	periodEnd: string;
+	status: CampaignStatus;
+	createdBy: string;
+	createdAt: string;
+	updatedAt: string;
+	deletedAt: string | null;
+	orgUnits: { id: string; campaignId: string; orgUnitId: string }[];
+	approverOverrides: {
+		id: string;
+		campaignId: string;
+		orgUnitId: string;
+		tier: number;
+		userId: string;
+	}[];
+}
+
+/** Campaign task — GET /v1/campaigns/{id}/tasks, /v1/tasks/* */
+export interface CampaignTask {
+	id: string;
+	campaignId: string;
+	orgUnitId: string;
+	tenantId: string;
+	status: CampaignTaskStatus;
+	currentTier: number;
+	emissionEntryId: string | null;
+	submittedAt: string | null;
+	approvedAt: string | null;
+	lockedAt: string | null;
+	createdAt: string;
+	updatedAt: string;
+}
+
+/** Campaign activation response */
+export interface CampaignActivationResponse {
+	campaign: CampaignWithDetails;
+	taskCount: number;
+}
