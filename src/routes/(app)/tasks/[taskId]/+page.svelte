@@ -3,6 +3,7 @@
 	import { superForm } from 'sveltekit-superforms';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import * as Card from '$lib/components/ui/card/index.js';
+	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { Badge } from '$lib/components/ui/badge/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Alert, AlertDescription } from '$lib/components/ui/alert/index.js';
@@ -10,8 +11,11 @@
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import Play from '@lucide/svelte/icons/play';
 	import Lock from '@lucide/svelte/icons/lock';
+	import Save from '@lucide/svelte/icons/save';
+	import Send from '@lucide/svelte/icons/send';
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
 	import Calendar from '@lucide/svelte/icons/calendar';
+	import { toast } from 'svelte-sonner';
 	import type { CampaignTaskStatus } from '$lib/api/types.js';
 	import { CAMPAIGN_TASK_STATUS_LABELS } from '$lib/api/types.js';
 	import { emissionEntrySchema } from '$lib/schemas/emission-entry.js';
@@ -26,9 +30,26 @@
 		validators: zod4Client(emissionEntrySchema),
 		dataType: 'json'
 	});
-	const { form: entryForm } = entryFormObj;
+	const {
+		form: entryForm,
+		enhance: entryEnhance,
+		message: entryMessage,
+		submitting: entrySaving
+	} = entryFormObj;
 
 	let starting = $state(false);
+	let submitDialogOpen = $state(false);
+	let submittingTask = $state(false);
+
+	$effect(() => {
+		if ($entryMessage) {
+			if ($entryMessage.startsWith('Draft')) {
+				toast.success($entryMessage);
+			} else {
+				toast.error($entryMessage);
+			}
+		}
+	});
 
 	const STATUS_BADGE_CLASSES: Record<CampaignTaskStatus, string> = {
 		pending: '',
@@ -222,23 +243,78 @@
 			</Alert>
 		{/if}
 
-		{#if data.indicator}
-			<ActivityDataSection
-				superform={entryFormObj}
-				form={entryForm}
-				category={data.indicator.emissionCategory}
-				calculationMethod={data.indicator.calculationMethod}
-				sources={data.emissionSources}
+		<form method="POST" action="?/saveDraft" use:entryEnhance class="flex flex-col gap-6">
+			{#if data.indicator}
+				<ActivityDataSection
+					superform={entryFormObj}
+					form={entryForm}
+					category={data.indicator.emissionCategory}
+					calculationMethod={data.indicator.calculationMethod}
+					sources={data.emissionSources}
+				/>
+			{/if}
+
+			<EvidenceSection taskId={data.task.id} existingEvidence={[]} />
+
+			<CalculationPreview
+				trace={data.emissionEntry?.trace ?? null}
+				co2eTonnes={null}
 			/>
-		{/if}
 
-		<EvidenceSection taskId={data.task.id} existingEvidence={[]} />
-
-		<CalculationPreview
-			trace={data.emissionEntry?.trace ?? null}
-			co2eTonnes={null}
-		/>
-
-		<!-- Placeholder for sticky footer (Task 17) -->
+			<!-- Sticky footer -->
+			<div class="sticky bottom-0 -mx-8 border-t border-border bg-background px-8 py-4">
+				<div class="flex items-center justify-between">
+					<Button variant="outline" href="/tasks">Cancel</Button>
+					<div class="flex items-center gap-3">
+						<Button type="submit" variant="outline" disabled={$entrySaving}>
+							<Save class="mr-2 size-4" />
+							{$entrySaving ? 'Saving...' : 'Save Draft'}
+						</Button>
+						<Button type="button" onclick={() => (submitDialogOpen = true)} disabled={$entrySaving}>
+							<Send class="mr-2 size-4" />
+							Submit for Review
+						</Button>
+					</div>
+				</div>
+			</div>
+		</form>
 	{/if}
 </div>
+
+<!-- Submit Confirmation Dialog -->
+<Dialog.Root bind:open={submitDialogOpen}>
+	<Dialog.Content class="sm:max-w-md">
+		<Dialog.Header>
+			<Dialog.Title>Submit for Review</Dialog.Title>
+			<Dialog.Description>
+				Are you sure you want to submit this task for review? Make sure all data is
+				correct and evidence is uploaded.
+			</Dialog.Description>
+		</Dialog.Header>
+		<Dialog.Footer>
+			<Button
+				variant="outline"
+				onclick={() => (submitDialogOpen = false)}
+				disabled={submittingTask}
+			>
+				Cancel
+			</Button>
+			<form
+				method="POST"
+				action="?/submit"
+				use:enhance={() => {
+					submittingTask = true;
+					return async ({ update }) => {
+						submittingTask = false;
+						submitDialogOpen = false;
+						await update();
+					};
+				}}
+			>
+				<Button type="submit" disabled={submittingTask}>
+					{submittingTask ? 'Submitting...' : 'Submit'}
+				</Button>
+			</form>
+		</Dialog.Footer>
+	</Dialog.Content>
+</Dialog.Root>
