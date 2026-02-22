@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { superForm } from 'sveltekit-superforms';
+	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { Badge } from '$lib/components/ui/badge/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
@@ -12,8 +14,16 @@
 	import Calendar from '@lucide/svelte/icons/calendar';
 	import type { CampaignTaskStatus } from '$lib/api/types.js';
 	import { CAMPAIGN_TASK_STATUS_LABELS } from '$lib/api/types.js';
+	import { emissionEntrySchema } from '$lib/schemas/emission-entry.js';
+	import ActivityDataSection from './_components/ActivityDataSection.svelte';
 
 	let { data } = $props();
+
+	const entryFormObj = superForm(data.entryForm, {
+		validators: zod4Client(emissionEntrySchema),
+		dataType: 'json'
+	});
+	const { form: entryForm } = entryFormObj;
 
 	let starting = $state(false);
 
@@ -145,17 +155,16 @@
 			</AlertDescription>
 		</Alert>
 
-		<!-- Placeholder for read-only data sections -->
-		<Card.Root>
-			<Card.Header>
-				<Card.Title>Activity Data</Card.Title>
-			</Card.Header>
-			<Card.Content>
-				<p class="text-sm text-muted-foreground">
-					Data entry details will be displayed here.
-				</p>
-			</Card.Content>
-		</Card.Root>
+		{#if data.indicator}
+			<ActivityDataSection
+				superform={entryFormObj}
+				form={entryForm}
+				category={data.indicator.emissionCategory}
+				calculationMethod={data.indicator.calculationMethod}
+				sources={data.emissionSources}
+				readonly={true}
+			/>
+		{/if}
 	{:else if data.task.status === 'in_review' || data.task.status === 'submitted' || data.task.status === 'approved'}
 		<!-- In Review: read-only data + approval -->
 		<Alert>
@@ -168,17 +177,16 @@
 			</AlertDescription>
 		</Alert>
 
-		<!-- Placeholder for read-only data sections -->
-		<Card.Root>
-			<Card.Header>
-				<Card.Title>Activity Data</Card.Title>
-			</Card.Header>
-			<Card.Content>
-				<p class="text-sm text-muted-foreground">
-					Data entry details will be displayed here.
-				</p>
-			</Card.Content>
-		</Card.Root>
+		{#if data.indicator}
+			<ActivityDataSection
+				superform={entryFormObj}
+				form={entryForm}
+				category={data.indicator.emissionCategory}
+				calculationMethod={data.indicator.calculationMethod}
+				sources={data.emissionSources}
+				readonly={true}
+			/>
+		{/if}
 
 		<!-- Placeholder for approval section (Task 16) -->
 	{:else if isEditable}
@@ -193,17 +201,15 @@
 			</Alert>
 		{/if}
 
-		<!-- Placeholder for ActivityDataSection (Task 13) -->
-		<Card.Root>
-			<Card.Header>
-				<Card.Title>Activity Data</Card.Title>
-			</Card.Header>
-			<Card.Content>
-				<p class="text-sm text-muted-foreground">
-					Data entry form will be displayed here.
-				</p>
-			</Card.Content>
-		</Card.Root>
+		{#if data.indicator}
+			<ActivityDataSection
+				superform={entryFormObj}
+				form={entryForm}
+				category={data.indicator.emissionCategory}
+				calculationMethod={data.indicator.calculationMethod}
+				sources={data.emissionSources}
+			/>
+		{/if}
 
 		<!-- Placeholder for EvidenceSection (Task 14) -->
 		<Card.Root>
