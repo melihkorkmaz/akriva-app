@@ -53,20 +53,15 @@ export const actions: Actions = {
       });
     }
 
-    console.log("creating");
-
     try {
-      const res = await createIndicator(session.idToken, {
+      await createIndicator(session.idToken, {
         name: form.data.name,
         emissionCategory: form.data.emissionCategory,
         calculationMethod: form.data.calculationMethod,
         defaultFuelType: form.data.defaultFuelType || null,
         defaultGasType: form.data.defaultGasType || null,
       });
-
-      console.log("res", res);
     } catch (err) {
-      console.error("Error creating indicator:", err);
       if (err instanceof ApiError) {
         if (err.status === 409) {
           return message(
