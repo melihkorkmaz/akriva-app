@@ -3,26 +3,37 @@ import { zod4 } from 'sveltekit-superforms/adapters';
 import type { Actions, PageServerLoad } from './$types.js';
 import { getOrgUnitsTree, createOrgUnit, updateOrgUnit, deleteOrgUnit } from '$lib/api/org-units.js';
 import { getApplicationSettings } from '$lib/api/tenant.js';
+import {
+	listEmissionSources,
+	createEmissionSource,
+	updateEmissionSource,
+	deleteEmissionSource
+} from '$lib/api/emission-sources.js';
 import { ApiError } from '$lib/api/client.js';
 import { createOrgUnitSchema, updateOrgUnitSchema } from '$lib/schemas/org-unit.js';
+import { createEmissionSourceSchema, updateEmissionSourceSchema } from '$lib/schemas/emission-source.js';
 import type { CreateOrgUnitRequest, UpdateOrgUnitRequest, GwpVersion } from '$lib/api/types.js';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const session = locals.session!;
-	const [treeResponse, tenantSettings] = await Promise.all([
+	const [treeResponse, tenantSettings, emissionSources] = await Promise.all([
 		getOrgUnitsTree(session.idToken),
-		getApplicationSettings(session.idToken)
+		getApplicationSettings(session.idToken),
+		listEmissionSources(session.idToken)
 	]);
 
-	const createForm = await superValidate(zod4(createOrgUnitSchema));
-	const updateForm = await superValidate(zod4(updateOrgUnitSchema));
+	const [createForm, updateForm] = await Promise.all([
+		superValidate(zod4(createOrgUnitSchema)),
+		superValidate(zod4(updateOrgUnitSchema))
+	]);
 
 	return {
 		tree: treeResponse.data,
 		total: treeResponse.total,
 		tenantSettings,
 		createForm,
-		updateForm
+		updateForm,
+		emissionSources
 	};
 };
 
@@ -157,6 +168,118 @@ export const actions: Actions = {
 				}
 				if (err.status === 404) {
 					return { success: false, error: 'Org unit not found.' };
+				}
+				if (err.status === 403) {
+					return {
+						success: false,
+						error: "You don't have permission to perform this action."
+					};
+				}
+			}
+			return { success: false, error: 'Something went wrong. Please try again.' };
+		}
+	},
+
+	createSource: async ({ request, locals }) => {
+		const session = locals.session!;
+		const form = await superValidate(request, zod4(createEmissionSourceSchema));
+
+		if (!form.valid) {
+			return message(form, 'Please check your information and try again.', { status: 400 });
+		}
+
+		try {
+			await createEmissionSource(session.idToken, {
+				orgUnitId: form.data.orgUnitId,
+				category: form.data.category,
+				name: form.data.name,
+				meterNumber: form.data.meterNumber ?? null,
+				vehicleType: form.data.vehicleType ?? null,
+				technology: form.data.technology ?? null,
+				defaultFuelType: form.data.defaultFuelType ?? null,
+				defaultGasType: form.data.defaultGasType ?? null
+			});
+			return message(form, 'Emission source created successfully.');
+		} catch (err) {
+			if (err instanceof ApiError) {
+				if (err.status === 400 && err.body.code === 'VALIDATION_FAILED') {
+					return message(form, err.body.error || 'Validation failed.', { status: 400 });
+				}
+				if (err.status === 409) {
+					return message(form, 'An emission source with this name already exists.', { status: 409 });
+				}
+				if (err.status === 403) {
+					return message(form, "You don't have permission to perform this action.", { status: 403 });
+				}
+			}
+			return message(form, 'Something went wrong. Please try again.', { status: 500 });
+		}
+	},
+
+	updateSource: async ({ request, locals }) => {
+		const session = locals.session!;
+		const formData = await request.formData();
+		const sourceId = formData.get('sourceId');
+
+		const form = await superValidate(formData, zod4(updateEmissionSourceSchema));
+
+		if (!sourceId || typeof sourceId !== 'string') {
+			return message(form, 'Missing emission source ID.', { status: 400 });
+		}
+
+		if (!form.valid) {
+			return message(form, 'Please check your information and try again.', { status: 400 });
+		}
+
+		try {
+			await updateEmissionSource(session.idToken, sourceId, {
+				name: form.data.name,
+				meterNumber: form.data.meterNumber ?? null,
+				vehicleType: form.data.vehicleType ?? null,
+				technology: form.data.technology ?? null,
+				defaultFuelType: form.data.defaultFuelType ?? null,
+				defaultGasType: form.data.defaultGasType ?? null,
+				isActive: form.data.isActive
+			});
+			return message(form, 'Emission source updated successfully.');
+		} catch (err) {
+			if (err instanceof ApiError) {
+				if (err.status === 400 && err.body.code === 'VALIDATION_FAILED') {
+					return message(form, err.body.error || 'Validation failed.', { status: 400 });
+				}
+				if (err.status === 404) {
+					return message(form, 'Emission source not found.', { status: 404 });
+				}
+				if (err.status === 403) {
+					return message(form, "You don't have permission to perform this action.", { status: 403 });
+				}
+			}
+			return message(form, 'Something went wrong. Please try again.', { status: 500 });
+		}
+	},
+
+	deleteSource: async ({ request, locals }) => {
+		const session = locals.session!;
+		const formData = await request.formData();
+		const sourceId = formData.get('sourceId');
+
+		if (!sourceId || typeof sourceId !== 'string') {
+			return { success: false, error: 'Missing emission source ID.' };
+		}
+
+		try {
+			await deleteEmissionSource(session.idToken, sourceId);
+			return { success: true };
+		} catch (err) {
+			if (err instanceof ApiError) {
+				if (err.status === 409) {
+					return {
+						success: false,
+						error: 'This source has associated emission entries. Remove them first.'
+					};
+				}
+				if (err.status === 404) {
+					return { success: false, error: 'Emission source not found.' };
 				}
 				if (err.status === 403) {
 					return {

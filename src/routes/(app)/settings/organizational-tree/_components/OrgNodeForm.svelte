@@ -25,9 +25,11 @@
     updateOrgUnitSchema,
   } from "$lib/schemas/org-unit";
   import DeleteDialog from "./DeleteDialog.svelte";
+  import EmissionSourcesSection from "./EmissionSourcesSection.svelte";
   import type {
     OrgUnitTreeResponseDto,
     TenantSettingsResponseDto,
+    EmissionSourceResponseDto,
   } from "$lib/api/types";
 
   let {
@@ -38,6 +40,7 @@
     updateFormData,
     tenantSettings,
     allNodes,
+    emissionSources = [],
     onCreated,
     onDeleted,
     onCancel,
@@ -49,10 +52,16 @@
     updateFormData: any;
     tenantSettings: TenantSettingsResponseDto;
     allNodes: { id: string; name: string }[];
+    emissionSources: EmissionSourceResponseDto[];
     onCreated: (id: string) => void;
     onDeleted: () => void;
     onCancel: () => void;
   } = $props();
+
+  // Filter emission sources for the current node
+  let nodeEmissionSources = $derived(
+    emissionSources.filter((s) => s.orgUnitId === node?.id),
+  );
 
   // --- Constants ---
   const typeLabels: Record<string, string> = {
@@ -735,6 +744,16 @@
               </div>
             </div>
           </div>
+        </Card.Content>
+      </Card.Root>
+
+      <!-- Emission Sources -->
+      <Card.Root>
+        <Card.Content class="pt-6">
+          <EmissionSourcesSection
+            orgUnitId={node.id}
+            sources={nodeEmissionSources}
+          />
         </Card.Content>
       </Card.Root>
 

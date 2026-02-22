@@ -124,6 +124,7 @@
         updateFormData={data.updateForm}
         tenantSettings={data.tenantSettings}
         {allNodes}
+        emissionSources={data.emissionSources}
         onCreated={handleCreated}
         onDeleted={handleDeleted}
         onCancel={handleCancel}
@@ -137,6 +138,7 @@
         updateFormData={data.updateForm}
         tenantSettings={data.tenantSettings}
         {allNodes}
+        emissionSources={data.emissionSources}
         onCreated={handleCreated}
         onDeleted={handleDeleted}
         onCancel={handleCancel}
