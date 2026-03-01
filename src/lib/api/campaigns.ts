@@ -4,6 +4,7 @@ import type {
   CampaignWithDetails,
   CampaignTask,
   CampaignActivationResponse,
+  WorkflowType,
 } from "./types.js";
 
 interface CampaignListItem {
@@ -11,6 +12,7 @@ interface CampaignListItem {
   tenantId: string;
   name: string;
   indicatorId: string;
+  workflowType: WorkflowType;
   approvalTiers: number;
   reportingYear: number;
   periodStart: string;
@@ -47,6 +49,7 @@ export async function createCampaign(
   data: {
     name: string;
     indicatorId: string;
+    workflowType: WorkflowType;
     reportingYear: number;
     periodStart: string;
     periodEnd: string;

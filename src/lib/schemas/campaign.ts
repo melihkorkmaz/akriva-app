@@ -1,9 +1,11 @@
 import { z } from 'zod';
+import { WORKFLOW_TYPE_VALUES } from '$lib/api/types.js';
 
 /** Base campaign fields (without refinements) */
 const campaignBaseSchema = z.object({
 	name: z.string().min(1, 'Name is required').max(200),
 	indicatorId: z.string().uuid('Indicator is required'),
+	workflowType: z.enum(WORKFLOW_TYPE_VALUES, { message: 'Workflow type is required' }),
 	reportingYear: z.coerce.number().int().min(2000).max(2100),
 	periodStart: z.string().min(1, 'Start date is required'),
 	periodEnd: z.string().min(1, 'End date is required'),

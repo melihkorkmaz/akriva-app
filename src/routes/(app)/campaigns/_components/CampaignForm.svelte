@@ -16,6 +16,8 @@
 	import { createCampaignSchema } from '$lib/schemas/campaign.js';
 	import {
 		EMISSION_CATEGORY_LABELS,
+		WORKFLOW_TYPES,
+		type WorkflowType,
 		type IndicatorResponseDto,
 		type OrgUnitTreeResponseDto,
 		type UserResponseDto,
@@ -63,7 +65,12 @@
 		selectedIndicator ? selectedIndicator.name : 'Select an indicator'
 	);
 
+	// Workflow type select label
+	let selectedWorkflow = $derived(WORKFLOW_TYPES.find((w) => w.value === $form.workflowType));
 
+	let workflowLabel = $derived(
+		selectedWorkflow ? selectedWorkflow.label : 'Select a workflow type'
+	);
 </script>
 
 <Card.Root class="max-w-3xl">
@@ -189,7 +196,50 @@
 
 			<Field.Separator />
 
-			<!-- Section 2: Organizational Units -->
+			<!-- Section 2: Workflow Type -->
+			<Field.Set>
+				<Field.Legend>Workflow Type</Field.Legend>
+				<Field.Description>
+					Select the approval workflow for this campaign
+				</Field.Description>
+				<Field.Group>
+					<Form.Field form={superform} name="workflowType">
+						<Form.Control>
+							{#snippet children({ props })}
+								<Form.Label>Approval Workflow</Form.Label>
+								<input type="hidden" name={props.name} value={$form.workflowType} />
+								<Select.Root
+									type="single"
+									value={$form.workflowType}
+									onValueChange={(val) => {
+										if (val) $form.workflowType = val as WorkflowType;
+									}}
+									disabled={fieldsDisabled}
+								>
+									<Select.Trigger class="w-full">
+										{workflowLabel}
+									</Select.Trigger>
+									<Select.Content>
+										{#each WORKFLOW_TYPES as wf}
+											<Select.Item value={wf.value}>
+												<div class="flex flex-col">
+													<span>{wf.label}</span>
+													<span class="text-xs text-muted-foreground">{wf.description}</span>
+												</div>
+											</Select.Item>
+										{/each}
+									</Select.Content>
+								</Select.Root>
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+				</Field.Group>
+			</Field.Set>
+
+			<Field.Separator />
+
+			<!-- Section 3: Organizational Units -->
 			<Field.Set>
 				<Field.Legend>Organizational Units</Field.Legend>
 				<Field.Description>
@@ -207,21 +257,6 @@
 						</Form.Control>
 						<Form.FieldErrors />
 					</Form.Field>
-				</Field.Group>
-			</Field.Set>
-
-			<Field.Separator />
-
-			<!-- Section 3: Approver Overrides (placeholder) -->
-			<Field.Set>
-				<Field.Legend>Approver Overrides</Field.Legend>
-				<Field.Description>
-					Optionally override the default approvers for specific org units
-				</Field.Description>
-				<Field.Group>
-					<p class="text-sm text-muted-foreground italic">
-						Approver overrides can be configured after campaign creation.
-					</p>
 				</Field.Group>
 			</Field.Set>
 

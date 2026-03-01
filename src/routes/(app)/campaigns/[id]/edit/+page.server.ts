@@ -4,7 +4,6 @@ import { zod4 } from 'sveltekit-superforms/adapters';
 import type { Actions, PageServerLoad } from './$types.js';
 import { getCampaign, updateCampaign, activateCampaign } from '$lib/api/campaigns.js';
 import { listIndicators } from '$lib/api/indicators.js';
-
 import { getOrgUnitsTree } from '$lib/api/org-units.js';
 import { fetchUsers } from '$lib/api/users.js';
 import { ApiError } from '$lib/api/client.js';
@@ -31,6 +30,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 		{
 			name: campaign.name,
 			indicatorId: campaign.indicatorId,
+			workflowType: campaign.workflowType,
 			reportingYear: campaign.reportingYear,
 			periodStart: campaign.periodStart,
 			periodEnd: campaign.periodEnd,
@@ -62,6 +62,7 @@ export const actions: Actions = {
 			await updateCampaign(session.idToken, params.id, {
 				name: form.data.name,
 				indicatorId: form.data.indicatorId,
+				workflowType: form.data.workflowType,
 				reportingYear: form.data.reportingYear,
 				periodStart: form.data.periodStart,
 				periodEnd: form.data.periodEnd,

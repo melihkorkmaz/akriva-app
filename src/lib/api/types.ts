@@ -558,6 +558,17 @@ export interface EmissionFactorLibraryResponseDto {
 	createdAt: string;
 }
 
+// ── Workflow Domain ──
+
+/** Predefined workflow types */
+export const WORKFLOW_TYPE_VALUES = ['simple', 'two_step'] as const;
+export type WorkflowType = (typeof WORKFLOW_TYPE_VALUES)[number];
+
+export const WORKFLOW_TYPES = [
+	{ value: 'simple', label: 'Simple', tiers: 1, description: 'Single approval: data_approver' },
+	{ value: 'two_step', label: 'Two-Step', tiers: 2, description: 'Review then approve: data_reviewer → data_approver' }
+] as const;
+
 // ── Campaign Domain ──
 
 /** Campaign status */
@@ -632,6 +643,7 @@ export interface CampaignResponseDto {
 	id: string;
 	name: string;
 	indicatorId: string;
+	workflowType: WorkflowType;
 	indicator: { name: string; emissionCategory: string } | null;
 	approvalTiers: number;
 	reportingYear: number;
@@ -651,6 +663,7 @@ export interface CampaignWithDetails {
 	tenantId: string;
 	name: string;
 	indicatorId: string;
+	workflowType: WorkflowType;
 	approvalTiers: number;
 	reportingYear: number;
 	periodStart: string;
