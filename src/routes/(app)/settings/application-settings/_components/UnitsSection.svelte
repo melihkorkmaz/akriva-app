@@ -45,7 +45,7 @@
           <RadioGroup.Root
             value={$form.unitSystem}
             onValueChange={(val) => {
-              if (val) $form.unitSystem = val;
+              if (val) $form.unitSystem = val as typeof $form.unitSystem;
             }}
           >
             <div class="flex gap-3">
@@ -94,7 +94,7 @@
                   type="single"
                   value={$form.emissionDisplayUnit}
                   onValueChange={(val) => {
-                    if (val) $form.emissionDisplayUnit = val;
+                    if (val) $form.emissionDisplayUnit = val as typeof $form.emissionDisplayUnit;
                   }}
                 >
                   <Select.Trigger class="w-full" {...props}>

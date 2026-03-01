@@ -58,7 +58,7 @@
           <RadioGroup.Root
             value={$form.gwpVersion}
             onValueChange={(val) => {
-              if (val) $form.gwpVersion = val;
+              if (val) $form.gwpVersion = val as typeof $form.gwpVersion;
             }}
           >
             <div class="flex gap-3">
@@ -94,7 +94,7 @@
                     type="single"
                     value={$form.scope1Authority}
                     onValueChange={(val) => {
-                      if (val) $form.scope1Authority = val;
+                      if (val) $form.scope1Authority = val as typeof $form.scope1Authority;
                     }}
                   >
                     <Select.Trigger class="w-[240px]" {...props}>
@@ -119,7 +119,7 @@
                     type="single"
                     value={$form.scope2Authority}
                     onValueChange={(val) => {
-                      if (val) $form.scope2Authority = val;
+                      if (val) $form.scope2Authority = val as typeof $form.scope2Authority;
                     }}
                   >
                     <Select.Trigger class="w-[240px]" {...props}>

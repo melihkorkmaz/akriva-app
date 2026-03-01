@@ -116,11 +116,11 @@
                 <Label class="text-sm font-medium">Emission Source</Label>
                 <Select.Root
                   type="single"
-                  value={selectedSource ? { value: selectedSource, label: selectedSource } : undefined}
+                  value={selectedSource || undefined}
                   onValueChange={handleSourceChange}
                 >
                   <Select.Trigger class="w-full">
-                    <Select.Value placeholder="Select emission source" />
+                    {selectedSource || "Select emission source"}
                   </Select.Trigger>
                   <Select.Content>
                     {#each sources as source}
@@ -171,11 +171,11 @@
                 <Label class="text-sm font-medium">Fuel Type</Label>
                 <Select.Root
                   type="single"
-                  value={fuelType ? { value: fuelType, label: fuelType } : undefined}
+                  value={fuelType || undefined}
                   onValueChange={(v) => (fuelType = v ?? "")}
                 >
                   <Select.Trigger class="w-full">
-                    <Select.Value placeholder="Select fuel" />
+                    {fuelType || "Select fuel"}
                   </Select.Trigger>
                   <Select.Content>
                     {#each fuelTypes as fuel}
@@ -199,11 +199,11 @@
                 <Label class="text-sm font-medium">Unit</Label>
                 <Select.Root
                   type="single"
-                  value={unit ? { value: unit, label: unit } : undefined}
+                  value={unit || undefined}
                   onValueChange={(v) => (unit = v ?? "")}
                 >
                   <Select.Trigger class="w-full">
-                    <Select.Value placeholder="Unit" />
+                    {unit || "Unit"}
                   </Select.Trigger>
                   <Select.Content>
                     {#each units as u}

@@ -80,9 +80,9 @@ export const load: PageServerLoad = async ({ locals, url }) => {
       revokeInviteForm,
       filters: { search: search || "", role: roleParam || "", includeInactive },
     };
-  } catch (error) {
-    console.error(error);
-    return null;
+  } catch (err) {
+    console.error(err);
+    throw error(500, "Failed to load team members");
   }
 };
 

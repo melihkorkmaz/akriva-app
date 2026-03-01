@@ -19,7 +19,7 @@
   import { CalendarDate, DateFormatter } from "@internationalized/date";
   import type { Component } from "svelte";
   import type { DateRange } from "bits-ui";
-  import type { OrgUnitTreeResponseDto } from "$lib/api";
+  import type { OrgUnitTreeResponseDto } from "$lib/api/types.js";
 
   const categories: { id: string; label: string; icon: Component }[] = [
     { id: "stationary", label: "Stationary", icon: Flame },

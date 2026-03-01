@@ -133,7 +133,7 @@
                   type="single"
                   value={$form.decimalSeparator}
                   onValueChange={(val) => {
-                    if (val) $form.decimalSeparator = val;
+                    if (val) $form.decimalSeparator = val as typeof $form.decimalSeparator;
                   }}
                 >
                   <Select.Trigger class="w-full" {...props}>
@@ -158,7 +158,7 @@
                   type="single"
                   value={$form.thousandsSeparator}
                   onValueChange={(val) => {
-                    if (val) $form.thousandsSeparator = val;
+                    if (val) $form.thousandsSeparator = val as typeof $form.thousandsSeparator;
                   }}
                 >
                   <Select.Trigger class="w-full" {...props}>
@@ -202,7 +202,7 @@
                   type="single"
                   value={$form.dateFormat}
                   onValueChange={(val) => {
-                    if (val) $form.dateFormat = val;
+                    if (val) $form.dateFormat = val as typeof $form.dateFormat;
                   }}
                 >
                   <Select.Trigger class="w-full" {...props}>
@@ -227,7 +227,7 @@
                   type="single"
                   value={$form.timeFormat}
                   onValueChange={(val) => {
-                    if (val) $form.timeFormat = val;
+                    if (val) $form.timeFormat = val as typeof $form.timeFormat;
                   }}
                 >
                   <Select.Trigger class="w-full" {...props}>
