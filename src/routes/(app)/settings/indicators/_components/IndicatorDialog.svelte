@@ -1,151 +1,80 @@
 <script lang="ts">
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import * as Form from '$lib/components/ui/form/index.js';
 	import * as Select from '$lib/components/ui/select/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
-	import { Label } from '$lib/components/ui/label/index.js';
 	import { Switch } from '$lib/components/ui/switch/index.js';
-	import { Alert, AlertDescription } from '$lib/components/ui/alert/index.js';
+	import { superForm } from 'sveltekit-superforms';
+	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import { toast } from 'svelte-sonner';
-	import { deserialize } from '$app/forms';
-	import { invalidateAll } from '$app/navigation';
-	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
-	import type {
-		IndicatorResponseDto,
-		EmissionCategory,
-		CalculationMethod
-	} from '$lib/api/types.js';
-	import {
-		EMISSION_CATEGORY_LABELS,
-		CALCULATION_METHOD_LABELS,
-		CATEGORY_METHOD_MAP
-	} from '$lib/api/types.js';
+	import type { IndicatorResponseDto, EmissionCategory } from '$lib/api/types.js';
+	import { EMISSION_CATEGORY_LABELS } from '$lib/api/types.js';
+	import { createIndicatorSchema, updateIndicatorSchema } from '$lib/schemas/indicator.js';
+	import type { Infer, SuperValidated } from 'sveltekit-superforms';
 
 	let {
 		open = $bindable(false),
 		mode,
-		indicator
+		indicator,
+		createFormData,
+		updateFormData
 	}: {
 		open: boolean;
 		mode: 'create' | 'edit';
 		indicator: IndicatorResponseDto | null;
+		createFormData: SuperValidated<Infer<typeof createIndicatorSchema>>;
+		updateFormData: SuperValidated<Infer<typeof updateIndicatorSchema>>;
 	} = $props();
 
-	let submitting = $state(false);
-	let errorMessage = $state('');
-
-	// Form fields
-	let name = $state('');
-	let emissionCategory = $state<EmissionCategory | ''>('');
-	let calculationMethod = $state<CalculationMethod | ''>('');
-	let defaultFuelType = $state('');
-	let defaultGasType = $state('');
-	let isActive = $state(true);
-
-	// Derived: available methods based on selected category
-	let availableMethods = $derived(
-		emissionCategory ? (CATEGORY_METHOD_MAP[emissionCategory as EmissionCategory] ?? []) : []
-	);
-
-	// Derived: display labels for selects
-	let categoryLabel = $derived(
-		emissionCategory
-			? EMISSION_CATEGORY_LABELS[emissionCategory as EmissionCategory]
-			: 'Select category'
-	);
-
-	let methodLabel = $derived(
-		calculationMethod
-			? CALCULATION_METHOD_LABELS[calculationMethod as CalculationMethod]
-			: 'Select method'
-	);
-
-	// Reset state when dialog opens
-	$effect(() => {
-		if (open) {
-			errorMessage = '';
-			if (mode === 'edit' && indicator) {
-				name = indicator.name;
-				emissionCategory = indicator.emissionCategory;
-				calculationMethod = indicator.calculationMethod;
-				defaultFuelType = indicator.defaultFuelType ?? '';
-				defaultGasType = indicator.defaultGasType ?? '';
-				isActive = indicator.isActive;
-			} else {
-				name = '';
-				emissionCategory = '';
-				calculationMethod = '';
-				defaultFuelType = '';
-				defaultGasType = '';
-				isActive = true;
+	// Create form
+	const createSF = superForm(createFormData, {
+		validators: zod4Client(createIndicatorSchema),
+		resetForm: false,
+		onUpdated({ form }) {
+			if (form.valid && form.message) {
+				open = false;
+				toast.success(form.message);
+			} else if (form.message) {
+				toast.error(form.message);
 			}
 		}
 	});
+	const { form: createForm, enhance: createEnhance, submitting: createSubmitting } = createSF;
 
-	function handleCategoryChange(value: string | undefined) {
-		if (!value) return;
-		emissionCategory = value as EmissionCategory;
-		// Reset calculation method when category changes (only in create mode)
-		if (mode === 'create') {
-			calculationMethod = '';
+	// Update form
+	const updateSF = superForm(updateFormData, {
+		validators: zod4Client(updateIndicatorSchema),
+		resetForm: false,
+		onUpdated({ form }) {
+			if (form.valid && form.message) {
+				open = false;
+				toast.success(form.message);
+			} else if (form.message) {
+				toast.error(form.message);
+			}
 		}
-	}
+	});
+	const { form: updateForm, enhance: updateEnhance, submitting: updateSubmitting } = updateSF;
 
-	async function handleSubmit() {
-		if (!name) return;
-
-		submitting = true;
-		errorMessage = '';
-
-		const formData = new FormData();
-
-		if (mode === 'create') {
-			if (!emissionCategory || !calculationMethod) return;
-
-			formData.set('name', name);
-			formData.set('emissionCategory', emissionCategory);
-			formData.set('calculationMethod', calculationMethod);
-			if (defaultFuelType) formData.set('defaultFuelType', defaultFuelType);
-			if (defaultGasType) formData.set('defaultGasType', defaultGasType);
-		} else if (mode === 'edit' && indicator) {
-			formData.set('id', indicator.id);
-			formData.set('name', name);
-			if (defaultFuelType) formData.set('defaultFuelType', defaultFuelType);
-			if (defaultGasType) formData.set('defaultGasType', defaultGasType);
-			formData.set('isActive', String(isActive));
-		}
-
-		const action = mode === 'create' ? '?/create' : '?/update';
-		const response = await fetch(action, {
-			method: 'POST',
-			body: formData
-		});
-
-		const result = deserialize(await response.text());
-		submitting = false;
-
-		if (result.type === 'success') {
-			open = false;
-			toast.success(
-				mode === 'create' ? 'Indicator created successfully.' : 'Indicator updated successfully.'
-			);
-			await invalidateAll();
-			return;
-		}
-
-		// Extract error message from superforms response
-		const msg =
-			result.type === 'failure'
-				? (result.data as Record<string, any> | undefined)?.form?.message
-				: undefined;
-		errorMessage = typeof msg === 'string' ? msg : `Failed to ${mode} indicator. Please try again.`;
-	}
-
-	let isCreateDisabled = $derived(
-		submitting || !name || !emissionCategory || !calculationMethod
+	// Derived: display label for category select
+	let categoryLabel = $derived(
+		$createForm.emissionCategory
+			? EMISSION_CATEGORY_LABELS[$createForm.emissionCategory as EmissionCategory]
+			: ''
 	);
 
-	let isEditDisabled = $derived(submitting || !name);
+	// Reset/populate forms when dialog opens
+	$effect(() => {
+		if (open) {
+			if (mode === 'create') {
+				createSF.reset();
+			} else if (mode === 'edit' && indicator) {
+				$updateForm.name = indicator.name;
+				$updateForm.isActive = indicator.isActive;
+			}
+		}
+	});
 </script>
 
 <Dialog.Root bind:open>
@@ -161,135 +90,124 @@
 			</Dialog.Description>
 		</Dialog.Header>
 
-		{#if errorMessage}
-			<Alert variant="destructive">
-				<TriangleAlert class="size-4" />
-				<AlertDescription>{errorMessage}</AlertDescription>
-			</Alert>
-		{/if}
+		{#if mode === 'create'}
+			<form method="POST" action="?/create" use:createEnhance>
+				<div class="flex flex-col gap-4 py-4">
+					<Form.Field form={createSF} name="name">
+						<Form.Control>
+							{#snippet children({ props })}
+								<Form.Label>Name</Form.Label>
+								<Input
+									{...props}
+									placeholder="e.g. Natural Gas Boiler"
+									bind:value={$createForm.name}
+								/>
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
 
-		<div class="flex flex-col gap-4 py-4">
-			<!-- Name -->
-			<div class="flex flex-col gap-2">
-				<Label for="indicator-name">Name</Label>
-				<Input
-					id="indicator-name"
-					placeholder="e.g. Natural Gas Boiler"
-					bind:value={name}
-				/>
-			</div>
-
-			<!-- Emission Category -->
-			<div class="flex flex-col gap-2">
-				<Label>Emission Category</Label>
-				{#if mode === 'edit'}
-					<Input
-						value={emissionCategory ? EMISSION_CATEGORY_LABELS[emissionCategory as EmissionCategory] : ''}
-						disabled
-					/>
-				{:else}
-					<Select.Root
-						type="single"
-						value={emissionCategory}
-						onValueChange={handleCategoryChange}
-					>
-						<Select.Trigger class="w-full">
-							{categoryLabel}
-						</Select.Trigger>
-						<Select.Content>
-							{#each Object.entries(EMISSION_CATEGORY_LABELS) as [value, label]}
-								<Select.Item {value}>{label}</Select.Item>
-							{/each}
-						</Select.Content>
-					</Select.Root>
-				{/if}
-			</div>
-
-			<!-- Calculation Method -->
-			<div class="flex flex-col gap-2">
-				<Label>Calculation Method</Label>
-				{#if mode === 'edit'}
-					<Input
-						value={calculationMethod ? CALCULATION_METHOD_LABELS[calculationMethod as CalculationMethod] : ''}
-						disabled
-					/>
-				{:else}
-					<Select.Root
-						type="single"
-						value={calculationMethod}
-						onValueChange={(val) => {
-							if (val) calculationMethod = val as CalculationMethod;
-						}}
-						disabled={!emissionCategory}
-					>
-						<Select.Trigger class="w-full">
-							{methodLabel}
-						</Select.Trigger>
-						<Select.Content>
-							{#each availableMethods as method}
-								<Select.Item value={method}>
-									{CALCULATION_METHOD_LABELS[method]}
-								</Select.Item>
-							{/each}
-						</Select.Content>
-					</Select.Root>
-				{/if}
-			</div>
-
-			<!-- Default Fuel Type -->
-			<div class="flex flex-col gap-2">
-				<Label for="indicator-fuel-type">Default Fuel Type</Label>
-				<Input
-					id="indicator-fuel-type"
-					placeholder="e.g. Natural Gas"
-					bind:value={defaultFuelType}
-				/>
-			</div>
-
-			<!-- Default Gas Type -->
-			<div class="flex flex-col gap-2">
-				<Label for="indicator-gas-type">Default Gas Type</Label>
-				<Input
-					id="indicator-gas-type"
-					placeholder="e.g. CO2"
-					bind:value={defaultGasType}
-				/>
-			</div>
-
-			<!-- Status (edit mode only) -->
-			{#if mode === 'edit'}
-				<div class="flex items-center justify-between">
-					<div class="flex flex-col gap-0.5">
-						<Label for="indicator-active">Active</Label>
-						<p class="text-xs text-muted-foreground">
-							Inactive indicators cannot be used in new campaigns
-						</p>
-					</div>
-					<Switch
-						id="indicator-active"
-						checked={isActive}
-						onCheckedChange={(checked) => {
-							isActive = !!checked;
-						}}
-					/>
+					<Form.Field form={createSF} name="emissionCategory">
+						<Form.Control>
+							{#snippet children({ props })}
+								<Form.Label>Emission Category</Form.Label>
+								<Select.Root
+									type="single"
+									value={$createForm.emissionCategory}
+									onValueChange={(val) => {
+										if (val) $createForm.emissionCategory = val as EmissionCategory;
+									}}
+								>
+									<Select.Trigger class="w-full" {...props}>
+										{#if categoryLabel}
+											{categoryLabel}
+										{:else}
+											<span class="text-muted-foreground">Select category</span>
+										{/if}
+									</Select.Trigger>
+									<Select.Content>
+										{#each Object.entries(EMISSION_CATEGORY_LABELS) as [value, label]}
+											<Select.Item {value}>{label}</Select.Item>
+										{/each}
+									</Select.Content>
+								</Select.Root>
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
 				</div>
-			{/if}
-		</div>
 
-		<Dialog.Footer>
-			<Button variant="outline" onclick={() => (open = false)} disabled={submitting}>
-				Cancel
-			</Button>
-			<Button
-				onclick={handleSubmit}
-				disabled={mode === 'create' ? isCreateDisabled : isEditDisabled}
-			>
-				{#if submitting}
-					{mode === 'create' ? 'Creating...' : 'Saving...'}
-				{:else}
-					{mode === 'create' ? 'Create Indicator' : 'Save Changes'}
-				{/if}
-			</Button>
-		</Dialog.Footer>
+				<Dialog.Footer>
+					<Button variant="outline" type="button" onclick={() => (open = false)} disabled={$createSubmitting}>
+						Cancel
+					</Button>
+					<Form.Button disabled={$createSubmitting}>
+						{$createSubmitting ? 'Creating...' : 'Create Indicator'}
+					</Form.Button>
+				</Dialog.Footer>
+			</form>
+		{:else}
+			<form method="POST" action="?/update" use:updateEnhance>
+				<input type="hidden" name="id" value={indicator?.id ?? ''} />
+
+				<div class="flex flex-col gap-4 py-4">
+					<Form.Field form={updateSF} name="name">
+						<Form.Control>
+							{#snippet children({ props })}
+								<Form.Label>Name</Form.Label>
+								<Input
+									{...props}
+									placeholder="e.g. Natural Gas Boiler"
+									bind:value={$updateForm.name}
+								/>
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+
+					<!-- Category (read-only display) -->
+					{#if indicator}
+						<div class="flex flex-col gap-2">
+							<Form.Label>Emission Category</Form.Label>
+							<Input
+								value={EMISSION_CATEGORY_LABELS[indicator.emissionCategory] ?? indicator.emissionCategory}
+								disabled
+							/>
+						</div>
+					{/if}
+
+					<Form.Field form={updateSF} name="isActive">
+						<Form.Control>
+							{#snippet children({ props })}
+								<div class="flex items-center justify-between">
+									<div class="flex flex-col gap-0.5">
+										<Form.Label>Active</Form.Label>
+										<p class="text-xs text-muted-foreground">
+											Inactive indicators cannot be used in new campaigns
+										</p>
+									</div>
+									<Switch
+										{...props}
+										checked={$updateForm.isActive ?? true}
+										onCheckedChange={(checked) => {
+											$updateForm.isActive = !!checked;
+										}}
+									/>
+								</div>
+							{/snippet}
+						</Form.Control>
+					</Form.Field>
+				</div>
+
+				<Dialog.Footer>
+					<Button variant="outline" type="button" onclick={() => (open = false)} disabled={$updateSubmitting}>
+						Cancel
+					</Button>
+					<Form.Button disabled={$updateSubmitting}>
+						{$updateSubmitting ? 'Saving...' : 'Save Changes'}
+					</Form.Button>
+				</Dialog.Footer>
+			</form>
+		{/if}
 	</Dialog.Content>
 </Dialog.Root>

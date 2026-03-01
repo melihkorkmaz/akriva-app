@@ -57,9 +57,6 @@ export const actions: Actions = {
       await createIndicator(session.idToken, {
         name: form.data.name,
         emissionCategory: form.data.emissionCategory,
-        calculationMethod: form.data.calculationMethod,
-        defaultFuelType: form.data.defaultFuelType || null,
-        defaultGasType: form.data.defaultGasType || null,
       });
     } catch (err) {
       if (err instanceof ApiError) {
@@ -110,8 +107,6 @@ export const actions: Actions = {
     try {
       await updateIndicator(session.idToken, id, {
         name: form.data.name,
-        defaultFuelType: form.data.defaultFuelType || null,
-        defaultGasType: form.data.defaultGasType || null,
         isActive: form.data.isActive,
       });
     } catch (err) {

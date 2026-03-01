@@ -616,9 +616,6 @@ export interface IndicatorResponseDto {
 	tenantId: string | null;
 	name: string;
 	emissionCategory: EmissionCategory;
-	calculationMethod: CalculationMethod;
-	defaultFuelType: string | null;
-	defaultGasType: string | null;
 	isGlobal: boolean;
 	isActive: boolean;
 	createdAt: string;

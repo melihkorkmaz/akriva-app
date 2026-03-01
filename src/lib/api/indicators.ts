@@ -20,9 +20,6 @@ export async function createIndicator(
   data: {
     name: string;
     emissionCategory: string;
-    calculationMethod: string;
-    defaultFuelType?: string | null;
-    defaultGasType?: string | null;
   }
 ): Promise<IndicatorResponseDto> {
   return apiFetchAuth<IndicatorResponseDto>(
@@ -40,8 +37,6 @@ export async function updateIndicator(
   id: string,
   data: {
     name?: string;
-    defaultFuelType?: string | null;
-    defaultGasType?: string | null;
     isActive?: boolean;
   }
 ): Promise<IndicatorResponseDto> {

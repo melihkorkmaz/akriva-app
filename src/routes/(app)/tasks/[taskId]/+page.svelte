@@ -163,12 +163,12 @@
 			</AlertDescription>
 		</Alert>
 
-		{#if data.indicator}
+		{#if data.indicator && data.emissionEntry}
 			<ActivityDataSection
 				superform={entryFormObj}
 				form={entryForm}
 				category={data.indicator.emissionCategory}
-				calculationMethod={data.indicator.calculationMethod}
+				calculationMethod={data.emissionEntry.calculationMethod}
 				sources={data.emissionSources}
 				readonly={true}
 			/>
@@ -191,12 +191,12 @@
 			</AlertDescription>
 		</Alert>
 
-		{#if data.indicator}
+		{#if data.indicator && data.emissionEntry}
 			<ActivityDataSection
 				superform={entryFormObj}
 				form={entryForm}
 				category={data.indicator.emissionCategory}
-				calculationMethod={data.indicator.calculationMethod}
+				calculationMethod={data.emissionEntry.calculationMethod}
 				sources={data.emissionSources}
 				readonly={true}
 			/>
@@ -227,12 +227,12 @@
 		{/if}
 
 		<form method="POST" action="?/saveDraft" use:entryEnhance class="flex flex-col gap-6">
-			{#if data.indicator}
+			{#if data.indicator && data.emissionEntry}
 				<ActivityDataSection
 					superform={entryFormObj}
 					form={entryForm}
 					category={data.indicator.emissionCategory}
-					calculationMethod={data.indicator.calculationMethod}
+					calculationMethod={data.emissionEntry.calculationMethod}
 					sources={data.emissionSources}
 				/>
 			{/if}

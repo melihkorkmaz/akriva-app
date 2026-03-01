@@ -19,6 +19,8 @@ import * as route53 from "aws-cdk-lib/aws-route53";
 import * as route53targets from "aws-cdk-lib/aws-route53-targets";
 import * as acm from "aws-cdk-lib/aws-certificatemanager";
 import * as s3deploy from "aws-cdk-lib/aws-s3-deployment";
+import * as apigwv2 from "aws-cdk-lib/aws-apigatewayv2";
+import * as apigwv2integrations from "aws-cdk-lib/aws-apigatewayv2-integrations";
 import * as path from "path";
 
 const LAMBDA_WEB_ADAPTER_ACCOUNT = "753240598075";
@@ -111,26 +113,48 @@ export class FrontendStack extends cdk.Stack {
       description: "SvelteKit SSR handler for Akriva frontend",
     });
 
-    const ssrFunctionUrl = ssrFunction.addFunctionUrl({
-      authType: lambda.FunctionUrlAuthType.NONE,
-      invokeMode: lambda.InvokeMode.BUFFERED,
+    // ========================================
+    // API GATEWAY V2 (HTTP API)
+    // ========================================
+    // Using API Gateway V2 instead of Lambda Function URL because
+    // Lambda Function URL rejects SvelteKit's form action query strings
+    // (e.g. ?/signin) with InvalidQueryStringException.
+
+    const httpApi = new apigwv2.HttpApi(this, "HttpApi", {
+      apiName: `${stackPrefix.toLowerCase()}-frontend-api`,
+      description: "HTTP API for SvelteKit SSR frontend",
     });
+
+    const lambdaIntegration =
+      new apigwv2integrations.HttpLambdaIntegration(
+        "SsrIntegration",
+        ssrFunction,
+      );
+
+    httpApi.addRoutes({
+      path: "/{proxy+}",
+      methods: [apigwv2.HttpMethod.ANY],
+      integration: lambdaIntegration,
+    });
+
+    httpApi.addRoutes({
+      path: "/",
+      methods: [apigwv2.HttpMethod.ANY],
+      integration: lambdaIntegration,
+    });
+
+    // Extract hostname from API Gateway URL
+    // URL format: https://<id>.execute-api.<region>.amazonaws.com
+    const apiDomain = `${httpApi.httpApiId}.execute-api.${this.region}.amazonaws.com`;
 
     // ========================================
     // CLOUDFRONT DISTRIBUTION
     // ========================================
 
-    // Extract hostname from Lambda function URL
-    // URL format: https://<id>.lambda-url.<region>.on.aws/
-    const functionUrlDomain = cdk.Fn.select(
-      2,
-      cdk.Fn.split("/", ssrFunctionUrl.url),
-    );
-
     const distribution = new cloudfront.Distribution(this, "Distribution", {
       comment: `${stackPrefix} Frontend (${environment})`,
       defaultBehavior: {
-        origin: new origins.HttpOrigin(functionUrlDomain, {
+        origin: new origins.HttpOrigin(apiDomain, {
           protocolPolicy: cloudfront.OriginProtocolPolicy.HTTPS_ONLY,
         }),
         viewerProtocolPolicy:
@@ -208,9 +232,9 @@ export class FrontendStack extends cdk.Stack {
       description: "S3 bucket for static assets",
     });
 
-    new cdk.CfnOutput(this, "SsrFunctionUrl", {
-      value: ssrFunctionUrl.url,
-      description: "Lambda function URL for SSR",
+    new cdk.CfnOutput(this, "HttpApiUrl", {
+      value: httpApi.apiEndpoint,
+      description: "API Gateway HTTP API URL for SSR",
     });
   }
 }
