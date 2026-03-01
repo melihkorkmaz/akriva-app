@@ -558,66 +558,6 @@ export interface EmissionFactorLibraryResponseDto {
 	createdAt: string;
 }
 
-// ── Workflow Domain ──
-
-/** Workflow template status */
-export type WorkflowTemplateStatus = 'draft' | 'active' | 'archived';
-
-export const WORKFLOW_STATUS_LABELS: Record<WorkflowTemplateStatus, string> = {
-	draft: 'Draft',
-	active: 'Active',
-	archived: 'Archived'
-};
-
-/** Workflow step type */
-export type WorkflowStepType = 'submit' | 'review' | 'approve';
-
-/** Workflow gate type */
-export type WorkflowGateType = 'serial' | 'parallel_all' | 'parallel_any';
-
-/** Workflow transition trigger */
-export type WorkflowTransitionTrigger = 'complete' | 'reject' | 'timeout';
-
-/** Workflow step response */
-export interface WorkflowStepResponseDto {
-	id: string;
-	name: string;
-	type: WorkflowStepType;
-	assignedRole: TenantRole;
-	gateType: WorkflowGateType;
-	stepOrder: number;
-}
-
-/** Workflow transition response */
-export interface WorkflowTransitionResponseDto {
-	id: string;
-	fromStepId: string;
-	toStepId: string;
-	trigger: WorkflowTransitionTrigger;
-	rejectionTargetStepId: string | null;
-}
-
-/** Workflow template — GET/POST/PATCH /v1/workflow-templates */
-export interface WorkflowTemplateResponseDto {
-	id: string;
-	tenantId: string;
-	name: string;
-	description: string | null;
-	version: number;
-	status: WorkflowTemplateStatus;
-	steps: WorkflowStepResponseDto[];
-	transitions: WorkflowTransitionResponseDto[];
-	createdBy: string;
-	createdAt: string;
-	updatedAt: string;
-}
-
-/** Workflow template list response */
-export interface WorkflowTemplateListResponse {
-	data: WorkflowTemplateResponseDto[];
-	total: number;
-}
-
 // ── Campaign Domain ──
 
 /** Campaign status */
@@ -693,7 +633,6 @@ export interface CampaignResponseDto {
 	name: string;
 	indicatorId: string;
 	indicator: { name: string; emissionCategory: string } | null;
-	workflowTemplateId: string;
 	approvalTiers: number;
 	reportingYear: number;
 	periodStart: string;
@@ -712,7 +651,6 @@ export interface CampaignWithDetails {
 	tenantId: string;
 	name: string;
 	indicatorId: string;
-	workflowTemplateId: string;
 	approvalTiers: number;
 	reportingYear: number;
 	periodStart: string;

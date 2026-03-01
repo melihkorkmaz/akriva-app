@@ -66,7 +66,6 @@
 	<CampaignForm
 		formData={data.form}
 		indicators={data.indicators}
-		workflowTemplates={data.workflowTemplates}
 		orgTree={data.orgTree}
 		users={data.users}
 		mode="edit"

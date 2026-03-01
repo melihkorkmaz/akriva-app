@@ -11,7 +11,6 @@ interface CampaignListItem {
   tenantId: string;
   name: string;
   indicatorId: string;
-  workflowTemplateId: string;
   approvalTiers: number;
   reportingYear: number;
   periodStart: string;
@@ -48,8 +47,6 @@ export async function createCampaign(
   data: {
     name: string;
     indicatorId: string;
-    workflowTemplateId: string;
-    approvalTiers: number;
     reportingYear: number;
     periodStart: string;
     periodEnd: string;

@@ -15,7 +15,7 @@
 	import Calendar from '@lucide/svelte/icons/calendar';
 	import Gauge from '@lucide/svelte/icons/gauge';
 	import Users from '@lucide/svelte/icons/users';
-	import Layers from '@lucide/svelte/icons/layers';
+
 	import Clock from '@lucide/svelte/icons/clock';
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
 	import type { CampaignTaskStatus, EmissionCategory } from '$lib/api/types.js';
@@ -224,17 +224,6 @@
 				<p class="text-xs text-muted-foreground">
 					to {formatDate(campaign.periodEnd)}
 				</p>
-			</Card.Content>
-		</Card.Root>
-
-		<!-- Approval Tiers -->
-		<Card.Root>
-			<Card.Content class="flex flex-col gap-2 p-4">
-				<div class="flex items-center gap-2 text-xs text-muted-foreground">
-					<Layers class="size-3.5" />
-					Approval Tiers
-				</div>
-				<p class="text-2xl font-semibold">{campaign.approvalTiers}</p>
 			</Card.Content>
 		</Card.Root>
 

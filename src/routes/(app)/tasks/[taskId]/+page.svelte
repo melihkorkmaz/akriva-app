@@ -115,12 +115,6 @@
 					)}</span
 				>
 			</div>
-			{#if data.campaign.approvalTiers}
-				<div>
-					<span class="font-medium text-foreground">Approval Tiers:</span>
-					{data.campaign.approvalTiers}
-				</div>
-			{/if}
 		</div>
 	</div>
 
@@ -192,8 +186,7 @@
 			<AlertDescription>
 				This task is currently under review. Data is read-only during the approval process.
 				{#if data.task.currentTier}
-					Currently at approval tier {data.task.currentTier} of {data.campaign
-						.approvalTiers}.
+					Currently at approval tier {data.task.currentTier}.
 				{/if}
 			</AlertDescription>
 		</Alert>

@@ -4,7 +4,7 @@ import { zod4 } from 'sveltekit-superforms/adapters';
 import type { Actions, PageServerLoad } from './$types.js';
 import { getCampaign, updateCampaign, activateCampaign } from '$lib/api/campaigns.js';
 import { listIndicators } from '$lib/api/indicators.js';
-import { listWorkflowTemplates } from '$lib/api/workflow-templates.js';
+
 import { getOrgUnitsTree } from '$lib/api/org-units.js';
 import { fetchUsers } from '$lib/api/users.js';
 import { ApiError } from '$lib/api/client.js';
@@ -15,10 +15,9 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 	requireAdmin(locals);
 	const session = locals.session!;
 
-	const [campaign, indicators, templates, orgTree, userList] = await Promise.all([
+	const [campaign, indicators, orgTree, userList] = await Promise.all([
 		getCampaign(session.idToken, params.id),
 		listIndicators(session.idToken),
-		listWorkflowTemplates(session.idToken),
 		getOrgUnitsTree(session.idToken),
 		fetchUsers(session.idToken)
 	]);
@@ -28,14 +27,10 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 		redirect(303, `/campaigns/${params.id}`);
 	}
 
-	const activeTemplates = templates.data.filter((t) => t.status === 'active');
-
 	const form = await superValidate(
 		{
 			name: campaign.name,
 			indicatorId: campaign.indicatorId,
-			workflowTemplateId: campaign.workflowTemplateId,
-			approvalTiers: campaign.approvalTiers,
 			reportingYear: campaign.reportingYear,
 			periodStart: campaign.periodStart,
 			periodEnd: campaign.periodEnd,
@@ -48,7 +43,6 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 		campaign,
 		form,
 		indicators,
-		workflowTemplates: activeTemplates,
 		orgTree: orgTree.data,
 		users: userList.users
 	};
@@ -68,8 +62,6 @@ export const actions: Actions = {
 			await updateCampaign(session.idToken, params.id, {
 				name: form.data.name,
 				indicatorId: form.data.indicatorId,
-				workflowTemplateId: form.data.workflowTemplateId,
-				approvalTiers: form.data.approvalTiers,
 				reportingYear: form.data.reportingYear,
 				periodStart: form.data.periodStart,
 				periodEnd: form.data.periodEnd,

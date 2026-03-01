@@ -4,7 +4,7 @@ import { zod4 } from 'sveltekit-superforms/adapters';
 import type { Actions, PageServerLoad } from './$types.js';
 import { createCampaign } from '$lib/api/campaigns.js';
 import { listIndicators } from '$lib/api/indicators.js';
-import { listWorkflowTemplates } from '$lib/api/workflow-templates.js';
+
 import { getOrgUnitsTree } from '$lib/api/org-units.js';
 import { fetchUsers } from '$lib/api/users.js';
 import { ApiError } from '$lib/api/client.js';
@@ -15,24 +15,20 @@ export const load: PageServerLoad = async ({ locals }) => {
 	requireAdmin(locals);
 	const session = locals.session!;
 
-	const [indicators, templates, orgTree, userList] = await Promise.all([
+	const [indicators, orgTree, userList] = await Promise.all([
 		listIndicators(session.idToken),
-		listWorkflowTemplates(session.idToken),
 		getOrgUnitsTree(session.idToken),
 		fetchUsers(session.idToken)
 	]);
 
-	const activeTemplates = templates.data.filter((t) => t.status === 'active');
-
 	const form = await superValidate(
-		{ reportingYear: new Date().getFullYear(), approvalTiers: 1 },
+		{ reportingYear: new Date().getFullYear() },
 		zod4(createCampaignSchema)
 	);
 
 	return {
 		form,
 		indicators,
-		workflowTemplates: activeTemplates,
 		orgTree: orgTree.data,
 		users: userList.users
 	};
@@ -52,8 +48,6 @@ export const actions: Actions = {
 			const created = await createCampaign(session.idToken, {
 				name: form.data.name,
 				indicatorId: form.data.indicatorId,
-				workflowTemplateId: form.data.workflowTemplateId,
-				approvalTiers: form.data.approvalTiers,
 				reportingYear: form.data.reportingYear,
 				periodStart: form.data.periodStart,
 				periodEnd: form.data.periodEnd,
