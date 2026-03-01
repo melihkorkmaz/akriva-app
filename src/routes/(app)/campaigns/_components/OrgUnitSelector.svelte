@@ -24,15 +24,8 @@
 		facility: Warehouse
 	};
 
-	// Track expanded state
-	let expanded = $state(new Set<string>());
-
-	// Auto-expand root nodes
-	$effect(() => {
-		for (const node of tree) {
-			expanded.add(node.id);
-		}
-	});
+	// Track expanded state — auto-expand root nodes on init
+	let expanded = $state(new Set<string>(tree.map((n) => n.id)));
 
 	// Internal Set for fast lookup
 	let selectedSet = $derived(new Set(selectedIds));
@@ -43,8 +36,6 @@
 		} else {
 			expanded.add(nodeId);
 		}
-		// Trigger reactivity
-		expanded = new Set(expanded);
 	}
 
 	function toggle(nodeId: string, checked: boolean | 'indeterminate') {

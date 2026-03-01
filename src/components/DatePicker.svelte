@@ -4,7 +4,9 @@
   import type { Instance } from "flatpickr/dist/types/instance";
   import "../styles/flatpickr-akriva.css";
 
-  interface Props {
+  import type { HTMLInputAttributes } from "svelte/elements";
+
+  interface Props extends Omit<HTMLInputAttributes, "value" | "onchange"> {
     mode?: "single" | "range";
     value?: string;
     label?: string;
@@ -24,6 +26,7 @@
     maxDate = undefined,
     disabled = false,
     onchange,
+    ...restProps
   }: Props = $props();
 
   let inputEl: HTMLInputElement;
@@ -64,11 +67,7 @@
   });
 </script>
 
-<div class="flex flex-col gap-1" class:opacity-50={disabled}>
-  {#if label}
-    <!-- svelte-ignore a11y_label_has_associated_control -->
-    <label class="text-sm font-medium text-foreground">{label}</label>
-  {/if}
+{#snippet inputWithIcon()}
   <div class="relative">
     <input
       bind:this={inputEl}
@@ -76,7 +75,8 @@
       readonly
       {placeholder}
       {disabled}
-      class="w-full h-10 px-3 pr-10 text-sm bg-card border border-input rounded-sm outline-none cursor-pointer placeholder:text-muted-foreground focus:border-ring focus:ring-1 focus:ring-ring disabled:cursor-not-allowed"
+      {...restProps}
+      class="w-full h-9 px-3 pr-10 text-sm bg-card border border-input rounded-md outline-none cursor-pointer placeholder:text-muted-foreground focus:border-ring focus:ring-1 focus:ring-ring disabled:cursor-not-allowed"
     />
     <svg
       class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
@@ -94,4 +94,16 @@
       />
     </svg>
   </div>
-</div>
+{/snippet}
+
+{#if label}
+  <div class="flex flex-col gap-1" class:opacity-50={disabled}>
+    <!-- svelte-ignore a11y_label_has_associated_control -->
+    <label class="text-sm font-medium text-foreground">{label}</label>
+    {@render inputWithIcon()}
+  </div>
+{:else}
+  <div class:opacity-50={disabled}>
+    {@render inputWithIcon()}
+  </div>
+{/if}

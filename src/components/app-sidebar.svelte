@@ -28,7 +28,7 @@
   let { user }: Props = $props();
 
   let isAdmin = $derived(
-    user.role === 'tenant_admin' || user.role === 'super_admin'
+    user.role === "tenant_admin" || user.role === "super_admin",
   );
 
   const dataItems = [
@@ -46,7 +46,6 @@
   const adminItems = [
     { title: "Campaigns", url: "/campaigns", icon: Megaphone },
     { title: "Settings", url: "/settings", icon: Settings },
-    { title: "Team Members", url: "/settings/team-members", icon: UsersRound },
   ];
 </script>
 
@@ -54,16 +53,39 @@
   <Sidebar.Header>
     <Sidebar.Menu>
       <Sidebar.MenuItem>
-        <Sidebar.MenuButton size="lg" class="hover:bg-transparent active:bg-transparent">
+        <Sidebar.MenuButton
+          size="lg"
+          class="hover:bg-transparent active:bg-transparent"
+        >
           {#snippet child({ props })}
             <a href="/dashboard" {...props}>
-              <div class="sidebar-logo-icon flex aspect-square size-8 items-center justify-center">
-                <svg width="32" height="32" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M4 44L24 4L44 44L36 44L24 20L12 44Z" fill="var(--sidebar-primary)" />
-                  <rect x="18" y="28" width="12" height="3" fill="var(--sidebar-foreground)" />
+              <div
+                class="sidebar-logo-icon flex aspect-square size-8 items-center justify-center"
+              >
+                <svg
+                  width="32"
+                  height="32"
+                  viewBox="0 0 48 48"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M4 44L24 4L44 44L36 44L24 20L12 44Z"
+                    fill="var(--sidebar-primary)"
+                  />
+                  <rect
+                    x="18"
+                    y="28"
+                    width="12"
+                    height="3"
+                    fill="var(--sidebar-foreground)"
+                  />
                 </svg>
               </div>
-              <span class="text-lg font-semibold tracking-tight text-sidebar-foreground">AKRIVA</span>
+              <span
+                class="text-lg font-semibold tracking-tight text-sidebar-foreground"
+                >AKRIVA</span
+              >
             </a>
           {/snippet}
         </Sidebar.MenuButton>
@@ -81,7 +103,8 @@
             <Sidebar.MenuItem>
               <Sidebar.MenuButton
                 tooltipContent={item.title}
-                isActive={page.url.pathname === item.url || page.url.pathname.startsWith(item.url + "/")}
+                isActive={page.url.pathname === item.url ||
+                  page.url.pathname.startsWith(item.url + "/")}
               >
                 {#snippet child({ props })}
                   <a href={item.url} {...props}>
@@ -106,7 +129,8 @@
               <Sidebar.MenuItem>
                 <Sidebar.MenuButton
                   tooltipContent={item.title}
-                  isActive={page.url.pathname === item.url || page.url.pathname.startsWith(item.url + "/")}
+                  isActive={page.url.pathname === item.url ||
+                    page.url.pathname.startsWith(item.url + "/")}
                 >
                   {#snippet child({ props })}
                     <a href={item.url} {...props}>

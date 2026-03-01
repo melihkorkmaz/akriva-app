@@ -22,7 +22,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 	const form = await superValidate(
 		{ reportingYear: new Date().getFullYear() },
-		zod4(createCampaignSchema)
+		zod4(createCampaignSchema),
+		{ errors: false }
 	);
 
 	return {

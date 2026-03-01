@@ -215,7 +215,8 @@
     @apply bg-background text-foreground font-sans text-sm leading-normal antialiased;
   }
 
-  a:not([class*="btn"]):not([role="menuitem"]):not([data-sidebar]) {
+  /* Exclude shadcn button anchors (data-slot="button"), menu items, and sidebar links */
+  a:not([class*="btn"]):not([role="menuitem"]):not([data-sidebar]):not([data-slot="button"]) {
     @apply text-primary underline hover:text-primary/80 transition-colors;
   }
 }

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { superForm, type SuperValidated, type Infer } from 'sveltekit-superforms';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
+	import { toast } from 'svelte-sonner';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import * as Form from '$lib/components/ui/form/index.js';
 	import * as Field from '$lib/components/ui/field/index.js';
@@ -12,6 +13,7 @@
 
 	import { Alert, AlertDescription } from '$lib/components/ui/alert/index.js';
 
+	import DatePicker from '$components/DatePicker.svelte';
 
 	import { createCampaignSchema } from '$lib/schemas/campaign.js';
 	import {
@@ -46,9 +48,26 @@
 
 	const superform = superForm(formData, {
 		validators: zod4Client(createCampaignSchema),
-		dataType: 'json'
+		dataType: 'json',
+		resetForm: false,
+		onUpdated({ form }) {
+			if (form.message) {
+				if (form.valid) {
+					toast.success(form.message);
+				} else {
+					toast.error(form.message);
+				}
+			}
+		},
+		onError({ result }) {
+			const msg =
+				typeof result.error === 'string'
+					? result.error
+					: 'An unexpected error occurred. Please try again.';
+			toast.error(msg);
+		}
 	});
-	const { form, enhance, message, submitting } = superform;
+	const { form, allErrors, enhance, message, submitting } = superform;
 
 	// Whether fields should be disabled (edit mode + non-draft)
 	let fieldsDisabled = $derived(mode === 'edit' && campaignStatus !== 'draft');
@@ -60,17 +79,8 @@
 
 	let selectedIndicator = $derived(indicatorMap.get($form.indicatorId));
 
-	// Indicator select label
-	let indicatorLabel = $derived(
-		selectedIndicator ? selectedIndicator.name : 'Select an indicator'
-	);
-
 	// Workflow type select label
 	let selectedWorkflow = $derived(WORKFLOW_TYPES.find((w) => w.value === $form.workflowType));
-
-	let workflowLabel = $derived(
-		selectedWorkflow ? selectedWorkflow.label : 'Select a workflow type'
-	);
 </script>
 
 <Card.Root class="max-w-3xl">
@@ -80,8 +90,20 @@
 				<AlertDescription>{$message}</AlertDescription>
 			</Alert>
 		{/if}
+		{#if $allErrors.length > 0}
+			<Alert variant="destructive" class="mb-4">
+				<AlertDescription>
+					<strong>Please fix the following errors:</strong>
+					<ul class="mt-2 pl-4 list-disc">
+						{#each $allErrors as error}
+							<li>{error.messages.join(', ')}</li>
+						{/each}
+					</ul>
+				</AlertDescription>
+			</Alert>
+		{/if}
 
-		<form method="POST" use:enhance class="flex flex-col gap-0">
+		<form method="POST" use:enhance class="flex flex-col gap-6">
 			<!-- Section 1: Campaign Details -->
 			<Field.Set>
 				<Field.Legend>Campaign Details</Field.Legend>
@@ -120,8 +142,12 @@
 										}}
 										disabled={fieldsDisabled}
 									>
-										<Select.Trigger class="w-full">
-											{indicatorLabel}
+										<Select.Trigger class="w-full" {...props}>
+											{#if selectedIndicator}
+												{selectedIndicator.name}
+											{:else}
+												<span class="text-muted-foreground">Select an indicator</span>
+											{/if}
 										</Select.Trigger>
 										<Select.Content>
 											{#each indicators as indicator}
@@ -164,9 +190,9 @@
 								<Form.Control>
 									{#snippet children({ props })}
 										<Form.Label>Period Start</Form.Label>
-										<Input
+										<DatePicker
 											{...props}
-											type="date"
+											placeholder="Select start date"
 											bind:value={$form.periodStart}
 											disabled={fieldsDisabled}
 										/>
@@ -179,9 +205,9 @@
 								<Form.Control>
 									{#snippet children({ props })}
 										<Form.Label>Period End</Form.Label>
-										<Input
+										<DatePicker
 											{...props}
-											type="date"
+											placeholder="Select end date"
 											bind:value={$form.periodEnd}
 											disabled={fieldsDisabled}
 										/>
@@ -216,8 +242,12 @@
 									}}
 									disabled={fieldsDisabled}
 								>
-									<Select.Trigger class="w-full">
-										{workflowLabel}
+									<Select.Trigger class="w-full" {...props}>
+										{#if selectedWorkflow}
+											{selectedWorkflow.label}
+										{:else}
+											<span class="text-muted-foreground">Select a workflow type</span>
+										{/if}
 									</Select.Trigger>
 									<Select.Content>
 										{#each WORKFLOW_TYPES as wf}
