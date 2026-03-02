@@ -57,15 +57,15 @@ export interface AuthTokens {
 }
 
 /** Valid tenant roles (lowest → highest privilege) */
-export type TenantRole = 'viewer' | 'data_entry' | 'data_approver' | 'tenant_admin' | 'super_admin';
+export type TenantRole = 'viewer' | 'data_entry' | 'data_approver' | 'data_reviewer' | 'tenant_admin';
 
 /** Display labels for tenant roles */
 export const TENANT_ROLE_LABELS: Record<TenantRole, string> = {
 	viewer: 'Viewer',
 	data_entry: 'Data Entry',
 	data_approver: 'Data Approver',
-	tenant_admin: 'Admin',
-	super_admin: 'Super Admin'
+	data_reviewer: 'Data Reviewer',
+	tenant_admin: 'Admin'
 };
 
 /** User info returned by signup */
@@ -406,6 +406,26 @@ export const EMISSION_CATEGORY_LABELS: Record<EmissionCategory, string> = {
 	process: 'Process Emissions'
 };
 
+/** Indicator method variant */
+export type MethodVariant = 'fuel' | 'distance' | 'production' | 'gas_abatement';
+
+export const METHOD_VARIANT_VALUES = ['fuel', 'distance', 'production', 'gas_abatement'] as const;
+
+export const METHOD_VARIANT_LABELS: Record<MethodVariant, string> = {
+	fuel: 'Fuel-based',
+	distance: 'Distance-based',
+	production: 'Production-based',
+	gas_abatement: 'Gas Abatement'
+};
+
+/** Which categories require which variants */
+export const CATEGORY_VARIANT_MAP: Record<EmissionCategory, MethodVariant[] | null> = {
+	stationary: null,
+	mobile: ['fuel', 'distance'],
+	fugitive: null,
+	process: ['production', 'gas_abatement']
+};
+
 /** Calculation methods */
 export type CalculationMethod =
 	| 'ipcc_energy_based'
@@ -616,6 +636,7 @@ export interface IndicatorResponseDto {
 	tenantId: string | null;
 	name: string;
 	emissionCategory: EmissionCategory;
+	methodVariant: MethodVariant | null;
 	isGlobal: boolean;
 	isActive: boolean;
 	createdAt: string;
@@ -654,30 +675,26 @@ export interface CampaignResponseDto {
 	updatedAt: string;
 }
 
-/** Campaign detail (with raw org units + overrides) — GET /v1/campaigns/{id} */
+/** Campaign detail (with resolved names) — GET /v1/campaigns/{id} */
 export interface CampaignWithDetails {
 	id: string;
 	tenantId: string;
 	name: string;
 	indicatorId: string;
+	indicator: { name: string; emissionCategory: string } | null;
 	workflowType: WorkflowType;
 	approvalTiers: number;
 	reportingYear: number;
 	periodStart: string;
 	periodEnd: string;
 	status: CampaignStatus;
+	orgUnits: CampaignOrgUnit[];
+	approverOverrides: CampaignApproverOverride[];
+	taskSummary?: TaskSummary;
 	createdBy: string;
 	createdAt: string;
 	updatedAt: string;
 	deletedAt: string | null;
-	orgUnits: { id: string; campaignId: string; orgUnitId: string }[];
-	approverOverrides: {
-		id: string;
-		campaignId: string;
-		orgUnitId: string;
-		tier: number;
-		userId: string;
-	}[];
 }
 
 /** Campaign task — GET /v1/campaigns/{id}/tasks, /v1/tasks/* */
@@ -685,6 +702,7 @@ export interface CampaignTask {
 	id: string;
 	campaignId: string;
 	orgUnitId: string;
+	orgUnitName: string;
 	tenantId: string;
 	status: CampaignTaskStatus;
 	currentTier: number;
@@ -694,6 +712,89 @@ export interface CampaignTask {
 	lockedAt: string | null;
 	createdAt: string;
 	updatedAt: string;
+}
+
+/** Task summary counts from campaign detail response */
+export interface TaskSummary {
+	total: number;
+	pending: number;
+	draft: number;
+	submitted: number;
+	inReview: number;
+	revisionRequested: number;
+	approved: number;
+	locked: number;
+}
+
+/** Paginated campaign task list response */
+export interface CampaignTaskListResponse {
+	tasks: CampaignTask[];
+	total: number;
+}
+
+/** My Tasks enriched DTO — returned by GET /v1/tasks/my */
+export interface MyTaskDto {
+	id: string;
+	campaignName: string;
+	indicatorName: string;
+	orgUnitName: string;
+	status: CampaignTaskStatus;
+	periodStart: string;
+	periodEnd: string;
+}
+
+/** My Tasks list response — API returns a flat array */
+export type MyTasksResponse = MyTaskDto[];
+
+/** Approval history entry — nested in task detail */
+export interface ApprovalHistoryEntry {
+	tier: number;
+	action: 'approve' | 'reject';
+	actorId: string;
+	actorName: string;
+	notes: string | null;
+	createdAt: string;
+}
+
+/** Emission trace summary in task detail */
+export interface TaskEmissionTrace {
+	totalCo2eKg: number;
+	totalCo2eTonnes: number;
+}
+
+/** Nested emission entry in task detail */
+export interface TaskEmissionEntry {
+	id: string;
+	status: string;
+	activityAmount: number | null;
+	activityUnit: string | null;
+	startDate: string;
+	endDate: string;
+	evidenceFiles: Array<{
+		id: string;
+		originalFilename: string;
+		status: string;
+	}>;
+	currentTrace: TaskEmissionTrace | null;
+}
+
+/** Task detail DTO — returned by GET /v1/tasks/{taskId} */
+export interface TaskDetailDto {
+	id: string;
+	campaignId: string;
+	campaignName: string;
+	indicatorName: string;
+	emissionCategory: EmissionCategory;
+	orgUnitId: string;
+	orgUnitName: string;
+	status: CampaignTaskStatus;
+	currentTier: number;
+	approvalTiers: number;
+	periodStart: string;
+	periodEnd: string;
+	emissionEntryId: string | null;
+	emissionEntry: TaskEmissionEntry | null;
+	approvalHistory: ApprovalHistoryEntry[];
 }
 
 /** Campaign activation response */
