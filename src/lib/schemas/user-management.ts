@@ -4,8 +4,8 @@ const tenantRoleEnum = z.enum([
 	'viewer',
 	'data_entry',
 	'data_approver',
-	'tenant_admin',
-	'super_admin'
+	'data_reviewer',
+	'tenant_admin'
 ]);
 
 /** Schema for changing a user's role */

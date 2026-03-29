@@ -21,7 +21,7 @@
 	let errorMessage = $state('');
 	let selectedRole = $state<TenantRole | ''>('');
 
-	const roles: TenantRole[] = ['viewer', 'data_entry', 'data_approver', 'tenant_admin', 'super_admin'];
+	const roles: TenantRole[] = ['viewer', 'data_entry', 'data_approver', 'data_reviewer', 'tenant_admin'];
 
 	let selectedRoleLabel = $derived(
 		selectedRole ? TENANT_ROLE_LABELS[selectedRole as TenantRole] : 'Select a role'

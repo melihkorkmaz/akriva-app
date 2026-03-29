@@ -14,14 +14,14 @@ function escapeHtml(str: string): string {
 }
 
 const roleBadgeConfig: Record<TenantRole, { cls: string }> = {
-	super_admin: {
-		cls: 'inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium bg-violet-50 text-violet-700 ring-1 ring-violet-500/20'
-	},
 	tenant_admin: {
 		cls: 'inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium bg-blue-50 text-blue-700 ring-1 ring-blue-500/20'
 	},
 	data_approver: {
 		cls: 'inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium bg-amber-50 text-amber-700 ring-1 ring-amber-500/20'
+	},
+	data_reviewer: {
+		cls: 'inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium bg-purple-50 text-purple-700 ring-1 ring-purple-500/20'
 	},
 	data_entry: {
 		cls: 'inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium bg-emerald-50 text-emerald-700 ring-1 ring-emerald-500/20'

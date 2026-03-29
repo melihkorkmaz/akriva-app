@@ -28,7 +28,7 @@
   let { user }: Props = $props();
 
   let isAdmin = $derived(
-    user.role === "tenant_admin" || user.role === "super_admin",
+    user.role === "tenant_admin",
   );
 
   const dataItems = [

@@ -25,13 +25,13 @@
 	let selectedRole = $state<TenantRole | ''>('');
 	let expiresInDays = $state('7');
 
-	const allRoles: TenantRole[] = ['viewer', 'data_entry', 'data_approver', 'tenant_admin', 'super_admin'];
+	const allRoles: TenantRole[] = ['viewer', 'data_entry', 'data_approver', 'data_reviewer', 'tenant_admin'];
 	const roleHierarchy: Record<TenantRole, number> = {
 		viewer: 0,
 		data_entry: 1,
 		data_approver: 2,
-		tenant_admin: 3,
-		super_admin: 4
+		data_reviewer: 3,
+		tenant_admin: 4
 	};
 
 	// Filter roles below current user's role (role cap enforcement)

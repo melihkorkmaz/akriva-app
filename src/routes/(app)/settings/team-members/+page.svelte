@@ -95,8 +95,8 @@
 		'viewer',
 		'data_entry',
 		'data_approver',
-		'tenant_admin',
-		'super_admin'
+		'data_reviewer',
+		'tenant_admin'
 	];
 
 	let roleFilterLabel = $derived(

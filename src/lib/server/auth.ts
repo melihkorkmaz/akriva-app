@@ -2,7 +2,7 @@ import { error, type Cookies } from '@sveltejs/kit';
 import { dev } from '$app/environment';
 import type { AuthTokens, TenantRole } from '$lib/api/types.js';
 
-const ADMIN_ROLES: TenantRole[] = ['tenant_admin', 'super_admin'];
+const ADMIN_ROLES: TenantRole[] = ['tenant_admin'];
 
 /** Throw 403 if the user is not a tenant or super admin */
 export function requireAdmin(locals: App.Locals): void {
@@ -12,7 +12,7 @@ export function requireAdmin(locals: App.Locals): void {
 	}
 }
 
-const VALID_ROLES: TenantRole[] = ['viewer', 'data_entry', 'data_approver', 'tenant_admin', 'super_admin'];
+const VALID_ROLES: TenantRole[] = ['viewer', 'data_entry', 'data_approver', 'data_reviewer', 'tenant_admin'];
 
 /** Seconds before actual JWT expiry to treat the token as expired, ensuring it remains valid for the duration of the downstream API request */
 const EXPIRY_BUFFER_SECONDS = 60;

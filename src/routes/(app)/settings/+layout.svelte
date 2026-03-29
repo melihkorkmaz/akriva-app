@@ -45,7 +45,7 @@
   ];
 
   let isAdmin = $derived(
-    page.data?.user?.role === 'tenant_admin' || page.data?.user?.role === 'super_admin'
+    page.data?.user?.role === 'tenant_admin'
   );
 
   let visibleNavItems = $derived(

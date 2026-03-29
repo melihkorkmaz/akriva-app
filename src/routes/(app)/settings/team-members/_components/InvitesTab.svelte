@@ -43,9 +43,9 @@
 
 	// Role badge colors (same as columns.ts)
 	const roleBadgeConfig: Record<TenantRole, string> = {
-		super_admin: 'bg-violet-100 text-violet-700 border-violet-200',
 		tenant_admin: 'bg-blue-100 text-blue-700 border-blue-200',
 		data_approver: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+		data_reviewer: 'bg-purple-100 text-purple-700 border-purple-200',
 		data_entry: 'bg-amber-100 text-amber-700 border-amber-200',
 		viewer: 'bg-gray-100 text-gray-700 border-gray-200'
 	};

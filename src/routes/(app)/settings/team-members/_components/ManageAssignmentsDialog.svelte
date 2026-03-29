@@ -48,7 +48,7 @@
 
 	let flatOrgUnits = $derived(flattenTree(orgTree));
 
-	let isAdminRole = $derived(user?.role === 'tenant_admin' || user?.role === 'super_admin');
+	let isAdminRole = $derived(user?.role === 'tenant_admin');
 
 	$effect(() => {
 		if (open && user) {

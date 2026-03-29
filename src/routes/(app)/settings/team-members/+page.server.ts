@@ -25,8 +25,8 @@ const VALID_ROLES: TenantRole[] = [
   "viewer",
   "data_entry",
   "data_approver",
+  "data_reviewer",
   "tenant_admin",
-  "super_admin",
 ];
 export const load: PageServerLoad = async ({ locals, url }) => {
   requireAdmin(locals);
