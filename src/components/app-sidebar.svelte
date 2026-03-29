@@ -9,14 +9,10 @@
   import Users from "@lucide/svelte/icons/users";
   import ClipboardList from "@lucide/svelte/icons/clipboard-list";
   import FileCheck from "@lucide/svelte/icons/file-check";
-  import ListChecks from "@lucide/svelte/icons/list-checks";
-  import Megaphone from "@lucide/svelte/icons/megaphone";
   import Settings from "@lucide/svelte/icons/settings";
-  import UsersRound from "@lucide/svelte/icons/users-round";
 
   import * as Sidebar from "$lib/components/ui/sidebar";
 
-  import AkrivaLogo from "$components/AkrivaLogo.svelte";
   import NavUser from "$components/nav-user.svelte";
 
   import type { SessionUser } from "$lib/server/auth";
@@ -27,9 +23,7 @@
 
   let { user }: Props = $props();
 
-  let isAdmin = $derived(
-    user.role === "tenant_admin",
-  );
+  let isAdmin = $derived(user.role === "tenant_admin");
 
   const dataItems = [
     { title: "Dashboard", url: "/dashboard", icon: LayoutGrid },
@@ -40,13 +34,9 @@
     { title: "Team", url: "/#", icon: Users },
     { title: "Inventory", url: "/#", icon: ClipboardList },
     { title: "Evidence", url: "/#", icon: FileCheck },
-    { title: "My Tasks", url: "/tasks", icon: ListChecks },
   ];
 
-  const adminItems = [
-    { title: "Campaigns", url: "/campaigns", icon: Megaphone },
-    { title: "Settings", url: "/settings", icon: Settings },
-  ];
+  const adminItems = [{ title: "Settings", url: "/settings", icon: Settings }];
 </script>
 
 <Sidebar.Root collapsible="icon">

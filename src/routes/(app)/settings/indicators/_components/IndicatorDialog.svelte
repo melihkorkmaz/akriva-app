@@ -5,11 +5,12 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Switch } from '$lib/components/ui/switch/index.js';
+	import { Label } from '$lib/components/ui/label/index.js';
 	import { superForm } from 'sveltekit-superforms';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import { toast } from 'svelte-sonner';
-	import type { IndicatorResponseDto, EmissionCategory } from '$lib/api/types.js';
-	import { EMISSION_CATEGORY_LABELS } from '$lib/api/types.js';
+	import type { IndicatorResponseDto, EmissionCategory, MethodVariant } from '$lib/api/types.js';
+	import { EMISSION_CATEGORY_LABELS, CATEGORY_VARIANT_MAP, METHOD_VARIANT_LABELS } from '$lib/api/types.js';
 	import { createIndicatorSchema, updateIndicatorSchema } from '$lib/schemas/indicator.js';
 	import type { Infer, SuperValidated } from 'sveltekit-superforms';
 
@@ -30,6 +31,7 @@
 	// Create form
 	const createSF = superForm(createFormData, {
 		validators: zod4Client(createIndicatorSchema),
+		dataType: 'json',
 		resetForm: false,
 		onUpdated({ form }) {
 			if (form.valid && form.message) {
@@ -63,6 +65,21 @@
 			? EMISSION_CATEGORY_LABELS[$createForm.emissionCategory as EmissionCategory]
 			: ''
 	);
+
+	// Derived: available variants for selected category
+	let availableVariants = $derived(
+		CATEGORY_VARIANT_MAP[$createForm.emissionCategory as EmissionCategory] ?? null
+	);
+
+	// Clear methodVariant when category changes
+	function handleCategoryChange(val: string | undefined) {
+		if (!val) return;
+		$createForm.emissionCategory = val as EmissionCategory;
+		const variants = CATEGORY_VARIANT_MAP[val as EmissionCategory];
+		if (!variants || !variants.includes($createForm.methodVariant as MethodVariant)) {
+			$createForm.methodVariant = null;
+		}
+	}
 
 	// Reset/populate forms when dialog opens
 	$effect(() => {
@@ -114,9 +131,7 @@
 								<Select.Root
 									type="single"
 									value={$createForm.emissionCategory}
-									onValueChange={(val) => {
-										if (val) $createForm.emissionCategory = val as EmissionCategory;
-									}}
+									onValueChange={handleCategoryChange}
 								>
 									<Select.Trigger class="w-full" {...props}>
 										{#if categoryLabel}
@@ -135,6 +150,39 @@
 						</Form.Control>
 						<Form.FieldErrors />
 					</Form.Field>
+
+					{#if availableVariants}
+						<Form.Field form={createSF} name="methodVariant">
+							<Form.Control>
+								{#snippet children({ props })}
+									<Form.Label>Method Variant</Form.Label>
+									<Select.Root
+										type="single"
+										value={$createForm.methodVariant ?? undefined}
+										onValueChange={(val) => {
+											$createForm.methodVariant = (val as MethodVariant) ?? null;
+										}}
+									>
+										<Select.Trigger class="w-full" {...props}>
+											{#if $createForm.methodVariant}
+												{METHOD_VARIANT_LABELS[$createForm.methodVariant as MethodVariant]}
+											{:else}
+												<span class="text-muted-foreground">Select method variant</span>
+											{/if}
+										</Select.Trigger>
+										<Select.Content>
+											{#each availableVariants as variant}
+												<Select.Item value={variant}>
+													{METHOD_VARIANT_LABELS[variant]}
+												</Select.Item>
+											{/each}
+										</Select.Content>
+									</Select.Root>
+								{/snippet}
+							</Form.Control>
+							<Form.FieldErrors />
+						</Form.Field>
+					{/if}
 				</div>
 
 				<Dialog.Footer>
@@ -168,9 +216,20 @@
 					<!-- Category (read-only display) -->
 					{#if indicator}
 						<div class="flex flex-col gap-2">
-							<Form.Label>Emission Category</Form.Label>
+							<Label>Emission Category</Label>
 							<Input
 								value={EMISSION_CATEGORY_LABELS[indicator.emissionCategory] ?? indicator.emissionCategory}
+								disabled
+							/>
+						</div>
+					{/if}
+
+					<!-- Method variant (read-only display) -->
+					{#if indicator?.methodVariant}
+						<div class="flex flex-col gap-2">
+							<Label>Method Variant</Label>
+							<Input
+								value={METHOD_VARIANT_LABELS[indicator.methodVariant as MethodVariant] ?? indicator.methodVariant}
 								disabled
 							/>
 						</div>

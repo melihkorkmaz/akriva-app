@@ -20,6 +20,7 @@ export async function createIndicator(
   data: {
     name: string;
     emissionCategory: string;
+    methodVariant?: string | null;
   }
 ): Promise<IndicatorResponseDto> {
   return apiFetchAuth<IndicatorResponseDto>(

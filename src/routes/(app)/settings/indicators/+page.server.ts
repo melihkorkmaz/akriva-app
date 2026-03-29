@@ -1,5 +1,5 @@
-import { error } from "@sveltejs/kit";
-import { message, superValidate } from "sveltekit-superforms";
+import { error, fail } from "@sveltejs/kit";
+import { message, superValidate, type ErrorStatus } from "sveltekit-superforms";
 import { zod4 } from "sveltekit-superforms/adapters";
 import type { Actions, PageServerLoad } from "./$types.js";
 import {
@@ -57,27 +57,19 @@ export const actions: Actions = {
       await createIndicator(session.idToken, {
         name: form.data.name,
         emissionCategory: form.data.emissionCategory,
+        methodVariant: form.data.methodVariant ?? null,
       });
     } catch (err) {
+      console.error('[indicators/create] Error:', err);
       if (err instanceof ApiError) {
-        if (err.status === 409) {
-          return message(
-            form,
-            err.body.error || "An indicator with this name already exists.",
-            { status: 409 }
-          );
-        }
-        if (err.status === 403) {
-          return message(
-            form,
-            "You do not have permission to create indicators.",
-            {
-              status: 403,
-            }
-          );
-        }
+        return message(
+          form,
+          err.body.error || "Something went wrong. Please try again.",
+          { status: err.status as ErrorStatus }
+        );
       }
-      return message(form, "Something went wrong. Please try again.", {
+      const errMsg = err instanceof Error ? err.message : String(err);
+      return message(form, errMsg || "Something went wrong. Please try again.", {
         status: 500,
       });
     }
@@ -146,41 +138,30 @@ export const actions: Actions = {
     const id = formData.get("id") as string;
 
     if (!id) {
-      const form = await superValidate(zod4(updateIndicatorSchema));
-      return message(form, "Invalid request.", { status: 400 });
+      return fail(400, { message: "Invalid request." });
     }
-
-    const form = await superValidate(zod4(updateIndicatorSchema));
 
     try {
       await deleteIndicator(session.idToken, id);
     } catch (err) {
       if (err instanceof ApiError) {
         if (err.status === 404) {
-          return message(form, "Indicator not found.", { status: 404 });
+          return fail(404, { message: "Indicator not found." });
         }
         if (err.status === 409) {
-          return message(
-            form,
-            err.body.error || "This indicator cannot be deleted.",
-            { status: 409 }
-          );
+          return fail(409, {
+            message: err.body.error || "This indicator cannot be deleted.",
+          });
         }
         if (err.status === 403) {
-          return message(
-            form,
-            "You do not have permission to delete indicators.",
-            {
-              status: 403,
-            }
-          );
+          return fail(403, {
+            message: "You do not have permission to delete indicators.",
+          });
         }
       }
-      return message(form, "Something went wrong. Please try again.", {
-        status: 500,
-      });
+      return fail(500, { message: "Something went wrong. Please try again." });
     }
 
-    return message(form, "Indicator deleted successfully.");
+    return { success: true };
   },
 };

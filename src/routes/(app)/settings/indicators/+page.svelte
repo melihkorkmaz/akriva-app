@@ -14,8 +14,8 @@
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
 	import type { IndicatorResponseDto } from '$lib/api/types.js';
-	import { EMISSION_CATEGORY_LABELS } from '$lib/api/types.js';
-	import type { EmissionCategory } from '$lib/api/types.js';
+	import { EMISSION_CATEGORY_LABELS, METHOD_VARIANT_LABELS } from '$lib/api/types.js';
+	import type { EmissionCategory, MethodVariant } from '$lib/api/types.js';
 	import IndicatorDialog from './_components/IndicatorDialog.svelte';
 
 	let { data } = $props();
@@ -60,7 +60,8 @@
 
 		const response = await fetch('?/delete', {
 			method: 'POST',
-			body: formData
+			body: formData,
+			headers: { 'x-sveltekit-action': 'true' }
 		});
 
 		const result = deserialize(await response.text());
@@ -75,7 +76,7 @@
 
 		const msg =
 			result.type === 'failure'
-				? (result.data as Record<string, any> | undefined)?.form?.message
+				? (result.data as Record<string, any> | undefined)?.message
 				: undefined;
 		deleteError = typeof msg === 'string' ? msg : 'Failed to delete indicator.';
 	}
@@ -109,6 +110,7 @@
 						<Table.Row>
 							<Table.Head>Name</Table.Head>
 							<Table.Head>Category</Table.Head>
+							<Table.Head>Method</Table.Head>
 							<Table.Head>Status</Table.Head>
 							<Table.Head class="w-[100px]">Actions</Table.Head>
 						</Table.Row>
@@ -119,6 +121,13 @@
 								<Table.Cell class="font-medium">{indicator.name}</Table.Cell>
 								<Table.Cell>
 									{EMISSION_CATEGORY_LABELS[indicator.emissionCategory as EmissionCategory] ?? indicator.emissionCategory}
+								</Table.Cell>
+								<Table.Cell>
+									{#if indicator.methodVariant}
+										{METHOD_VARIANT_LABELS[indicator.methodVariant as MethodVariant] ?? indicator.methodVariant}
+									{:else}
+										<span class="text-muted-foreground">—</span>
+									{/if}
 								</Table.Cell>
 								<Table.Cell>
 									{#if indicator.isActive}
