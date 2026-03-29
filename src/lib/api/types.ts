@@ -414,38 +414,6 @@ export const EMISSION_CATEGORY_LABELS: Record<EmissionCategory, string> = {
   process: "Process Emissions",
 };
 
-/** Indicator method variant */
-export type MethodVariant =
-  | "fuel"
-  | "distance"
-  | "production"
-  | "gas_abatement";
-
-export const METHOD_VARIANT_VALUES = [
-  "fuel",
-  "distance",
-  "production",
-  "gas_abatement",
-] as const;
-
-export const METHOD_VARIANT_LABELS: Record<MethodVariant, string> = {
-  fuel: "Fuel-based",
-  distance: "Distance-based",
-  production: "Production-based",
-  gas_abatement: "Gas Abatement",
-};
-
-/** Which categories require which variants */
-export const CATEGORY_VARIANT_MAP: Record<
-  EmissionCategory,
-  MethodVariant[] | null
-> = {
-  stationary: null,
-  mobile: ["fuel", "distance"],
-  fugitive: null,
-  process: ["production", "gas_abatement"],
-};
-
 /** Calculation methods */
 export type CalculationMethod =
   | "ipcc_energy_based"
@@ -487,11 +455,10 @@ export interface EmissionSourceResponseDto {
   orgUnitId: string;
   category: EmissionCategory;
   name: string;
+  unit: string;
   meterNumber: string | null;
   vehicleType: string | null;
   technology: string | null;
-  defaultFuelType: string | null;
-  defaultGasType: string | null;
   isActive: boolean;
   createdBy: string;
   createdAt: string;
@@ -621,16 +588,3 @@ export const WORKFLOW_TYPES = [
     description: "Review then approve: data_reviewer → data_approver",
   },
 ] as const;
-
-/** Indicator — GET/POST/PATCH /v1/indicators */
-export interface IndicatorResponseDto {
-  id: string;
-  tenantId: string | null;
-  name: string;
-  emissionCategory: EmissionCategory;
-  methodVariant: MethodVariant | null;
-  isGlobal: boolean;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-}

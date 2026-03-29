@@ -110,6 +110,7 @@
 					<Table.Row>
 						<Table.Head>Name</Table.Head>
 						<Table.Head>Category</Table.Head>
+						<Table.Head>Unit</Table.Head>
 						<Table.Head>Meter #</Table.Head>
 						<Table.Head>Status</Table.Head>
 						<Table.Head class="text-right">Actions</Table.Head>
@@ -121,6 +122,9 @@
 							<Table.Cell class="font-medium">{source.name}</Table.Cell>
 							<Table.Cell>
 								{EMISSION_CATEGORY_LABELS[source.category] ?? source.category}
+							</Table.Cell>
+							<Table.Cell class="text-muted-foreground">
+								{source.unit}
 							</Table.Cell>
 							<Table.Cell class="text-muted-foreground">
 								{source.meterNumber || '--'}

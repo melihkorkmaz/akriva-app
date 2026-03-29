@@ -5,7 +5,6 @@
   import Calculator from "@lucide/svelte/icons/calculator";
   import Building2 from "@lucide/svelte/icons/building-2";
 
-  import Gauge from "@lucide/svelte/icons/gauge";
   import UsersRound from "@lucide/svelte/icons/users-round";
   import ShieldCheck from "@lucide/svelte/icons/shield-check";
   import Puzzle from "@lucide/svelte/icons/puzzle";
@@ -27,12 +26,6 @@
       label: "Organizational Tree",
       icon: Building2,
     },
-
-    {
-      href: "/settings/indicators",
-      label: "Indicators",
-      icon: Gauge,
-    },
     {
       href: "/settings/team-members",
       label: "Team Members",
@@ -44,23 +37,23 @@
     { href: "/settings/api", label: "API & Webhooks", icon: Terminal },
   ];
 
-  let isAdmin = $derived(
-    page.data?.user?.role === 'tenant_admin'
-  );
+  let isAdmin = $derived(page.data?.user?.role === "tenant_admin");
 
   let visibleNavItems = $derived(
     navItems.filter((item) => {
-      if (item.href === '/settings/team-members') return isAdmin;
-      if (item.href === '/settings/indicators') return isAdmin;
+      if (item.href === "/settings/team-members") return isAdmin;
       return true;
-    })
+    }),
   );
 
   let currentPath = $derived(page.url.pathname);
 </script>
 
 <Sidebar.Provider class="min-h-0 h-full" style="--sidebar-width: 270px;">
-  <Sidebar.Root collapsible="none" class="bg-secondary text-foreground border-r">
+  <Sidebar.Root
+    collapsible="none"
+    class="bg-secondary text-foreground border-r"
+  >
     <Sidebar.Content>
       <Sidebar.Group>
         <Sidebar.GroupLabel>Settings</Sidebar.GroupLabel>

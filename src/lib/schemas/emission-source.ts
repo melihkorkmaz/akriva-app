@@ -7,11 +7,10 @@ export const createEmissionSourceSchema = z.object({
 		message: 'Category is required'
 	}),
 	name: z.string().min(1, 'Name is required').max(255),
+	unit: z.string().min(1, 'Unit is required'),
 	meterNumber: z.string().max(100).nullish().default(null),
 	vehicleType: z.string().max(100).nullish().default(null),
-	technology: z.string().max(100).nullish().default(null),
-	defaultFuelType: z.string().max(100).nullish().default(null),
-	defaultGasType: z.string().max(100).nullish().default(null)
+	technology: z.string().max(100).nullish().default(null)
 });
 
 /** Schema for updating an emission source — PATCH /v1/emission-sources/{id} */
@@ -20,7 +19,5 @@ export const updateEmissionSourceSchema = z.object({
 	meterNumber: z.string().max(100).nullish(),
 	vehicleType: z.string().max(100).nullish(),
 	technology: z.string().max(100).nullish(),
-	defaultFuelType: z.string().max(100).nullish(),
-	defaultGasType: z.string().max(100).nullish(),
 	isActive: z.boolean().optional()
 });
