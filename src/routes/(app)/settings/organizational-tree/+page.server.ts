@@ -5,14 +5,12 @@ import {
   getOrgUnitsTree,
   createOrgUnit,
   updateOrgUnit,
-  deleteOrgUnit,
 } from "$lib/api/org-units.js";
 import { getApplicationSettings } from "$lib/api/tenant.js";
 import {
   listEmissionSources,
   createEmissionSource,
   updateEmissionSource,
-  deleteEmissionSource,
 } from "$lib/api/emission-sources.js";
 import { ApiError } from "$lib/api/client.js";
 import {
@@ -183,43 +181,6 @@ export const actions: Actions = {
     return message(form, "Changes saved successfully.");
   },
 
-  delete: async ({ request, locals }) => {
-    const session = locals.session!;
-    const formData = await request.formData();
-    const id = formData.get("id");
-
-    if (!id || typeof id !== "string") {
-      return { success: false, error: "Missing org unit ID." };
-    }
-
-    try {
-      await deleteOrgUnit(session.idToken, id);
-      return { success: true };
-    } catch (err) {
-      if (err instanceof ApiError) {
-        if (err.status === 409) {
-          return {
-            success: false,
-            error: "This node has active children. Move or delete them first.",
-          };
-        }
-        if (err.status === 404) {
-          return { success: false, error: "Org unit not found." };
-        }
-        if (err.status === 403) {
-          return {
-            success: false,
-            error: "You don't have permission to perform this action.",
-          };
-        }
-      }
-      return {
-        success: false,
-        error: "Something went wrong. Please try again.",
-      };
-    }
-  },
-
   createSource: async ({ request, locals }) => {
     const session = locals.session!;
     const form = await superValidate(request, zod4(createEmissionSourceSchema));
@@ -330,41 +291,4 @@ export const actions: Actions = {
     }
   },
 
-  deleteSource: async ({ request, locals }) => {
-    const session = locals.session!;
-    const formData = await request.formData();
-    const sourceId = formData.get("sourceId");
-
-    if (!sourceId || typeof sourceId !== "string") {
-      return { success: false, error: "Missing emission source ID." };
-    }
-
-    try {
-      await deleteEmissionSource(session.idToken, sourceId);
-      return { success: true };
-    } catch (err) {
-      if (err instanceof ApiError) {
-        if (err.status === 409) {
-          return {
-            success: false,
-            error:
-              "This source has associated emission entries. Remove them first.",
-          };
-        }
-        if (err.status === 404) {
-          return { success: false, error: "Emission source not found." };
-        }
-        if (err.status === 403) {
-          return {
-            success: false,
-            error: "You don't have permission to perform this action.",
-          };
-        }
-      }
-      return {
-        success: false,
-        error: "Something went wrong. Please try again.",
-      };
-    }
-  },
 };

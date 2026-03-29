@@ -29,10 +29,9 @@ export async function getEmissionSource(
 
 export async function listActivityUnits(
   accessToken: string,
-  orgUnitId: string,
   category: string
 ): Promise<string[]> {
-  const qs = new URLSearchParams({ orgUnitId, category });
+  const qs = new URLSearchParams({ category });
   return apiFetchAuth<string[]>(`/emission/activity-units?${qs}`, accessToken);
 }
 

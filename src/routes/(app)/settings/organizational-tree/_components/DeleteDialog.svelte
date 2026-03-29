@@ -21,20 +21,14 @@
 
   async function handleDelete() {
     deleting = true;
-    const formData = new FormData();
-    formData.set("id", nodeId);
 
-    const response = await fetch("?/delete", {
-      method: "POST",
-      body: formData,
-    });
+    const response = await fetch(
+      `/settings/organizational-tree/org-units/${nodeId}`,
+      { method: "DELETE" }
+    );
 
-    const result = await response.json();
-
+    const data = await response.json();
     deleting = false;
-
-    // SvelteKit form action responses are wrapped in a data array
-    const data = result?.data?.[0] ?? result;
 
     if (data?.success) {
       open = false;
