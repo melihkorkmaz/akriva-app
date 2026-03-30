@@ -455,7 +455,7 @@ export interface EmissionSourceResponseDto {
   orgUnitId: string;
   category: EmissionCategory;
   name: string;
-  unit: string;
+  fuelType: string | null;
   meterNumber: string | null;
   vehicleType: string | null;
   technology: string | null;
@@ -463,6 +463,13 @@ export interface EmissionSourceResponseDto {
   createdBy: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface FuelTypeDto {
+  id: string;
+  label: string;
+  phase: string;
+  compatibleUnits: string[];
 }
 
 /** Calculation trace — nested in emission entry */

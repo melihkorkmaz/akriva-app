@@ -13,6 +13,7 @@
   import type {
     EmissionSourceResponseDto,
     EmissionCategory,
+    FuelTypeDto,
   } from "$lib/api/types.js";
   import { EMISSION_CATEGORY_LABELS } from "$lib/api/types.js";
 
@@ -34,15 +35,18 @@
   // Form fields
   let name = $state("");
   let category = $state<EmissionCategory | "">("");
-  let unit = $state("");
+  let fuelType = $state("");
   let meterNumber = $state("");
   let vehicleType = $state("");
   let technology = $state("");
   let isActive = $state(true);
 
-  // Activity units dropdown
-  let activityUnits = $state<string[]>([]);
-  let loadingUnits = $state(false);
+  // Fuel types dropdown
+  let fuelTypes = $state<FuelTypeDto[]>([]);
+  let loadingFuelTypes = $state(false);
+
+  // Categories that use fuel types
+  let hasFuelType = $derived(category === "stationary" || category === "mobile");
 
   // Conditional field visibility
   let isMobile = $derived(category === "mobile");
@@ -61,7 +65,7 @@
       if (mode === "edit" && source) {
         name = source.name;
         category = source.category;
-        unit = source.unit;
+        fuelType = source.fuelType ?? "";
         meterNumber = source.meterNumber ?? "";
         vehicleType = source.vehicleType ?? "";
         technology = source.technology ?? "";
@@ -69,34 +73,34 @@
       } else {
         name = "";
         category = "";
-        unit = "";
+        fuelType = "";
         meterNumber = "";
         vehicleType = "";
         technology = "";
         isActive = true;
-        activityUnits = [];
+        fuelTypes = [];
       }
     }
   });
 
-  // Fetch activity units when category changes
+  // Fetch fuel types when category changes
   $effect(() => {
-    if (!open || !category) return;
+    if (!open || !category || !hasFuelType) return;
 
-    loadingUnits = true;
-    activityUnits = [];
+    loadingFuelTypes = true;
+    fuelTypes = [];
 
-    const qs = new URLSearchParams({ orgUnitId, category });
-    fetch(`/settings/organizational-tree/activity-units?${qs}`)
+    const qs = new URLSearchParams({ category });
+    fetch(`/settings/organizational-tree/fuel-types?${qs}`)
       .then((res) => (res.ok ? res.json() : []))
-      .then((units: string[]) => {
-        activityUnits = units;
+      .then((data: FuelTypeDto[]) => {
+        fuelTypes = data;
       })
       .catch(() => {
-        activityUnits = [];
+        fuelTypes = [];
       })
       .finally(() => {
-        loadingUnits = false;
+        loadingFuelTypes = false;
       });
   });
 
@@ -109,12 +113,13 @@
     const formData = new FormData();
 
     if (mode === "create") {
-      if (!category || !unit) return;
+      if (!category) return;
+      if (hasFuelType && !fuelType) return;
 
       formData.set("orgUnitId", orgUnitId);
       formData.set("category", category);
       formData.set("name", name);
-      formData.set("unit", unit);
+      if (fuelType) formData.set("fuelType", fuelType);
       if (meterNumber) formData.set("meterNumber", meterNumber);
       if (isMobile && vehicleType) formData.set("vehicleType", vehicleType);
       if (isMobile && technology) formData.set("technology", technology);
@@ -158,7 +163,9 @@
     await invalidateAll();
   }
 
-  let isCreateDisabled = $derived(submitting || !name || !category || !unit);
+  let isCreateDisabled = $derived(
+    submitting || !name || !category || (hasFuelType && !fuelType),
+  );
   let isEditDisabled = $derived(submitting || !name);
 </script>
 
@@ -210,7 +217,7 @@
             onValueChange={(val) => {
               if (val) {
                 category = val as EmissionCategory;
-                unit = "";
+                fuelType = "";
               }
             }}
           >
@@ -226,39 +233,40 @@
         {/if}
       </div>
 
-      <!-- Unit -->
-      <div class="flex flex-col gap-2">
-        <Label>Unit</Label>
-        {#if mode === "edit"}
-          <Input value={unit} disabled />
-        {:else}
-          <Select.Root
-            type="single"
-            value={unit}
-            onValueChange={(val) => {
-              if (val) unit = val;
-            }}
-            disabled={!category || loadingUnits}
-          >
-            <Select.Trigger class="w-full">
-              {#if loadingUnits}
-                Loading units...
-              {:else if !category}
-                Select a category first
-              {:else if unit}
-                {unit}
-              {:else}
-                Select unit
-              {/if}
-            </Select.Trigger>
-            <Select.Content>
-              {#each activityUnits as u}
-                <Select.Item value={u}>{u}</Select.Item>
-              {/each}
-            </Select.Content>
-          </Select.Root>
-        {/if}
-      </div>
+      <!-- Fuel Type (stationary & mobile only) -->
+      {#if hasFuelType}
+        <div class="flex flex-col gap-2">
+          <Label>Fuel Type</Label>
+          {#if mode === "edit"}
+            <Input value={fuelType} disabled />
+          {:else}
+            <Select.Root
+              type="single"
+              value={fuelType}
+              onValueChange={(val) => {
+                if (val) fuelType = val;
+              }}
+              disabled={!category || loadingFuelTypes}
+            >
+              <Select.Trigger class="w-full">
+                {#if loadingFuelTypes}
+                  Loading fuel types...
+                {:else if !category}
+                  Select a category first
+                {:else}
+                  {fuelTypes.find((ft) => ft.id === fuelType)?.label ??
+                    "Select fuel type"}
+                {/if}
+              </Select.Trigger>
+              <Select.Content>
+                {#each fuelTypes as ft}
+                  <Select.Item value={ft.id}>{ft.label}</Select.Item>
+                {/each}
+              </Select.Content>
+            </Select.Root>
+          {/if}
+        </div>
+      {/if}
 
       <!-- Meter Number / Licence -->
       <div class="flex flex-col gap-2">

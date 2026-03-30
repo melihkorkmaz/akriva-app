@@ -7,7 +7,7 @@ export const createEmissionSourceSchema = z.object({
 		message: 'Category is required'
 	}),
 	name: z.string().min(1, 'Name is required').max(255),
-	unit: z.string().min(1, 'Unit is required'),
+	fuelType: z.string().max(255).nullish().default(null),
 	meterNumber: z.string().max(100).nullish().default(null),
 	vehicleType: z.string().max(100).nullish().default(null),
 	technology: z.string().max(100).nullish().default(null)

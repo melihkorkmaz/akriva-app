@@ -123,6 +123,7 @@
         createFormData={data.createForm}
         updateFormData={data.updateForm}
         tenantSettings={data.tenantSettings}
+        consolidationApproach={data.consolidationApproach}
         {allNodes}
         emissionSources={data.emissionSources}
         onCreated={handleCreated}
@@ -137,6 +138,7 @@
         createFormData={data.createForm}
         updateFormData={data.updateForm}
         tenantSettings={data.tenantSettings}
+        consolidationApproach={data.consolidationApproach}
         {allNodes}
         emissionSources={data.emissionSources}
         onCreated={handleCreated}

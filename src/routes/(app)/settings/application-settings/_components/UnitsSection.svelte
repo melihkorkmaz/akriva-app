@@ -32,13 +32,14 @@
 </script>
 
 <Card.Root>
-  <Card.Content class="pt-6">
+  <Card.Header>
+    <Card.Title>Units & Display</Card.Title>
+    <Card.Description>
+      Configure measurement units and emission display preferences
+    </Card.Description>
+  </Card.Header>
+  <Card.Content>
     <Field.Set>
-      <Field.Legend>Units & Display</Field.Legend>
-      <Field.Description>
-        Configure measurement units and emission display preferences
-      </Field.Description>
-
       <Field.Group>
         <Field.Field>
           <Field.Label>Unit System</Field.Label>
@@ -94,7 +95,9 @@
                   type="single"
                   value={$form.emissionDisplayUnit}
                   onValueChange={(val) => {
-                    if (val) $form.emissionDisplayUnit = val as typeof $form.emissionDisplayUnit;
+                    if (val)
+                      $form.emissionDisplayUnit =
+                        val as typeof $form.emissionDisplayUnit;
                   }}
                 >
                   <Select.Trigger class="w-full" {...props}>

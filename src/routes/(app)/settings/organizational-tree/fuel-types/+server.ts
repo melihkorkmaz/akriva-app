@@ -1,6 +1,6 @@
 import { json } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types.js";
-import { listActivityUnits } from "$lib/api/emission-sources.js";
+import { listFuelTypes } from "$lib/api/emission-sources.js";
 
 export const GET: RequestHandler = async ({ url, locals }) => {
   const session = locals.session!;
@@ -11,8 +11,8 @@ export const GET: RequestHandler = async ({ url, locals }) => {
   }
 
   try {
-    const units = await listActivityUnits(session.idToken, category);
-    return json(units);
+    const fuelTypes = await listFuelTypes(session.idToken, category);
+    return json(fuelTypes);
   } catch {
     return json([], { status: 500 });
   }

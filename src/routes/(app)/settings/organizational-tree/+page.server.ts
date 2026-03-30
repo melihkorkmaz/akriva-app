@@ -6,7 +6,7 @@ import {
   createOrgUnit,
   updateOrgUnit,
 } from "$lib/api/org-units.js";
-import { getApplicationSettings } from "$lib/api/tenant.js";
+import { getApplicationSettings, getTenant } from "$lib/api/tenant.js";
 import {
   listEmissionSources,
   createEmissionSource,
@@ -29,11 +29,13 @@ import type {
 
 export const load: PageServerLoad = async ({ locals }) => {
   const session = locals.session!;
-  const [treeResponse, tenantSettings, emissionSources] = await Promise.all([
-    getOrgUnitsTree(session.idToken),
-    getApplicationSettings(session.idToken),
-    listEmissionSources(session.idToken),
-  ]);
+  const [treeResponse, tenantSettings, emissionSources, tenant] =
+    await Promise.all([
+      getOrgUnitsTree(session.idToken),
+      getApplicationSettings(session.idToken),
+      listEmissionSources(session.idToken),
+      getTenant(session.idToken, session.user.tenantId),
+    ]);
 
   const [createForm, updateForm] = await Promise.all([
     superValidate(zod4(createOrgUnitSchema)),
@@ -44,6 +46,7 @@ export const load: PageServerLoad = async ({ locals }) => {
     tree: treeResponse.data,
     total: treeResponse.total,
     tenantSettings,
+    consolidationApproach: tenant.consolidationApproach,
     createForm,
     updateForm,
     emissionSources,
@@ -196,7 +199,7 @@ export const actions: Actions = {
         orgUnitId: form.data.orgUnitId,
         category: form.data.category,
         name: form.data.name,
-        unit: form.data.unit,
+        fuelType: form.data.fuelType ?? null,
         meterNumber: form.data.meterNumber ?? null,
         vehicleType: form.data.vehicleType ?? null,
         technology: form.data.technology ?? null,

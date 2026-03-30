@@ -12,7 +12,6 @@
   import { Button } from "$lib/components/ui/button";
   import { Switch } from "$lib/components/ui/switch";
   import { Checkbox } from "$lib/components/ui/checkbox";
-  import { Badge } from "$lib/components/ui/badge";
   import { Label } from "$lib/components/ui/label";
   import { Separator } from "$lib/components/ui/separator";
   import Trash2 from "@lucide/svelte/icons/trash-2";
@@ -30,6 +29,7 @@
     OrgUnitTreeResponseDto,
     TenantSettingsResponseDto,
     EmissionSourceResponseDto,
+    ConsolidationApproach,
   } from "$lib/api/types";
 
   let {
@@ -39,6 +39,7 @@
     createFormData,
     updateFormData,
     tenantSettings,
+    consolidationApproach,
     allNodes,
     emissionSources = [],
     onCreated,
@@ -51,12 +52,15 @@
     createFormData: any;
     updateFormData: any;
     tenantSettings: TenantSettingsResponseDto;
+    consolidationApproach: ConsolidationApproach | null;
     allNodes: { id: string; name: string }[];
     emissionSources: EmissionSourceResponseDto[];
     onCreated: (id: string) => void;
     onDeleted: () => void;
     onCancel: () => void;
   } = $props();
+
+  let isEquityShare = $derived(consolidationApproach === "equity_share");
 
   // Filter emission sources for the current node
   let nodeEmissionSources = $derived(
@@ -181,8 +185,7 @@
         $updateForm.country = n.country;
         $updateForm.stateProvince = n.stateProvince;
         $updateForm.city = n.city;
-        $updateForm.overrideScientificAuthority =
-          n.overrideScientificAuthority;
+        $updateForm.overrideScientificAuthority = n.overrideScientificAuthority;
         $updateForm.scope1Authority = n.overrideScientificAuthority
           ? n.effectiveScope1Authority
           : null;
@@ -215,7 +218,7 @@
   <form method="POST" action="?/create" use:createEnhance>
     <div class="flex flex-col gap-6 mt-4">
       <Card.Root>
-        <Card.Content class="pt-6">
+        <Card.Content>
           <div class="flex flex-col gap-5">
             <!-- Parent -->
             <Form.Field form={createSuperform} name="parentId">
@@ -286,9 +289,7 @@
                           : "Select type..."}
                       </Select.Trigger>
                       <Select.Content>
-                        <Select.Item value="subsidiary"
-                          >Subsidiary</Select.Item
-                        >
+                        <Select.Item value="subsidiary">Subsidiary</Select.Item>
                         <Select.Item value="division">Division</Select.Item>
                         <Select.Item value="facility">Facility</Select.Item>
                       </Select.Content>
@@ -386,37 +387,39 @@
             </Form.Field>
 
             <!-- Equity Share -->
-            <Form.Field form={createSuperform} name="equitySharePercentage">
-              <Form.Control>
-                {#snippet children({ props })}
-                  <Form.Label>Equity Share (%)</Form.Label>
-                  <div class="flex items-center gap-2">
-                    <Input
-                      {...props}
-                      type="number"
-                      min={0}
-                      max={100}
-                      step="0.01"
-                      placeholder="e.g., 100"
-                      class="w-[150px]"
-                      value={$createForm.equitySharePercentage ?? ""}
-                      oninput={(e) => {
-                        const val = (e.target as HTMLInputElement).value;
-                        $createForm.equitySharePercentage = val
-                          ? Number(val)
-                          : null;
-                      }}
-                    />
-                    <span class="text-sm text-muted-foreground">%</span>
-                  </div>
-                {/snippet}
-              </Form.Control>
-              <Form.Description>
-                Used for equity-based consolidation. Leave empty if not
-                applicable.
-              </Form.Description>
-              <Form.FieldErrors />
-            </Form.Field>
+            {#if isEquityShare}
+              <Form.Field form={createSuperform} name="equitySharePercentage">
+                <Form.Control>
+                  {#snippet children({ props })}
+                    <Form.Label>Equity Share (%)</Form.Label>
+                    <div class="flex items-center gap-2">
+                      <Input
+                        {...props}
+                        type="number"
+                        min={0}
+                        max={100}
+                        step="0.01"
+                        placeholder="e.g., 100"
+                        class="w-[150px]"
+                        value={$createForm.equitySharePercentage ?? ""}
+                        oninput={(e) => {
+                          const val = (e.target as HTMLInputElement).value;
+                          $createForm.equitySharePercentage = val
+                            ? Number(val)
+                            : null;
+                        }}
+                      />
+                      <span class="text-sm text-muted-foreground">%</span>
+                    </div>
+                  {/snippet}
+                </Form.Control>
+                <Form.Description>
+                  Used for equity-based consolidation. Leave empty if not
+                  applicable.
+                </Form.Description>
+                <Form.FieldErrors />
+              </Form.Field>
+            {/if}
           </div>
         </Card.Content>
       </Card.Root>
@@ -446,8 +449,10 @@
     <div class="flex flex-col gap-6 mt-4">
       <!-- Basic Information -->
       <Card.Root>
-        <Card.Content class="pt-6">
-          <h2 class="text-lg font-semibold mb-5">Basic Information</h2>
+        <Card.Header>
+          <Card.Title>Basic Information</Card.Title>
+        </Card.Header>
+        <Card.Content>
           <div class="flex flex-col gap-5">
             <div class="grid grid-cols-2 gap-4">
               <!-- Name -->
@@ -547,82 +552,87 @@
       </Card.Root>
 
       <!-- Boundary & Inheritance -->
-      <Card.Root>
-        <Card.Content class="pt-6">
-          <h2 class="text-lg font-semibold">Boundary & Inheritance</h2>
-          <p class="text-sm text-muted-foreground mb-5">
-            Configure equity share and boundary rules for this node
-          </p>
+      {#if isEquityShare}
+        <Card.Root>
+          <Card.Header>
+            <Card.Title>Boundary & Inheritance</Card.Title>
+            <Card.Description>
+              Configure equity share and boundary rules for this node
+            </Card.Description>
+          </Card.Header>
+          <Card.Content>
+            <div class="flex flex-col gap-4">
+              <div class="flex items-center gap-6">
+                <div class="flex items-center gap-3">
+                  <Checkbox
+                    checked={overrideEquity}
+                    onCheckedChange={(val) => {
+                      overrideEquity = val === true;
+                      if (!overrideEquity) {
+                        $updateForm.equitySharePercentage = null;
+                      }
+                    }}
+                  />
+                  <Label class="font-medium">Override Equity Share</Label>
+                </div>
 
-          <div class="flex flex-col gap-4">
-            <div class="flex items-center gap-6">
-              <div class="flex items-center gap-3">
-                <Checkbox
-                  checked={overrideEquity}
-                  onCheckedChange={(val) => {
-                    overrideEquity = val === true;
-                    if (!overrideEquity) {
-                      $updateForm.equitySharePercentage = null;
-                    }
-                  }}
-                />
-                <Label class="font-medium">Override Equity Share</Label>
+                {#if overrideEquity}
+                  <Form.Field
+                    form={updateSuperform}
+                    name="equitySharePercentage"
+                  >
+                    <Form.Control>
+                      {#snippet children({ props })}
+                        <div class="flex items-center gap-2">
+                          <Input
+                            {...props}
+                            type="number"
+                            min={0}
+                            max={100}
+                            step="0.01"
+                            class="w-[100px]"
+                            value={$updateForm.equitySharePercentage ?? ""}
+                            oninput={(e) => {
+                              const val = (e.target as HTMLInputElement).value;
+                              $updateForm.equitySharePercentage = val
+                                ? Number(val)
+                                : null;
+                            }}
+                          />
+                          <span class="text-sm text-muted-foreground">%</span>
+                        </div>
+                      {/snippet}
+                    </Form.Control>
+                    <Form.FieldErrors />
+                  </Form.Field>
+                {/if}
               </div>
 
-              {#if overrideEquity}
-                <Form.Field form={updateSuperform} name="equitySharePercentage">
-                  <Form.Control>
-                    {#snippet children({ props })}
-                      <div class="flex items-center gap-2">
-                        <Input
-                          {...props}
-                          type="number"
-                          min={0}
-                          max={100}
-                          step="0.01"
-                          class="w-[100px]"
-                          value={$updateForm.equitySharePercentage ?? ""}
-                          oninput={(e) => {
-                            const val = (e.target as HTMLInputElement).value;
-                            $updateForm.equitySharePercentage = val
-                              ? Number(val)
-                              : null;
-                          }}
-                        />
-                        <span class="text-sm text-muted-foreground">%</span>
-                      </div>
-                    {/snippet}
-                  </Form.Control>
-                  <Form.FieldErrors />
-                </Form.Field>
+              {#if overrideEquity && $updateForm.equitySharePercentage != null}
+                <div class="flex items-start gap-3 rounded-md bg-muted p-4">
+                  <Info class="size-4 text-muted-foreground mt-0.5 shrink-0" />
+                  <p class="text-sm">
+                    This node is {$updateForm.equitySharePercentage}% equity
+                    owned. Emissions will be calculated based on this equity
+                    share.
+                  </p>
+                </div>
               {/if}
             </div>
-
-            {#if overrideEquity && $updateForm.equitySharePercentage != null}
-              <div
-                class="flex items-start gap-3 rounded-md bg-muted p-4"
-              >
-                <Info class="size-4 text-muted-foreground mt-0.5 shrink-0" />
-                <p class="text-sm">
-                  This node is {$updateForm.equitySharePercentage}% equity
-                  owned. Emissions will be calculated based on this equity
-                  share.
-                </p>
-              </div>
-            {/if}
-          </div>
-        </Card.Content>
-      </Card.Root>
+          </Card.Content>
+        </Card.Root>
+      {/if}
 
       <!-- Scientific Authority Override -->
       <Card.Root>
-        <Card.Content class="pt-6">
-          <h2 class="text-lg font-semibold">Scientific Authority Override</h2>
-          <p class="text-sm text-muted-foreground mb-5">
+        <Card.Header>
+          <Card.Title>Scientific Authority Override</Card.Title>
+          <Card.Description>
             Override standard mapping for this specific node. GWP Version is
             inherited from global settings.
-          </p>
-
+          </Card.Description>
+        </Card.Header>
+        <Card.Content>
           <div class="flex flex-col gap-5">
             <!-- GWP Version (Inherited / Locked) -->
             <div class="flex flex-col gap-2">
@@ -684,7 +694,9 @@
                 <Form.Field form={updateSuperform} name="scope1Authority">
                   <Form.Control>
                     {#snippet children({ props })}
-                      <Form.Label class="text-xs font-medium text-muted-foreground">
+                      <Form.Label
+                        class="text-xs font-medium text-muted-foreground"
+                      >
                         Scope 1 - Direct Emissions
                       </Form.Label>
                       <Select.Root
@@ -715,7 +727,9 @@
                 <Form.Field form={updateSuperform} name="scope2Authority">
                   <Form.Control>
                     {#snippet children({ props })}
-                      <Form.Label class="text-xs font-medium text-muted-foreground">
+                      <Form.Label
+                        class="text-xs font-medium text-muted-foreground"
+                      >
                         Scope 2 - Energy Indirect
                       </Form.Label>
                       <Select.Root
@@ -748,29 +762,27 @@
       </Card.Root>
 
       <!-- Emission Sources -->
-      <Card.Root>
-        <Card.Content class="pt-6">
-          <EmissionSourcesSection
-            orgUnitId={node.id}
-            sources={nodeEmissionSources}
-          />
-        </Card.Content>
-      </Card.Root>
+      <EmissionSourcesSection
+        orgUnitId={node.id}
+        sources={nodeEmissionSources}
+      />
 
       <!-- Danger Zone -->
       <Card.Root class="border-destructive/50">
-        <Card.Content class="pt-6">
+        <Card.Header>
+          <Card.Title class="flex items-center gap-2">
+            <TriangleAlert class="size-5 text-destructive" />
+            <span class="text-lg font-semibold text-destructive">
+              Danger Zone
+            </span>
+          </Card.Title>
+          <Card.Description>
+            Manage emission sources assigned to this organizational unit
+          </Card.Description>
+        </Card.Header>
+        <Card.Content>
           <div class="flex flex-col gap-4">
-            <div class="flex items-center gap-2">
-              <TriangleAlert class="size-5 text-destructive" />
-              <span class="text-lg font-semibold text-destructive">
-                Danger Zone
-              </span>
-            </div>
-
-            <div
-              class="rounded-md bg-destructive/10 p-4 flex flex-col gap-2"
-            >
+            <div class="rounded-md bg-destructive/10 p-4 flex flex-col gap-2">
               <div class="flex items-center gap-2">
                 <TriangleAlert class="size-4 text-destructive shrink-0" />
                 <span class="text-sm font-semibold text-destructive">

@@ -27,19 +27,18 @@
 </script>
 
 <Card.Root>
-  <Card.Content class="pt-6">
+  <Card.Header>
+    <Card.Title>Boundary Rules (Consolidation Approach)</Card.Title>
+    <Card.Description>
+      Determine which emissions belong to your company based on the GHG Protocol
+    </Card.Description>
+  </Card.Header>
+  <Card.Content>
     <Field.Set>
-      <Field.Legend>Boundary Rules (Consolidation Approach)</Field.Legend>
-      <Field.Description>
-        Determine which emissions belong to your company based on the GHG
-        Protocol
-      </Field.Description>
-
       <RadioGroup.Root
         value={consolidationApproach}
         onValueChange={(val) => {
-          $form.consolidationApproach =
-            (val as ConsolidationApproach) || null;
+          $form.consolidationApproach = (val as ConsolidationApproach) || null;
         }}
       >
         <div class="flex flex-col gap-3">

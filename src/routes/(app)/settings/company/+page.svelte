@@ -69,9 +69,7 @@
     <div class="flex flex-col gap-6 mt-6">
       <Card.Root>
         <Card.Header>
-          <Card.Title>
-            <h2 class="text-lg font-semibold">Company Master Settings</h2>
-          </Card.Title>
+          <Card.Title>Company Master Settings</Card.Title>
         </Card.Header>
         <Card.Content>
           <Field.Group>

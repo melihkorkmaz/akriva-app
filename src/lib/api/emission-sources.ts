@@ -1,5 +1,5 @@
 import { apiFetchAuth } from "./client.js";
-import type { EmissionSourceResponseDto } from "./types.js";
+import type { EmissionSourceResponseDto, FuelTypeDto } from "./types.js";
 
 export async function listEmissionSources(
   accessToken: string,
@@ -27,12 +27,12 @@ export async function getEmissionSource(
   );
 }
 
-export async function listActivityUnits(
+export async function listFuelTypes(
   accessToken: string,
   category: string
-): Promise<string[]> {
+): Promise<FuelTypeDto[]> {
   const qs = new URLSearchParams({ category });
-  return apiFetchAuth<string[]>(`/emission/activity-units?${qs}`, accessToken);
+  return apiFetchAuth<FuelTypeDto[]>(`/emission-factors/fuel-types?${qs}`, accessToken);
 }
 
 export async function createEmissionSource(
@@ -41,7 +41,7 @@ export async function createEmissionSource(
     orgUnitId: string;
     category: string;
     name: string;
-    unit: string;
+    fuelType?: string | null;
     meterNumber?: string | null;
     vehicleType?: string | null;
     technology?: string | null;

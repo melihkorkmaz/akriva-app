@@ -115,14 +115,15 @@
 </script>
 
 <Card.Root>
-  <Card.Content class="pt-6">
+  <Card.Header>
+    <Card.Title>Localization</Card.Title>
+    <Card.Description>
+      Configure number, date, and time formatting preferences for your
+      organization
+    </Card.Description>
+  </Card.Header>
+  <Card.Content>
     <Field.Set>
-      <Field.Legend>Localization</Field.Legend>
-      <Field.Description>
-        Configure number, date, and time formatting preferences for your
-        organization
-      </Field.Description>
-
       <Field.Group>
         <div class="grid grid-cols-3 gap-4">
           <Form.Field form={superform} name="decimalSeparator">
@@ -133,7 +134,9 @@
                   type="single"
                   value={$form.decimalSeparator}
                   onValueChange={(val) => {
-                    if (val) $form.decimalSeparator = val as typeof $form.decimalSeparator;
+                    if (val)
+                      $form.decimalSeparator =
+                        val as typeof $form.decimalSeparator;
                   }}
                 >
                   <Select.Trigger class="w-full" {...props}>
@@ -158,7 +161,9 @@
                   type="single"
                   value={$form.thousandsSeparator}
                   onValueChange={(val) => {
-                    if (val) $form.thousandsSeparator = val as typeof $form.thousandsSeparator;
+                    if (val)
+                      $form.thousandsSeparator =
+                        val as typeof $form.thousandsSeparator;
                   }}
                 >
                   <Select.Trigger class="w-full" {...props}>

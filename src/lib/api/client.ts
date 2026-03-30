@@ -26,12 +26,26 @@ export async function apiFetch<T>(
     },
   });
 
+  console.log(
+    `API Request: ${options.method || "GET"} ${url}`,
+    response.status
+  );
+  if (response.status >= 400) {
+    console.log(`API Request: ${options.method || "GET"} ${url}`);
+    console.log("Request options:", options);
+    console.log("API Response status:", response);
+    console.log("API Response body:", await response.clone().text());
+  }
+
   if (!response.ok) {
     const errorBody = (await response.json()) as ApiErrorResponse;
     throw new ApiError(response.status, errorBody);
   }
 
-  if (response.status === 204 || response.headers.get('content-length') === '0') {
+  if (
+    response.status === 204 ||
+    response.headers.get("content-length") === "0"
+  ) {
     return undefined as T;
   }
 
@@ -44,11 +58,18 @@ export async function apiFetchAuth<T>(
   accessToken: string,
   options: RequestInit = {}
 ): Promise<T> {
-  return apiFetch<T>(endpoint, {
-    ...options,
-    headers: {
-      ...options.headers,
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
+  try {
+    const res = await apiFetch<T>(endpoint, {
+      ...options,
+      headers: {
+        ...options.headers,
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    return res;
+  } catch (error) {
+    console.error("API request failed:", error);
+    return Promise.reject(error);
+  }
 }

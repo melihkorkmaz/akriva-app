@@ -39,14 +39,15 @@
 </script>
 
 <Card.Root>
-  <Card.Content class="pt-6">
+  <Card.Header>
+    <Card.Title>Scientific Authority</Card.Title>
+    <Card.Description>
+      Select authoritative sources for emissions calculations and global warming
+      potentials
+    </Card.Description>
+  </Card.Header>
+  <Card.Content>
     <Field.Set>
-      <Field.Legend>Scientific Authority</Field.Legend>
-      <Field.Description>
-        Select authoritative sources for emissions calculations and global
-        warming potentials
-      </Field.Description>
-
       <Field.Group>
         <Field.Field class="max-w-[400px]">
           <Field.Content>
@@ -94,7 +95,9 @@
                     type="single"
                     value={$form.scope1Authority}
                     onValueChange={(val) => {
-                      if (val) $form.scope1Authority = val as typeof $form.scope1Authority;
+                      if (val)
+                        $form.scope1Authority =
+                          val as typeof $form.scope1Authority;
                     }}
                   >
                     <Select.Trigger class="w-[240px]" {...props}>
@@ -119,7 +122,9 @@
                     type="single"
                     value={$form.scope2Authority}
                     onValueChange={(val) => {
-                      if (val) $form.scope2Authority = val as typeof $form.scope2Authority;
+                      if (val)
+                        $form.scope2Authority =
+                          val as typeof $form.scope2Authority;
                     }}
                   >
                     <Select.Trigger class="w-[240px]" {...props}>
