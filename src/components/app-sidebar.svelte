@@ -10,6 +10,7 @@
   import ClipboardList from "@lucide/svelte/icons/clipboard-list";
   import FileCheck from "@lucide/svelte/icons/file-check";
   import Settings from "@lucide/svelte/icons/settings";
+  import Inbox from "@lucide/svelte/icons/inbox";
 
   import * as Sidebar from "$lib/components/ui/sidebar";
 
@@ -24,6 +25,9 @@
   let { user }: Props = $props();
 
   let isAdmin = $derived(user.role === "tenant_admin");
+  let isCoordinator = $derived(
+    ["data_approver", "data_reviewer", "tenant_admin"].includes(user.role),
+  );
 
   const dataItems = [
     { title: "Dashboard", url: "/dashboard", icon: LayoutGrid },
@@ -34,6 +38,10 @@
     { title: "Team", url: "/#", icon: Users },
     { title: "Inventory", url: "/#", icon: ClipboardList },
     { title: "Evidence", url: "/#", icon: FileCheck },
+  ];
+
+  const coordinatorItems = [
+    { title: "Requests", url: "/requests", icon: Inbox },
   ];
 
   const adminItems = [{ title: "Settings", url: "/settings", icon: Settings }];
@@ -108,6 +116,33 @@
         </Sidebar.Menu>
       </Sidebar.GroupContent>
     </Sidebar.Group>
+
+    <!-- Coordination Group -->
+    {#if isCoordinator}
+      <Sidebar.Group>
+        <Sidebar.GroupLabel>Coordination</Sidebar.GroupLabel>
+        <Sidebar.GroupContent>
+          <Sidebar.Menu>
+            {#each coordinatorItems as item}
+              <Sidebar.MenuItem>
+                <Sidebar.MenuButton
+                  tooltipContent={item.title}
+                  isActive={page.url.pathname === item.url ||
+                    page.url.pathname.startsWith(item.url + "/")}
+                >
+                  {#snippet child({ props })}
+                    <a href={item.url} {...props}>
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </a>
+                  {/snippet}
+                </Sidebar.MenuButton>
+              </Sidebar.MenuItem>
+            {/each}
+          </Sidebar.Menu>
+        </Sidebar.GroupContent>
+      </Sidebar.Group>
+    {/if}
 
     <!-- Admin Group -->
     {#if isAdmin}

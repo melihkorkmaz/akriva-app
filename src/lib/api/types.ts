@@ -595,3 +595,93 @@ export const WORKFLOW_TYPES = [
     description: "Review then approve: data_reviewer → data_approver",
   },
 ] as const;
+
+// ── Data Collection Domain ──
+
+/** Data collection request status */
+export type DataCollectionRequestStatus =
+  | "open"
+  | "in_progress"
+  | "completed"
+  | "cancelled";
+
+/** Display labels for request statuses */
+export const DATA_COLLECTION_REQUEST_STATUS_LABELS: Record<
+  DataCollectionRequestStatus,
+  string
+> = {
+  open: "Open",
+  in_progress: "In Progress",
+  completed: "Completed",
+  cancelled: "Cancelled",
+};
+
+/** Data collection task status */
+export type DataCollectionTaskStatus =
+  | "pending"
+  | "in_progress"
+  | "completed"
+  | "cancelled";
+
+/** Display labels for task statuses */
+export const DATA_COLLECTION_TASK_STATUS_LABELS: Record<
+  DataCollectionTaskStatus,
+  string
+> = {
+  pending: "Pending",
+  in_progress: "In Progress",
+  completed: "Completed",
+  cancelled: "Cancelled",
+};
+
+/** Data collection request — returned by list endpoint */
+export interface DataCollectionRequestResponseDto {
+  id: string;
+  tenantId: string;
+  title: string;
+  message: string | null;
+  deadline: string;
+  status: DataCollectionRequestStatus;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+  cancelledAt: string | null;
+  taskCount: number;
+  completedTaskCount: number;
+}
+
+/** Data collection request detail — returned by GET /requests/{id} and POST /requests */
+export interface DataCollectionRequestDetailResponseDto
+  extends DataCollectionRequestResponseDto {
+  tasks: DataCollectionTaskResponseDto[];
+}
+
+/** Data collection task — individual work item within a request */
+export interface DataCollectionTaskResponseDto {
+  id: string;
+  tenantId: string;
+  requestId: string;
+  emissionSourceId: string;
+  orgUnitId: string;
+  status: DataCollectionTaskStatus;
+  emissionEntryId: string | null;
+  completedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  emissionSourceName?: string;
+  orgUnitName?: string;
+}
+
+/** Paginated list of data collection requests */
+export interface DataCollectionRequestListResponse {
+  items: DataCollectionRequestResponseDto[];
+  total: number;
+}
+
+/** Create data collection request payload — POST /v1/data-collection/requests */
+export interface CreateDataCollectionRequestPayload {
+  title: string;
+  message: string | null;
+  deadline: string;
+  emissionSourceIds: string[];
+}

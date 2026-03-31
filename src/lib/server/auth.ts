@@ -12,6 +12,16 @@ export function requireAdmin(locals: App.Locals): void {
 	}
 }
 
+const COORDINATOR_ROLES: TenantRole[] = ['data_approver', 'data_reviewer', 'tenant_admin'];
+
+/** Throw 403 if the user is not a coordinator (data_approver, data_reviewer, or tenant_admin) */
+export function requireCoordinator(locals: App.Locals): void {
+	const session = locals.session!;
+	if (!COORDINATOR_ROLES.includes(session.user.role)) {
+		error(403, 'Forbidden');
+	}
+}
+
 const VALID_ROLES: TenantRole[] = ['viewer', 'data_entry', 'data_approver', 'data_reviewer', 'tenant_admin'];
 
 /** Seconds before actual JWT expiry to treat the token as expired, ensuring it remains valid for the duration of the downstream API request */
