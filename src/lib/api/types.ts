@@ -620,7 +620,9 @@ export const DATA_COLLECTION_REQUEST_STATUS_LABELS: Record<
 export type DataCollectionTaskStatus =
   | "pending"
   | "in_progress"
-  | "completed"
+  | "submitted"
+  | "approved"
+  | "revision_needed"
   | "cancelled";
 
 /** Display labels for task statuses */
@@ -630,7 +632,9 @@ export const DATA_COLLECTION_TASK_STATUS_LABELS: Record<
 > = {
   pending: "Pending",
   in_progress: "In Progress",
-  completed: "Completed",
+  submitted: "Submitted",
+  approved: "Approved",
+  revision_needed: "Revision Needed",
   cancelled: "Cancelled",
 };
 
@@ -665,10 +669,12 @@ export interface DataCollectionTaskResponseDto {
   orgUnitId: string;
   status: DataCollectionTaskStatus;
   emissionEntryId: string | null;
+  reviewNote: string | null;
   completedAt: string | null;
   createdAt: string;
   updatedAt: string;
   emissionSourceName?: string;
+  emissionSourceCategory?: string;
   orgUnitName?: string;
 }
 
@@ -684,4 +690,17 @@ export interface CreateDataCollectionRequestPayload {
   message: string | null;
   deadline: string;
   emissionSourceIds: string[];
+}
+
+/** Paginated list of data collection tasks */
+export interface DataCollectionTaskListResponse {
+  items: DataCollectionTaskResponseDto[];
+  total: number;
+}
+
+/** Update data collection task payload — PATCH /v1/data-collection/tasks/{id} */
+export interface UpdateDataCollectionTaskPayload {
+  status?: "in_progress" | "submitted" | "approved" | "revision_needed";
+  emissionEntryId?: string | null;
+  reviewNote?: string;
 }

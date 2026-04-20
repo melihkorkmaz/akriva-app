@@ -11,6 +11,7 @@
   import FileCheck from "@lucide/svelte/icons/file-check";
   import Settings from "@lucide/svelte/icons/settings";
   import Inbox from "@lucide/svelte/icons/inbox";
+  import ListTodo from "@lucide/svelte/icons/list-todo";
 
   import * as Sidebar from "$lib/components/ui/sidebar";
 
@@ -32,6 +33,7 @@
   const dataItems = [
     { title: "Dashboard", url: "/dashboard", icon: LayoutGrid },
     { title: "Scope 1-3", url: "/scope-1/emission-entries", icon: Globe },
+    { title: "Tasks", url: "/tasks", icon: ListTodo },
     { title: "Evidence Vault", url: "/#", icon: Archive },
     { title: "Reports", url: "/#", icon: FileText },
     { title: "Assets", url: "/#", icon: Box },

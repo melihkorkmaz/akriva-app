@@ -9,7 +9,7 @@
   import { Badge } from "$lib/components/ui/badge/index.js";
   import { toast } from "svelte-sonner";
   import ArrowLeft from "@lucide/svelte/icons/arrow-left";
-  import DatePicker from "$components/DatePicker.svelte";
+  import { DatePicker } from "$lib/components/ui/date-picker/index.js";
   import { createDataCollectionRequestSchema } from "$lib/schemas/data-collection-request.js";
   import { EMISSION_CATEGORY_LABELS } from "$lib/api/types.js";
   import type {

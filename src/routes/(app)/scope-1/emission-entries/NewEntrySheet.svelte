@@ -6,7 +6,7 @@
   import { Button } from "$lib/components/ui/button";
   import { Input } from "$lib/components/ui/input";
   import { Label } from "$lib/components/ui/label";
-  import DatePicker from "$components/DatePicker.svelte";
+  import { DatePicker } from "$lib/components/ui/date-picker/index.js";
   import { cn } from "$lib/utils";
   import Upload from "@lucide/svelte/icons/upload";
   import Info from "@lucide/svelte/icons/info";

@@ -8,6 +8,7 @@
   border: 1px solid var(--border);
   border-radius: 8px;
   box-shadow: var(--shadow-md);
+  z-index: 99999 !important;
   width: 280px;
 }
 
