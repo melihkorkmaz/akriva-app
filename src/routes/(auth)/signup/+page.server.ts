@@ -6,7 +6,7 @@ import { signup } from "$lib/api/auth.js";
 import { validateInviteToken } from "$lib/api/invites.js";
 import { ApiError } from "$lib/api/client.js";
 import { setAuthCookies } from "$lib/server/auth.js";
-import { signupSchema } from "$lib/schemas/signup.js";
+import { signupSchema, verifyCodeSchema } from "$lib/schemas/signup.js";
 
 export const load: PageServerLoad = async ({ url }) => {
   const token = url.searchParams.get("token");
@@ -28,7 +28,7 @@ export const load: PageServerLoad = async ({ url }) => {
       } else {
         redirectUrl = `/signup/invited?error=${validation.reason}`;
       }
-    } catch (error) {
+    } catch {
       // Keep default not_found redirect
     }
 
@@ -40,7 +40,7 @@ export const load: PageServerLoad = async ({ url }) => {
 };
 
 export const actions: Actions = {
-  default: async ({ request, cookies }) => {
+  register: async ({ request, cookies }) => {
     const form = await superValidate(request, zod4(signupSchema));
 
     if (!form.valid) {
@@ -57,6 +57,7 @@ export const actions: Actions = {
       });
 
       setAuthCookies(cookies, response.tokens);
+      return { form, registered: true };
     } catch (err) {
       if (err instanceof ApiError) {
         if (err.status === 409) {
@@ -65,7 +66,7 @@ export const actions: Actions = {
           });
         }
 
-        if (err.status === 400 && err.body.code === "VALIDATION_FAILED") {
+        if (err.status === 400 && err.body?.code === "VALIDATION_FAILED") {
           return message(
             form,
             err.body.error || "Please check your information and try again.",
@@ -78,7 +79,20 @@ export const actions: Actions = {
         status: 500,
       });
     }
+  },
 
-    redirect(302, "/dashboard");
+  // Email verification — backend support not yet implemented. Step 4 is a UX
+  // confirmation today; this stub keeps the wiring in place for when the
+  // /auth/verify endpoint lands.
+  verify: async ({ request }) => {
+    const form = await superValidate(request, zod4(verifyCodeSchema));
+    if (!form.valid) return fail(400, { form });
+    return { form, verified: true };
+  },
+
+  // Resend code — backend support not yet implemented. Cooldown is enforced
+  // client-side; this stub matches the future endpoint shape.
+  resend: async () => {
+    return { resent: true };
   },
 };
