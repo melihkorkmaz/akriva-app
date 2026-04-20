@@ -7,7 +7,7 @@
   import MicrosoftIcon from "@lucide/svelte/icons/grid-2x2";
   import { useWizard } from "$lib/signup/wizard.svelte.js";
   import TextDivider from "$components/TextDivider.svelte";
-  import SoonBadge from "./SoonBadge.svelte";
+  import SoonBadge from "$components/SoonBadge.svelte";
 
   const wizard = useWizard();
 
