@@ -57,3 +57,30 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
     );
   }
 };
+
+export const PATCH: RequestHandler = async ({ params, request, locals }) => {
+  const session = locals.session!;
+
+  try {
+    const body = await request.json();
+    const task = await updateTask(session.idToken, params.id, body);
+    return json({ success: true, task });
+  } catch (err) {
+    if (err instanceof ApiError) {
+      if (err.status === 400) {
+        return json(
+          { success: false, error: err.body.error || "Invalid status transition." },
+          { status: 400 }
+        );
+      }
+      if (err.status === 404) {
+        return json({ success: false, error: "Task not found." }, { status: 404 });
+      }
+    }
+    console.error("Failed to update task status:", err);
+    return json(
+      { success: false, error: "Something went wrong. Please try again." },
+      { status: 500 }
+    );
+  }
+};

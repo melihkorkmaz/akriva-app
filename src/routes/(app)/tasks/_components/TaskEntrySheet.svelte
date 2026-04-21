@@ -69,11 +69,29 @@
 	$effect(() => {
 		if (open && task) {
 			loadSourceData(task.emissionSourceId, task.orgUnitId);
+			if (task.status === 'pending') {
+				void startTask(task.id);
+			}
 		}
 		if (!open) {
 			resetForm();
 		}
 	});
+
+	async function startTask(taskId: string) {
+		try {
+			const res = await fetch(`/tasks/${taskId}`, {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ status: 'in_progress' })
+			});
+			if (res.ok) {
+				await invalidateAll();
+			}
+		} catch {
+			// non-fatal: backend is idempotent, submit will surface any real error
+		}
+	}
 
 	async function loadSourceData(sourceId: string, orgUnitId: string) {
 		loading = true;
