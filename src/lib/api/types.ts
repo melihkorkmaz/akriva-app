@@ -651,7 +651,7 @@ export interface DataCollectionRequestResponseDto {
   updatedAt: string;
   cancelledAt: string | null;
   taskCount: number;
-  completedTaskCount: number;
+  approvedTaskCount: number;
 }
 
 /** Data collection request detail — returned by GET /requests/{id} and POST /requests */

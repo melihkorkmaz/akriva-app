@@ -5,7 +5,6 @@
   import { Badge } from "$lib/components/ui/badge/index.js";
   import ArrowLeft from "@lucide/svelte/icons/arrow-left";
   import XCircle from "@lucide/svelte/icons/x-circle";
-  import type { DataCollectionRequestResponseDto } from "$lib/api/types.js";
   import {
     DATA_COLLECTION_REQUEST_STATUS_LABELS,
     DATA_COLLECTION_TASK_STATUS_LABELS,
@@ -106,7 +105,7 @@
           <span class="text-xs font-medium text-muted-foreground">Progress</span
           >
           <span class="text-sm"
-            >{request.completedTaskCount}/{request.taskCount} completed</span
+            >{request.approvedTaskCount}/{request.taskCount} completed</span
           >
         </div>
         <div class="flex flex-col gap-1">
@@ -130,7 +129,7 @@
     <Card.Header>
       <Card.Title>Tasks</Card.Title>
       <Card.Description>
-        {request.completedTaskCount} of {request.taskCount} tasks completed
+        {request.approvedTaskCount} of {request.taskCount} tasks completed
       </Card.Description>
     </Card.Header>
     <Card.Content class="p-0">
@@ -162,7 +161,10 @@
                   {task.orgUnitName || task.orgUnitId}
                 </Table.Cell>
                 <Table.Cell>
-                  <Badge variant="outline" class={taskStatusClasses[task.status]}>
+                  <Badge
+                    variant="outline"
+                    class={taskStatusClasses[task.status]}
+                  >
                     {DATA_COLLECTION_TASK_STATUS_LABELS[task.status]}
                   </Badge>
                 </Table.Cell>

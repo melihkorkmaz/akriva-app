@@ -1,9 +1,6 @@
 import type { ColumnDef } from "@tanstack/table-core";
 import { createRawSnippet } from "svelte";
-import {
-  renderSnippet,
-  renderComponent,
-} from "$lib/components/ui/data-table";
+import { renderSnippet, renderComponent } from "$lib/components/ui/data-table";
 import type { DataCollectionRequestResponseDto } from "$lib/api/types.js";
 import StatusBadge from "./StatusBadge.svelte";
 
@@ -50,18 +47,18 @@ export const columns: ColumnDef<DataCollectionRequestResponseDto>[] = [
     id: "progress",
     header: "Progress",
     cell: ({ row }) => {
-      const { taskCount, completedTaskCount } = row.original;
-      const snippet = createRawSnippet<
-        [{ completed: number; total: number }]
-      >((getData) => {
-        const d = getData();
-        return {
-          render: () =>
-            `<span class="text-sm text-muted-foreground">${d.completed}/${d.total} completed</span>`,
-        };
-      });
+      const { taskCount, approvedTaskCount } = row.original;
+      const snippet = createRawSnippet<[{ completed: number; total: number }]>(
+        (getData) => {
+          const d = getData();
+          return {
+            render: () =>
+              `<span class="text-sm text-muted-foreground">${d.completed}/${d.total} completed</span>`,
+          };
+        }
+      );
       return renderSnippet(snippet, {
-        completed: completedTaskCount,
+        completed: approvedTaskCount ?? 0,
         total: taskCount,
       });
     },

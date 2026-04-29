@@ -17,7 +17,8 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 
   const statusParam = url.searchParams.get("status") || undefined;
   const status =
-    statusParam && VALID_STATUSES.includes(statusParam as DataCollectionRequestStatus)
+    statusParam &&
+    VALID_STATUSES.includes(statusParam as DataCollectionRequestStatus)
       ? statusParam
       : undefined;
   const page = Math.max(1, Number(url.searchParams.get("page")) || 1);
@@ -32,6 +33,8 @@ export const load: PageServerLoad = async ({ locals, url }) => {
       page,
       pageSize,
     });
+
+    console.log(response);
 
     return {
       requests: response.items,
